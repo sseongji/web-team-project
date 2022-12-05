@@ -1,0 +1,22 @@
+{
+  "name": "gongbubang",
+  "version": "1.0.0",
+  "description": "공부밭, 취업스터디 관리 웹",
+  "main": "webserver.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sseongji/web-team-project.git"
+  },
+  "author": "권진이, 김성지, 이상영, 정태민",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sseongji/web-team-project/issues"
+  },
+  "homepage": "https://github.com/sseongji/web-team-project#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
