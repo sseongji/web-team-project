@@ -1,13 +1,52 @@
 <!-- <head>
-  <link rel="stylesheet" href="/css/nav_style.css">
+  <link rel="stylesheet" type="text/html" href="/css/navstyle.css">
 </head> -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang">
+
 <style>
-  #gongbubat{
+*{
+    font-family: 'Gowun Batang', serif;
+    font-size: 20px;
+ }
+ #gongbubat{
     color: #4AB186;
-  }
-  #navibar{
+    font-size: 50px;
+    font-weight: 1000;
+    transition: 1s;
+}
+#navibar{
     background-color: white;
-  }
+}
+#userBtn{
+    width: 27%;
+    float: right;
+    margin-top:2%;
+    margin-right: 4%;
+}
+#loginBtn, #signupBtn{
+    border: 0px solid;
+    background-color: #F16A6E;
+    border-radius: 20px 20px 20px 20px;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+/* 마우스 오버 (마우스 올렸을 때) */
+.item:hover{
+    font-weight: 1000;
+    transform: translate(2px, 2px);
+}
+#loginBtn:hover{
+    font-weight: 1000;
+}
+#signupBtn:hover{
+    font-weight: 1000;
+}
+/* 마우스 클릭하고 있을 때 */
+li:active{
+    background-color: #ffc8c8;
+}
 </style>
 
 <center>
@@ -19,32 +58,38 @@
       </button>
       <div class="collapse navbar-collapse justify-content-start" id="navbarNav">
         <ul class="navbar-nav">
-          <li class="nav-item">
+          <li class="item nav-item">
             <a class="nav-link" href="#">면접</a>
           </li>
-          <li class="nav-item">
+          <li class="item nav-item">
             <a class="nav-link" href="#">인적성</a>
           </li>
-          <li class="nav-item">
+          <li class="item nav-item">
             <a class="nav-link" href="#">언어</a>
           </li>
-          <li class="nav-item">
+          <li class="item nav-item">
             <a class="nav-link" href="#">자소서</a>
           </li>
-          <li class="nav-item">
+          <li class="item nav-item">
             <a class="nav-link" href="#">자격증</a>
           </li>
         </ul>
-        <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+        <div class="collapse navbar-collapse justify-content-end" id="navbarNav" style="margin: auto;">
           <ul class="navbar-nav">
             <li class="nav-item">
-              <a class="nav-link" href="/login">로그인</a>
+              <a href=#">
+                <img id="userBtn" src="/public/image/default_user.png" alt="사용자 사진">
+              </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/logout">로그아웃</a>
+              <a class="nav-link" href="/login">
+                <button id="loginBtn" class="btn">로그인</button>
+              </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/signup">회원가입</a>
+              <a class="nav-link" href="/signup">
+                <button id="signupBtn" class="btn">회원가입</button>
+              </a>
             </li>
           </ul>
         </div>
