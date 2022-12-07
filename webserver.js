@@ -13,7 +13,15 @@ const handleListening = () => {
     console.log(`Server listening on port http://localhost:${process.env.PORT}`)
 }
 
-app.listen(PORT, handleListening);
+app.listen(process.env.PORT, handleListening);
+
+app.get("/post", (req, res) => {
+  return res.render("post.ejs");
+});
+
+app.get("/signup", (req, res) => {
+  return res.render("signup.ejs");
+});
 
 app.get("/search", (req, res) => {
   return res.render("search.ejs");
