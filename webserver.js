@@ -76,18 +76,13 @@ app.get("/group", (req, res) => {
 });
 
 app.get("/homework", (req, res) => {
-  // // 현재시간을 한국 시간 기준으로(+9h)
-  // const curr = new Date()
-  // const utc = curr.getTime() + (curr.getTimezoneOffset() * 60 * 1000)
-  // const KR_TIME_DIFF = 9 * 60 * 60 * 1000
-  
-  // console.log(new Date(utc+KR_TIME_DIFF))
+  console.log(getCurrentDate())
 
   db.collection('homework').insertOne({
     content: '영어 단어 외우기',
-    date: new Date(),
+    date: getCurrentDate(),
     success: {one: false, two: true, three: true},
-    createdate: new Date(),
+    createdate: getCurrentDate(),
     group_id: 200
     },(err, result)=>{
       if(err) return console.log(err)
@@ -96,3 +91,16 @@ app.get("/homework", (req, res) => {
   
   return res.render("homework.ejs");
 });
+
+//get korea local time
+const getCurrentDate = ()=>{
+  const date = new Date()
+  const year = date.getFullYear()
+  const month = date.getMonth()
+  const today = date.getDate()
+  const hours = date.getHours()
+  const minutes = date.getMinutes()
+  const seconds = date.getSeconds()
+  const milliseconds = date.getMilliseconds()
+  return new Date(Date.UTC(year, month, today, hours, minutes, seconds, milliseconds)) 
+}
