@@ -33,16 +33,18 @@
     #footer{
       margin-right: 5%;
     }
-   
-    #button{
+
+
+    #button, #category{
       margin-top: 50px;
     }
     </style>
 </head>
-<body class="bg-light">
-    <%- include('nav.html') %>
+<body >
+  
     
 <div class="container">
+    <%- include('nav.html') %>
   <main>
     <div class="py-5 text-center" id="header">
     <img class="d-block mx-auto mb-4" src="/docs/5.2/assets/brand/bootstrap-logo.svg" alt="" width="72" height="57">
@@ -93,13 +95,8 @@
               </div>
             </div>
 
-            <div class="d-grid gap-2" id="button">
-              <button class="btn btn-primary" type="submit">Button</button>
-  
-              </div>
-            </div>
 
-            <div class="btn-group" role="group" aria-label="Basic checkbox toggle button group">
+                <div class="btn-group" role="group" aria-label="Basic checkbox toggle button group" id="category">
                 <input type="checkbox" class="btn-check" id="btncheck1" autocomplete="off">
                 <label class="btn btn-outline-primary" for="btncheck1">면접</label>
 
@@ -108,7 +105,21 @@
 
                 <input type="checkbox" class="btn-check" id="btncheck3" autocomplete="off">
                 <label class="btn btn-outline-primary" for="btncheck3">언어</label>
+
+                <input type="checkbox" class="btn-check" id="btncheck3" autocomplete="off">
+                <label class="btn btn-outline-primary" for="btncheck3">자소서</label>
+
+                <input type="checkbox" class="btn-check" id="btncheck3" autocomplete="off">
+                <label class="btn btn-outline-primary" for="btncheck3">자격증</label>
             </div>
+
+            <div class="d-grid gap-2" id="button">
+              <button class="btn btn-primary" type="submit">Button</button>
+  
+              </div>
+            </div>
+
+        
 
 
 
