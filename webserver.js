@@ -13,26 +13,12 @@ const handleListening = () => {
     console.log(`Server listening on port http://localhost:${process.env.PORT}`)
 }
 
-app.listen(process.env.PORT, handleListening)
+app.listen(PORT, handleListening);
 
-// 라우터
-//kwon
-app.get("/signup", (req, res) => {
-    return res.render("signup.ejs");
-})
-
-//kim
-
-//lee
-app.get("/post", (req, res) => {
-    return res.render("post.ejs");
-})
-
-//jung
 app.get("/search", (req, res) => {
   return res.render("search.ejs");
-})
+});
 
 app.get("/groupAdd", (req, res) => {
   return res.render("group_sign.ejs");
-})
+});
