@@ -20,6 +20,8 @@
     }
     #form{
         margin-left: 30%;
+     
+        
     }
 
     #header{
@@ -34,14 +36,26 @@
       margin-right: 5%;
     }
 
+    #border{
+      padding: 30px;
+    }
 
     #button, #category{
       margin-top: 50px;
     }
+
+    #filename{
+      margin-top: 10px;
+    }
+
+    #preview{
+      
+      width: 485px;
+    }
     </style>
 </head>
 <body >
-  
+  <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
     
 <div class="container">
     <%- include('nav.html') %>
@@ -54,11 +68,11 @@
 
     <div class="row g-5" id="form">
     
-      <div class="col-md-7 col-lg-8">
+      <div class="col-md-7 col-lg-8 border rounded" id="border">
         
         <form class="needs-validation" method="post">
           <div class="row g-3">
-            <div class="col-12">
+            <div class="col-12" >
               <label for="Name" class="form-label">이름</label>
               <input type="text" class="form-control" id="Name" placeholder="이름" value="" required>
               <div class="invalid-feedback">
@@ -66,7 +80,7 @@
               </div>
             </div>
 
-           
+        
 
             <div class="col-12">
               <label for="Notice" class="form-label">공지</label>
@@ -90,13 +104,31 @@
             <div class="col-12">
               <label for="Img" class="form-label">사진</label>
               <input type="file" class="form-control" id="Img" placeholder="사진" accept="image/*">
-              <div class="invalid-feedback">
-                Please enter your shipping address.
-              </div>
+              <img id="preview">
             </div>
 
+            <script>
+              $('#Img').change((e)=>{
 
-                <div class="btn-group" role="group" aria-label="Basic checkbox toggle button group" id="category">
+                console.log(e)
+                $('#filename').text(e.target.files[0].name)
+
+                var file = event.target.files[0];
+
+                var reader = new FileReader(); 
+                reader.onload = function(e) 
+                {
+
+                $("#preview").attr("src", e.target.result);
+               }
+
+                   reader.readAsDataURL(file);
+                
+              })
+            </script>
+
+
+            <div class="btn-group" role="group" aria-label="Basic checkbox toggle button group" id="category">
                 <input type="checkbox" class="btn-check" id="btncheck1" autocomplete="off">
                 <label class="btn btn-outline-primary" for="btncheck1">면접</label>
 
@@ -114,16 +146,10 @@
             </div>
 
             <div class="d-grid gap-2" id="button">
-              <button class="btn btn-primary" type="submit">Button</button>
+              <button class="btn btn-primary" type="submit">버튼</button>
   
               </div>
             </div>
-
-        
-
-
-
-       
         </form>
       </div>
     </div>
