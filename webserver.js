@@ -1,12 +1,38 @@
-const express = require('express');
-const app = express();
+const express = require('express')
+const app = express()
 
-require('dotenv').config();
+//dotenv, 환경변수세팅
+require('dotenv').config()
+//ejs
+app.set('view engine', 'ejs')
+//public folder
+app.use('/public', express.static('public'))
 
-app.listen(process.env.PORT, function(){
-    console.log('listening on 8080');
+//(app == http) express Server
+const handleListening = () => {
+    console.log(`Server listening on port http://localhost:${process.env.PORT}`)
+}
+
+app.listen(process.env.PORT, handleListening)
+
+// 라우터
+//kwon
+app.get("/signup", (req, res) => {
+    return res.render("signup.ejs");
 })
 
-app.get('/signup',(req, res) => {
-    res.render('signup.ejs');
-});
+//kim
+
+//lee
+app.get("/post", (req, res) => {
+    return res.render("post.ejs");
+})
+
+//jung
+app.get("/search", (req, res) => {
+  return res.render("search.ejs");
+})
+
+app.get("/groupAdd", (req, res) => {
+  return res.render("group_sign.ejs");
+})
