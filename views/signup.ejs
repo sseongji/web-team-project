@@ -22,16 +22,13 @@
             border-color: #d9d9d9ff;
             border-width: 1px;
             padding: 40px;
-            width: 1000px;
+            width: 700px;
             margin: auto;
             margin-bottom: 100px;
         }
         label{
             font-size: 20px;
             font-weight: bold;
-        }
-        .signupBtn{
-            margin: 0 auto;
         }
         .total{
             padding-bottom: 20px;
@@ -102,7 +99,7 @@
             <label>생년월일</label>
             <div class="row total">
                 <div class="col">
-                    <input type="text" class="form-control" name="name" placeholder="[필수]생년월일">
+                    <input type="text" class="form-control" name="birth" placeholder="[필수]생년월일">
                 </div>
                 <div id="emailHelp" class="form-text">1990-01-01</div>
             </div>
@@ -130,30 +127,28 @@
 
             <label>관심 태그</label>
             <div class="row total">
-                <div class="col">
-                    <div class="btn-group" role="group" aria-label="Basic checkbox toggle button group">
-                        <input type="checkbox" class="btn-check" id="btncheck1" autocomplete="off">
-                        <label class="btn btn-outline-secondary" for="btncheck1" >#면접</label>
-                    
-                        <input type="checkbox" class="btn-check" id="btncheck2" autocomplete="off">
-                        <label class="btn btn-outline-secondary" for="btncheck2">#인적성</label>
-                    
-                        <input type="checkbox" class="btn-check" id="btncheck3" autocomplete="off">
-                        <label class="btn btn-outline-secondary" for="btncheck3">#언어</label>
+                <div class="btn-group" role="group" aria-label="Basic checkbox toggle button group">
+                    <input type="checkbox" class="btn-check" id="btncheck1" autocomplete="off">
+                    <label class="btn btn-outline-secondary" for="btncheck1" >#면접</label>
+                
+                    <input type="checkbox" class="btn-check" id="btncheck2" autocomplete="off">
+                    <label class="btn btn-outline-secondary" for="btncheck2">#인적성</label>
+                
+                    <input type="checkbox" class="btn-check" id="btncheck3" autocomplete="off">
+                    <label class="btn btn-outline-secondary" for="btncheck3">#언어</label>
 
-                        <input type="checkbox" class="btn-check" id="btncheck4" autocomplete="off">
-                        <label class="btn btn-outline-secondary" for="btncheck4">#자소서</label>
+                    <input type="checkbox" class="btn-check" id="btncheck4" autocomplete="off">
+                    <label class="btn btn-outline-secondary" for="btncheck4">#자소서</label>
 
-                        <input type="checkbox" class="btn-check" id="btncheck5" autocomplete="off">
-                        <label class="btn btn-outline-secondary" for="btncheck5">#자격증</label>
-                    </div>
+                    <input type="checkbox" class="btn-check" id="btncheck5" autocomplete="off">
+                    <label class="btn btn-outline-secondary" for="btncheck5">#자격증</label>
                 </div>
             </div>
 
             <p></p>
 
-            <div class="row total" style="margin-top: 50px;">
-                <button type="submit" class="btn btn-primary hwak" style="background-color: #4AB186; border-color:#4AB186;">회원가입</button>
+            <div class="row total" style="margin: 50px 0 10px 0;">
+                <button type="submit" class="btn btn-primary" style="background-color: #4AB186; border-color:#4AB186;">회원가입</button>
             </div>
 
         </form>

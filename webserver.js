@@ -1,33 +1,45 @@
-const { group } = require('console')
-const express = require('express')
-const app = express()
+const { group } = require("console");
+const express = require("express");
+const app = express();
 
 //dotenv, 환경변수세팅
-require('dotenv').config()
+require("dotenv").config();
 //MongoDB
-const mongoClient = require('mongodb').MongoClient
+const mongoClient = require("mongodb").MongoClient;
 //ejs
-app.set('view engine', 'ejs')
+app.set("view engine", "ejs");
 //public folder
-app.use('/public', express.static('public'))
+app.use("/public", express.static("public"));
+
+//bodyParser(req.body 사용용도)
+const bodyParser = require("body-parser");
+app.use(bodyParser.urlencoded({ extended: true }));
 
 //(app == http) express Server
 const handleListening = () => {
-    console.log(`Server listening on port http://localhost:${process.env.PORT}`)
-}
+  console.log(`Server listening on port http://localhost:${process.env.PORT}`);
+};
 
 //db
 var db;
-mongoClient.connect(process.env.DB_URL, function(err, client){
-    if(err) return console.log(err)
-    //db연결
-    db = client.db('main')
-    app.db = db
+mongoClient.connect(process.env.DB_URL, function (err, client) {
+  if (err) return console.log(err);
+  //db연결
+  db = client.db("main");
+  app.db = db;
 
-    app.listen(process.env.PORT, handleListening);
-})
+  app.listen(process.env.PORT, handleListening);
+});
 
 //routes
+app.get("/changeprivacy", (req, res) => {
+    return res.render("changeprivacy.ejs");
+  });
+
+app.get("/login", (req, res) => {
+    return res.render("login.ejs");
+  });
+
 app.get("/post", (req, res) => {
   return res.render("post.ejs");
 });
@@ -42,6 +54,25 @@ app.get("/search", (req, res) => {
 
 app.get("/groupAdd", (req, res) => {
   return res.render("group_sign.ejs");
+});
+
+app.post("/group_upload", (req, res) => {
+  let username = req.body.Name;
+
+  console.log(username);
+  // db.collection("group").insertOne(
+  //   { id: username },
+
+  //   function (err, result) {
+  //     if (err) return console.log(err);
+  //     console.log("수정 완료");
+  //     res.redirect("/search");
+  //   }
+  // );
+});
+
+app.get("/group", (req, res) => {
+  return res.render("group_info.ejs");
 });
 
 app.get("/homework", (req, res) => {
