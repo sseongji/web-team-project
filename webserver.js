@@ -52,7 +52,7 @@ app.get("/search", (req, res) => {
   return res.render("search.ejs");
 });
 
-app.get("/groupAdd", (req, res) => {
+app.get("/group_add", (req, res) => {
   return res.render("group_sign.ejs");
 });
 
