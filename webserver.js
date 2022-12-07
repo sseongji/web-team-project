@@ -84,7 +84,7 @@ app.get("/homework", (req, res) => {
   // console.log(new Date(utc+KR_TIME_DIFF))
 
   db.collection('homework').insertOne({
-    content: '단어 외우기2',
+    content: '영어 단어 외우기',
     date: new Date(),
     success: {one: false, two: true, three: true},
     createdate: new Date(),
