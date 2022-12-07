@@ -28,6 +28,14 @@ mongoClient.connect(process.env.DB_URL, function(err, client){
 })
 
 //routes
+app.get("/changeprivacy", (req, res) => {
+    return res.render("changeprivacy.ejs");
+  });
+
+app.get("/login", (req, res) => {
+    return res.render("login.ejs");
+  });
+
 app.get("/post", (req, res) => {
   return res.render("post.ejs");
 });
