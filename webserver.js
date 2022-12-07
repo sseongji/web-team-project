@@ -45,12 +45,19 @@ app.get("/groupAdd", (req, res) => {
 });
 
 app.get("/homework", (req, res) => {
+  // // 현재시간을 한국 시간 기준으로(+9h)
+  // const curr = new Date()
+  // const utc = curr.getTime() + (curr.getTimezoneOffset() * 60 * 1000)
+  // const KR_TIME_DIFF = 9 * 60 * 60 * 1000
+  
+  // console.log(new Date(utc+KR_TIME_DIFF))
+
   db.collection('homework').insertOne({
-    content: '단어 외우기',
+    content: '단어 외우기2',
     date: new Date(),
     success: {one: false, two: true, three: true},
     createdate: new Date(),
-    group_id: 100
+    group_id: 200
     },(err, result)=>{
       if(err) return console.log(err)
       console.log('저장완료')
