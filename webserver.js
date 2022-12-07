@@ -1,15 +1,38 @@
-//express를 이용한 서버 만들기
 const express = require('express')
 const app = express()
+
 //dotenv, 환경변수세팅
 require('dotenv').config()
 //ejs
 app.set('view engine', 'ejs')
-//미들웨어, static file들은 public폴더에서 관리하겠다. (정적파일 예)이미지)
+//public folder
 app.use('/public', express.static('public'))
 
 //(app == http) express Server
-http.listen(process.env.PORT, ()=>{
-    console.log('listening on 8080')
+const handleListening = () => {
+    console.log(`Server listening on port http://localhost:${process.env.PORT}`)
+}
+
+app.listen(process.env.PORT, handleListening)
+
+// 라우터
+//kwon
+app.get("/signup", (req, res) => {
+    return res.render("signup.ejs");
 })
 
+//kim
+
+//lee
+app.get("/post", (req, res) => {
+    return res.render("post.ejs");
+})
+
+//jung
+app.get("/search", (req, res) => {
+  return res.render("search.ejs");
+})
+
+app.get("/groupAdd", (req, res) => {
+  return res.render("group_sign.ejs");
+})
