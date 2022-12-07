@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>공부밭</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+    
+    <style>
+        body{
+            width: 1130px; 
+            margin: 0 auto;
+        }
+        h2{
+            text-align: center;
+            margin: 60px 0 40px 0;
+            color: #4AB186;
+        }
+        .formbody{
+            border: solid;
+            border-radius: 20px;
+            border-color: #d9d9d9ff;
+            border-width: 1px;
+            padding: 40px;
+            width: 1000px;
+            margin: auto;
+            margin-bottom: 100px;
+        }
+        label{
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .signupBtn{
+            margin: 0 auto;
+        }
+        .total{
+            padding-bottom: 20px;
+        }
+    </style>
+    
+  </head>
+  <body>
+    
+    <%- include('nav.html') %>
+        
+    <h2>공부밭</h2>
+    
+    <div class="formbody">
+        
+        
+        <form>
+
+            <label>아이디</label>
+            <div class="row">
+                <div class="col">
+                    <input type="text" class="form-control" name="id" placeholder="전화번호를 입력하세요">
+                </div>
+                <div class="col">
+                    <button type="submit" class="btn btn-danger" style="background-color: #F16A6E; border-color: #F16A6E;">인증번호 전송</button>
+                </div>
+            </div>
+            <div id="emailHelp" class="form-text">중복 확인 메시지</div>
+        
+            <div class="row total">
+                <div class="col">
+                    <input type="text" class="form-control" name="id">
+                </div>
+                <div class="col">
+                    <button type="submit" class="btn btn-primary hwakin" style="background-color: #4AB186; border-color: #4AB186;">인증 확인</button>
+                </div>
+            </div>
+
+            <p></p>
+
+            <label>비밀번호</label>
+            <div class="row">
+                <div class="col">
+                    <input type="password" class="form-control" name="pw" placeholder="비밀번호를 입력하세요">
+                </div>
+            </div>
+            <div id="emailHelp" class="form-text">영문, 숫자 조합 8자 이상, 특수문자 포함</div>
+            
+            <div class="row total">
+                <div class="col">
+                    <input type="password" class="form-control" name="pw" placeholder="비밀번호를 재입력하세요">
+                </div>
+                <div id="emailHelp" class="form-text">일치 확인 메시지</div>
+            </div>
+            
+            <p></p>
+
+            <label>닉네임</label>
+            <div class="row total">
+                <div class="col">
+                    <input type="text" class="form-control" name="name" placeholder="[필수]닉네임">
+                </div>
+                <div id="emailHelp" class="form-text">중복 확인 메시지</div>
+            </div>
+
+            <p></p>
+
+            <label>생년월일</label>
+            <div class="row total">
+                <div class="col">
+                    <input type="text" class="form-control" name="name" placeholder="[필수]생년월일">
+                </div>
+                <div id="emailHelp" class="form-text">1990-01-01</div>
+            </div>
+
+            <p></p>
+
+            <label>지역</label>
+            <div class="row total">
+                <div class="col">
+                    <select class="form-select" id="autoSizingSelect">
+                        <option selected>[필수]지역</option>
+                        <option value="1">서울</option>
+                        <option value="2">경기</option>
+                        <option value="2">인천</option>
+                        <option value="3">강원</option>
+                        <option value="2">충청</option>
+                        <option value="3">전라</option>
+                        <option value="3">경상</option>
+                        <option value="3">부산</option>
+                    </select>
+                </div>
+            </div>
+
+            <p></p>
+
+            <label>관심 태그</label>
+            <div class="row total">
+                <div class="col">
+                    <div class="btn-group" role="group" aria-label="Basic checkbox toggle button group">
+                        <input type="checkbox" class="btn-check" id="btncheck1" autocomplete="off">
+                        <label class="btn btn-outline-secondary" for="btncheck1" >#면접</label>
+                    
+                        <input type="checkbox" class="btn-check" id="btncheck2" autocomplete="off">
+                        <label class="btn btn-outline-secondary" for="btncheck2">#인적성</label>
+                    
+                        <input type="checkbox" class="btn-check" id="btncheck3" autocomplete="off">
+                        <label class="btn btn-outline-secondary" for="btncheck3">#언어</label>
+
+                        <input type="checkbox" class="btn-check" id="btncheck4" autocomplete="off">
+                        <label class="btn btn-outline-secondary" for="btncheck4">#자소서</label>
+
+                        <input type="checkbox" class="btn-check" id="btncheck5" autocomplete="off">
+                        <label class="btn btn-outline-secondary" for="btncheck5">#자격증</label>
+                    </div>
+                </div>
+            </div>
+
+            <p></p>
+
+            <div class="row total" style="margin-top: 50px;">
+                <button type="submit" class="btn btn-primary hwak" style="background-color: #4AB186; border-color:#4AB186;">회원가입</button>
+            </div>
+
+        </form>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
+  </body>
+</html>
