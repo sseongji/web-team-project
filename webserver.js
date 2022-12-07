@@ -78,17 +78,26 @@ app.get("/group", (req, res) => {
 app.get("/homework", (req, res) => {
   console.log(getCurrentDate())
 
-  db.collection('homework').insertOne({
-    content: '영어 단어 외우기',
-    date: getCurrentDate(),
-    success: {one: false, two: true, three: true},
-    createdate: getCurrentDate(),
-    group_id: 200
-    },(err, result)=>{
+  //test insert
+  // db.collection('homework').insertOne({
+  //   content: '영어 단어 외우기',
+  //   date: getCurrentDate(),
+  //   success: {one: false, two: true, three: true},
+  //   createdate: getCurrentDate(),
+  //   group_id: 200
+  //   },(err, result)=>{
+  //     if(err) return console.log(err)
+  //     console.log('저장완료')
+  // })
+
+  //test update
+  db.collection('homework').updateOne(
+    {'content': '영어 단어 외우기'},
+    {$set: {'success.one': true, 'success.two': true, 'success.four': true}},
+    (err, result)=>{
       if(err) return console.log(err)
-      console.log('저장완료')
+      console.log('수정완료')
   })
-  
   return res.render("homework.ejs");
 });
 
