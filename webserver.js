@@ -20,6 +20,23 @@ const handleListening = () => {
   console.log(`Server listening on port http://localhost:${process.env.PORT}`);
 };
 
+// multer 설정(사진 업로드)
+let multer = require("multer");
+const path = require("path");
+//const { Server } = require("http");
+let storage = multer.diskStorage({
+  destination: function (req, res, cb) {
+    cb(null, "./public/image");
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + file.originalname);
+  },
+});
+
+let upload = multer({
+  storage: storage,
+  limits: { fieldSize: 1024 * 1024 * 3 },
+});
 //db
 var db;
 mongoClient.connect(process.env.DB_URL, function (err, client) {
@@ -33,12 +50,12 @@ mongoClient.connect(process.env.DB_URL, function (err, client) {
 
 //routes
 app.get("/changeprivacy", (req, res) => {
-    return res.render("changeprivacy.ejs");
-  });
+  return res.render("changeprivacy.ejs");
+});
 
 app.get("/login", (req, res) => {
-    return res.render("login.ejs");
-  });
+  return res.render("login.ejs");
+});
 
   // db의 post collection을 post.ejs에 result로 전달 (게시물)
 app.get("/post", (req, res) => {
@@ -74,8 +91,12 @@ app.get("/signup", (req, res) => {
   return res.render("signup.ejs");
 });
 
-app.get("/search", (req, res) => {
-  return res.render("search.ejs");
+app.get("/", (req, res) => {
+  db.collection("group")
+    .find()
+    .toArray(function (err, result) {
+      res.render("search.ejs", { posts: result });
+    });
 });
 
 app.get("/group_add", (req, res) => {
@@ -102,20 +123,25 @@ app.post('/add', (req, res) =>{
   })
   res.redirect("/post");
 })
+app.post("/group_upload", upload.single("Img"), (req, res) => {
+  let members = req.body.member.split(",");
 
-app.post("/group_upload", (req, res) => {
-  let username = req.body.Name;
-
-  console.log(username);
-  // db.collection("group").insertOne(
-  //   { id: username },
-
-  //   function (err, result) {
-  //     if (err) return console.log(err);
-  //     console.log("수정 완료");
-  //     res.redirect("/search");
-  //   }
-  // );
+  db.collection("group").insertOne(
+    {
+      name: req.body.Name,
+      member: members,
+      notice: req.body.Notice,
+      intro: req.body.Description,
+      img: req.file.filename,
+      tag: req.body.tag,
+      createdate: getCurrentDate(),
+    },
+    function (err, result) {
+      if (err) return console.log(err);
+      console.log("수정 완료");
+      res.redirect("/");
+    }
+  );
 });
 
 app.get("/group", (req, res) => {
@@ -123,7 +149,7 @@ app.get("/group", (req, res) => {
 });
 
 app.get("/homework", (req, res) => {
-  console.log(getCurrentDate())
+  console.log(getCurrentDate());
 
   //test insert
   // db.collection('homework').insertOne({
@@ -138,25 +164,30 @@ app.get("/homework", (req, res) => {
   // })
 
   //test update
-  db.collection('homework').updateOne(
-    {'content': '영어 단어 외우기'},
-    {$set: {'success.one': true, 'success.two': true, 'success.four': true}},
-    (err, result)=>{
-      if(err) return console.log(err)
-      console.log('수정완료')
-  })
+  // db.collection("homework").updateOne(
+  //   { content: "영어 단어 외우기" },
+  //   {
+  //     $set: { "success.one": true, "success.two": true, "success.four": true },
+  //   },
+  //   (err, result) => {
+  //     if (err) return console.log(err);
+  //     console.log("수정완료");
+  //   }
+  // );
   return res.render("homework.ejs");
 });
 
 //get korea local time
-const getCurrentDate = ()=>{
-  const date = new Date()
-  const year = date.getFullYear()
-  const month = date.getMonth()
-  const today = date.getDate()
-  const hours = date.getHours()
-  const minutes = date.getMinutes()
-  const seconds = date.getSeconds()
-  const milliseconds = date.getMilliseconds()
-  return new Date(Date.UTC(year, month, today, hours, minutes, seconds, milliseconds)) 
-}
+const getCurrentDate = () => {
+  const date = new Date();
+  const year = date.getFullYear();
+  const month = date.getMonth();
+  const today = date.getDate();
+  const hours = date.getHours();
+  const minutes = date.getMinutes();
+  const seconds = date.getSeconds();
+  const milliseconds = date.getMilliseconds();
+  return new Date(
+    Date.UTC(year, month, today, hours, minutes, seconds, milliseconds)
+  );
+};
