@@ -77,6 +77,14 @@
               </div>
             </div>
 
+             <div class="col-12" >
+              <label for="Name" class="form-label">멤버</label>
+              <input type="text" class="form-control" id="member" placeholder="멤버" name="member" required>
+              <div class="invalid-feedback">
+                Valid name is required.
+              </div>
+            </div>
+
             <div class="col-12">
               <label for="Notice" class="form-label">공지</label>
               <div class="input-group has-validation">
@@ -122,23 +130,25 @@
               })
             </script>
 
+             
+          <div class="btn-group" role="group" aria-label="Basic radio toggle button group" >
+            <input type="radio" class="btn-check" name="tag" id="btnradio1" autocomplete="off" value="면접">
+            <label class="btn btn-outline-primary" for="btnradio1">면접</label>
 
-            <div class="btn-group" role="group" aria-label="Basic checkbox toggle button group" id="category">
-                <input type="checkbox" class="btn-check" id="btncheck1" autocomplete="off">
-                <label class="btn btn-outline-primary" for="btncheck1">면접</label>
+            <input type="radio" class="btn-check" name="tag" id="btnradio2" autocomplete="off" value="인적성">
+            <label class="btn btn-outline-primary" for="btnradio2">인적성</label>
 
-                <input type="checkbox" class="btn-check" id="btncheck2" autocomplete="off">
-                <label class="btn btn-outline-primary" for="btncheck2">인적성</label>
+            <input type="radio" class="btn-check" name="tag" id="btnradio3" autocomplete="off" value="언어">
+            <label class="btn btn-outline-primary" for="btnradio3">언어</label>
 
-                <input type="checkbox" class="btn-check" id="btncheck3" autocomplete="off">
-                <label class="btn btn-outline-primary" for="btncheck3">언어</label>
+            <input type="radio" class="btn-check" name="tag" id="btnradio4" autocomplete="off" value="자소서">
+            <label class="btn btn-outline-primary" for="btnradio4">자소서</label>
 
-                <input type="checkbox" class="btn-check" id="btncheck3" autocomplete="off">
-                <label class="btn btn-outline-primary" for="btncheck3">자소서</label>
+            <input type="radio" class="btn-check" name="tag" id="btnradio5" autocomplete="off" value="자격증">
+            <label class="btn btn-outline-primary" for="btnradio5">자격증</label>
+          </div>
 
-                <input type="checkbox" class="btn-check" id="btncheck3" autocomplete="off">
-                <label class="btn btn-outline-primary" for="btncheck3">자격증</label>
-            </div>
+         
 
             <div class="d-grid gap-2" id="button">
               <button class="btn btn-primary" type="submit">버튼</button>
