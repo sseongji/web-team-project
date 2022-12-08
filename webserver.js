@@ -148,34 +148,49 @@ app.get("/group", (req, res) => {
   return res.render("group_info.ejs");
 });
 
+
 app.get("/homework", (req, res) => {
   console.log(getCurrentDate());
 
-  const date = new Date()
-  const thisYear = date.getFullYear()
-  const thisMonth = date.getMonth()+1
-  console.log(thisYear, thisMonth)
+  const nowdate = new Date()
+  const thisYear = nowdate.getFullYear()
+  const thisMonth = nowdate.getMonth()+1
+  // console.log(thisYear, thisMonth)
   //일
   // const prevLast = new date(thisYear, thisMonth, 0)
   const lastDate = new Date(thisYear, thisMonth, 0).getDate()
   const thisDates = [...Array(lastDate+1).keys()].splice(1)
-  console.log(thisDates)
+  // console.log(thisDates)
 
-  //숙제 데이터 없으면, 특정 그룹명(200)으로 생성
-  // db.collection('homework').find().toArray({ group_id : 200, date : {y: thisYear, m: thisMonth+1}}, (err, result)=>{
+  //:id == gid, 해당 모임의 해당 월 숙제 데이터 find
   const gid = 200
-  db.collection('homework').find({ group_id : 200, date : {y: thisYear, m: thisMonth+1}}).toArray((err, result)=>{
+  // db.collection('homework').find({ group_id : gid, date : {y: thisYear}, date :{m: thisMonth}}).toArray((err, result)=>{
+  db.collection('homework').find({ group_id : gid, 'date.y' : thisYear, 'date.m' : thisMonth}).toArray((err, result)=>{
     if(err) console.log(err)
     console.log(result)
     console.log(result.length)
-    if(!result.length){
+    if(result.length===0){
+      //데이터가 없으면, 해당 월의 날짜만큼 숙제 데이터 insert
       res.send(`그룹아이디 ${gid}의 ${thisMonth}월 숙제 데이터가 없습니다.`)
-      // db.collection('homework').insertMany(
-      //   []
-      // )
-
+      let hw = []
+      thisDates.forEach(d=>{
+        hw.push({
+          date:{
+            y: thisYear,
+            m: thisMonth,
+            // d: d
+          },
+          group_id : gid
+        })
+      })
+      // console.log(hw)
+      db.collection('homework').insertMany(hw, (err, result)=>{
+        if(err) console.log(err)
+        console.log(result)
+      })
     }else{
-      return res.render("homework.ejs");
+      //데이터가 있으면, render
+      return res.render("homework.ejs", result);
     }
 
   })
