@@ -20,7 +20,7 @@ const handleListening = () => {
   console.log(`Server listening on port http://localhost:${process.env.PORT}`);
 };
 
-// multer 설정
+// multer 설정(사진 업로드)
 let multer = require("multer");
 const path = require("path");
 //const { Server } = require("http");
@@ -29,7 +29,7 @@ let storage = multer.diskStorage({
     cb(null, "./public/image");
   },
   filename: function (req, file, cb) {
-    cb(null, file.originalname);
+    cb(null, Date.now() + file.originalname);
   },
 });
 
@@ -77,21 +77,17 @@ app.post("/group_upload", upload.single("Img"), (req, res) => {
   let username = req.body.Name;
   let Notice = req.body.Notice;
   let Description = req.body.Description;
-  let Img = req.file;
+  let Img = req.file.filename;
+  let tag = req.body.tag;
 
-  console.log(username);
-  console.log(Notice);
-  console.log(Description);
-  console.log(Img);
-
-  // db.collection("group").insertOne(
-  //   { name: username, notice: Notice, intro: Description, img: Img },
-  //   function (err, result) {
-  //     if (err) return console.log(err);
-  //     console.log("수정 완료");
-  //     res.redirect("/search");
-  //   }
-  // );
+  db.collection("group").insertOne(
+    { name: username, notice: Notice, intro: Description, img: Img, tag: tag },
+    function (err, result) {
+      if (err) return console.log(err);
+      console.log("수정 완료");
+      res.redirect("/search");
+    }
+  );
 });
 
 app.get("/group", (req, res) => {
