@@ -57,15 +57,41 @@ app.get("/login", (req, res) => {
   return res.render("login.ejs");
 });
 
+  // db의 post collection을 post.ejs에 result로 전달 (게시물)
 app.get("/post", (req, res) => {
-  return res.render("post.ejs");
+  db.collection("post")
+      .find()
+      .toArray( (err, postResult) => {
+
+        // post 게시물 id를 기준으로 그 게시물의 댓글들만 가져옴
+        db.collection("comment")
+            // { post_id : postResult._id } 뒤에 아무거나 넣으면 모든 데이터가 나옴 웨나옴?
+            .find()
+            .toArray( (err, commentResult) => {
+              // 게시물, 댓글을 post.ejs로 전달
+              res.render("post.ejs", { posts: postResult, comments: commentResult });
+            });
+      });
 });
+
+app.get("/test", (req, res) => {
+  db.collection("comment")
+      .find( {post_id : 0})
+      .toArray( (err, postResult) => {
+        console.log("3")
+        console.log(postResult) 
+      })
+})
+
+app.get('/write', function(req, res){
+  res.render('write.ejs');
+})
 
 app.get("/signup", (req, res) => {
   return res.render("signup.ejs");
 });
 
-app.get("/search", (req, res) => {
+app.get("/", (req, res) => {
   db.collection("group")
     .find()
     .toArray(function (err, result) {
@@ -77,6 +103,26 @@ app.get("/group_add", (req, res) => {
   return res.render("group_sign.ejs");
 });
 
+app.post('/add', (req, res) =>{
+  console.log(req.body.title)
+  console.log(req.body.date)
+
+  db.collection('counter').findOne({name :'postcnt'}, (err, result) =>{
+      if(err) return console.log(err);
+      console.log("토탈포스트는 : " + result.cnt);
+      var postCount = result.cnt
+
+      // passport.serializeUser(function(user, done)에 있는 user를 받아서 사용
+      db.collection('post').insert({_id : postCount + 1, writer : req.user._id, content : req.body.content, createdate : getCurrentDate()}, function(err, result){
+          console.log('저장 완료');
+
+          db.collection('counter').updateOne({name : 'postcnt'} , { $inc : {cnt : 1}}, function(){
+              if(err) return console.log(err);
+          })
+      })
+  })
+  res.redirect("/post");
+})
 app.post("/group_upload", upload.single("Img"), (req, res) => {
   let members = req.body.member.split(",");
 
@@ -93,7 +139,7 @@ app.post("/group_upload", upload.single("Img"), (req, res) => {
     function (err, result) {
       if (err) return console.log(err);
       console.log("수정 완료");
-      res.redirect("/search");
+      res.redirect("/");
     }
   );
 });
