@@ -66,12 +66,12 @@
     
       <div class="col-md-7 col-lg-8 border rounded" id="border">
         
-        <form class="needs-validation" method="post" action="/group_upload">
+        <form class="needs-validation" method="post" action="/group_upload" enctype="multipart/form-data" >
 
           <div class="row g-3">
             <div class="col-12" >
               <label for="Name" class="form-label">이름</label>
-              <input type="text" class="form-control" id="Name" placeholder="이름" value="" name="Name" required>
+              <input type="text" class="form-control" id="Name" placeholder="이름" name="Name" required>
               <div class="invalid-feedback">
                 Valid name is required.
               </div>
@@ -81,7 +81,7 @@
               <label for="Notice" class="form-label">공지</label>
               <div class="input-group has-validation">
                 
-                <input type="text" class="form-control" id="Notice" placeholder="공지" value="" >
+                <input type="text" class="form-control" id="Notice" placeholder="공지" value="" name="Notice">
               <div class="invalid-feedback">
                   Your username is required.
                 </div>
@@ -90,7 +90,7 @@
 
             <div class="form-floating">
               <span>소개 </span>
-              <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea2" style="height: 100px"></textarea>
+              <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea2" style="height: 100px" name="Description"></textarea>
               <div class="invalid-feedback">
                 Please enter a valid email address for shipping updates.
               </div>
@@ -98,7 +98,7 @@
 
             <div class="col-12">
               <label for="Img" class="form-label">사진</label>
-              <input type="file" class="form-control" id="Img" placeholder="사진" accept="image/*">
+              <input type="file" class="form-control" id="Img" placeholder="사진" accept="image/*" name="Img" >
               <img id="preview">
             </div>
 

@@ -20,6 +20,23 @@ const handleListening = () => {
   console.log(`Server listening on port http://localhost:${process.env.PORT}`);
 };
 
+// multer 설정
+let multer = require("multer");
+const path = require("path");
+//const { Server } = require("http");
+let storage = multer.diskStorage({
+  destination: function (req, res, cb) {
+    cb(null, "./public/image");
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname);
+  },
+});
+
+let upload = multer({
+  storage: storage,
+  limits: { fieldSize: 1024 * 1024 * 3 },
+});
 //db
 var db;
 mongoClient.connect(process.env.DB_URL, function (err, client) {
@@ -33,12 +50,12 @@ mongoClient.connect(process.env.DB_URL, function (err, client) {
 
 //routes
 app.get("/changeprivacy", (req, res) => {
-    return res.render("changeprivacy.ejs");
-  });
+  return res.render("changeprivacy.ejs");
+});
 
 app.get("/login", (req, res) => {
-    return res.render("login.ejs");
-  });
+  return res.render("login.ejs");
+});
 
 app.get("/post", (req, res) => {
   return res.render("post.ejs");
@@ -56,13 +73,19 @@ app.get("/group_add", (req, res) => {
   return res.render("group_sign.ejs");
 });
 
-app.post("/group_upload", (req, res) => {
+app.post("/group_upload", upload.single("Img"), (req, res) => {
   let username = req.body.Name;
+  let Notice = req.body.Notice;
+  let Description = req.body.Description;
+  let Img = req.file;
 
   console.log(username);
-  // db.collection("group").insertOne(
-  //   { id: username },
+  console.log(Notice);
+  console.log(Description);
+  console.log(Img);
 
+  // db.collection("group").insertOne(
+  //   { name: username, notice: Notice, intro: Description, img: Img },
   //   function (err, result) {
   //     if (err) return console.log(err);
   //     console.log("수정 완료");
@@ -76,7 +99,7 @@ app.get("/group", (req, res) => {
 });
 
 app.get("/homework", (req, res) => {
-  console.log(getCurrentDate())
+  console.log(getCurrentDate());
 
   //test insert
   // db.collection('homework').insertOne({
@@ -91,25 +114,30 @@ app.get("/homework", (req, res) => {
   // })
 
   //test update
-  db.collection('homework').updateOne(
-    {'content': '영어 단어 외우기'},
-    {$set: {'success.one': true, 'success.two': true, 'success.four': true}},
-    (err, result)=>{
-      if(err) return console.log(err)
-      console.log('수정완료')
-  })
+  db.collection("homework").updateOne(
+    { content: "영어 단어 외우기" },
+    {
+      $set: { "success.one": true, "success.two": true, "success.four": true },
+    },
+    (err, result) => {
+      if (err) return console.log(err);
+      console.log("수정완료");
+    }
+  );
   return res.render("homework.ejs");
 });
 
 //get korea local time
-const getCurrentDate = ()=>{
-  const date = new Date()
-  const year = date.getFullYear()
-  const month = date.getMonth()
-  const today = date.getDate()
-  const hours = date.getHours()
-  const minutes = date.getMinutes()
-  const seconds = date.getSeconds()
-  const milliseconds = date.getMilliseconds()
-  return new Date(Date.UTC(year, month, today, hours, minutes, seconds, milliseconds)) 
-}
+const getCurrentDate = () => {
+  const date = new Date();
+  const year = date.getFullYear();
+  const month = date.getMonth();
+  const today = date.getDate();
+  const hours = date.getHours();
+  const minutes = date.getMinutes();
+  const seconds = date.getSeconds();
+  const milliseconds = date.getMilliseconds();
+  return new Date(
+    Date.UTC(year, month, today, hours, minutes, seconds, milliseconds)
+  );
+};
