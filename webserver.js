@@ -65,7 +65,7 @@ app.get("/signup", (req, res) => {
   return res.render("signup.ejs");
 });
 
-app.get("/search", (req, res) => {
+app.get("/", (req, res) => {
   db.collection("group")
     .find()
     .toArray(function (err, result) {
@@ -93,7 +93,7 @@ app.post("/group_upload", upload.single("Img"), (req, res) => {
     function (err, result) {
       if (err) return console.log(err);
       console.log("수정 완료");
-      res.redirect("/search");
+      res.redirect("/");
     }
   );
 });
