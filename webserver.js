@@ -114,16 +114,16 @@ app.get("/homework", (req, res) => {
   // })
 
   //test update
-  db.collection("homework").updateOne(
-    { content: "영어 단어 외우기" },
-    {
-      $set: { "success.one": true, "success.two": true, "success.four": true },
-    },
-    (err, result) => {
-      if (err) return console.log(err);
-      console.log("수정완료");
-    }
-  );
+  // db.collection("homework").updateOne(
+  //   { content: "영어 단어 외우기" },
+  //   {
+  //     $set: { "success.one": true, "success.two": true, "success.four": true },
+  //   },
+  //   (err, result) => {
+  //     if (err) return console.log(err);
+  //     console.log("수정완료");
+  //   }
+  // );
   return res.render("homework.ejs");
 });
 
