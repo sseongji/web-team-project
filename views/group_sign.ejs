@@ -77,6 +77,14 @@
               </div>
             </div>
 
+             <div class="col-12" >
+              <label for="Name" class="form-label">멤버</label>
+              <input type="text" class="form-control" id="member" placeholder="멤버" name="member" required>
+              <div class="invalid-feedback">
+                Valid name is required.
+              </div>
+            </div>
+
             <div class="col-12">
               <label for="Notice" class="form-label">공지</label>
               <div class="input-group has-validation">
@@ -140,12 +148,7 @@
             <label class="btn btn-outline-primary" for="btnradio5">자격증</label>
           </div>
 
-            <script>
-              $('#btnradio1').change((e) =>{
-                console.log(e.target.value)
-              })
-
-            </script>
+         
 
             <div class="d-grid gap-2" id="button">
               <button class="btn btn-primary" type="submit">버튼</button>

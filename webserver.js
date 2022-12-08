@@ -66,7 +66,11 @@ app.get("/signup", (req, res) => {
 });
 
 app.get("/search", (req, res) => {
-  return res.render("search.ejs");
+  db.collection("group")
+    .find()
+    .toArray(function (err, result) {
+      res.render("search.ejs", { posts: result });
+    });
 });
 
 app.get("/group_add", (req, res) => {
@@ -74,14 +78,18 @@ app.get("/group_add", (req, res) => {
 });
 
 app.post("/group_upload", upload.single("Img"), (req, res) => {
-  let username = req.body.Name;
-  let Notice = req.body.Notice;
-  let Description = req.body.Description;
-  let Img = req.file.filename;
-  let tag = req.body.tag;
+  let members = req.body.member.split(",");
 
   db.collection("group").insertOne(
-    { name: username, notice: Notice, intro: Description, img: Img, tag: tag },
+    {
+      name: req.body.Name,
+      member: members,
+      notice: req.body.Notice,
+      intro: req.body.Description,
+      img: req.file.filename,
+      tag: req.body.tag,
+      createdate: getCurrentDate(),
+    },
     function (err, result) {
       if (err) return console.log(err);
       console.log("수정 완료");
