@@ -35,8 +35,8 @@
     <h2 class="ml-2 my-3 text-center">게시판</h2>
 
     <!-- 검색바 -->
-    <div id="searchDiv">  
-      <form id="searchForm"  class="input-group mb-3" style="padding: 1rem; background-color: rgba(255, 255, 255, 0.5); border: 1px solid #adb5bd;; border-radius: 5px; width: 1130px;">
+    <div id="searchDiv" style="width: 1100px;">  
+      <form id="searchForm"  class="input-group mb-3" style="padding: 1rem; background-color: rgba(255, 255, 255, 0.5); border: 1px solid #adb5bd;; border-radius: 5px;">
         <select class="form-select" style="width: 120px; display: inline-block">
           <option value="1">글내용</option>
           <option value="2">작성자</option>
@@ -48,29 +48,36 @@
     </div>
 
     <!-- 게시글 -->
-    <div class="row">
-      <div class="col">
-        1 of 3
-      </div>
-      <div class="col-md-auto">
-        Variable width content
-      </div>
-      <div class="col col-lg-2">
-        3 of 3
-      </div>
-    </div>
-
-    <div class="container">
+    <div class="container" style="width: 1130px;">
       <ul class="list-group">
+        <% for(let i = 0; i < posts.length; i++){ %>
         <li class="list-group-item">
-          <p>글 번호 : 0</p>
-          <h4>내용 : 안녕하세요 오늘 가입했어요~</h4>
-          <p>날짜 : 2022-12-07</p>
-          <button class="btn btn-danger delete">삭제</button>
-          <a class="btn btn-danger">수정</a>
+          글 번호 : <%= posts[i]._id %>
+          <rightAligh style="float: right;">날짜 : <%= posts[i].createdate %></rightAligh>
+          <p></p>
+          <h4>글 내용 : <%= posts[i].content %>
+            <userform style="float: right;">
+              <button class="btn btn-danger delete" data-id="<%= posts[i]._id %>">삭제</button>
+              <a class="btn btn-danger" href="/edit/<%= posts[i]._id %>">수정</a>
+            </userform>
+          </h4>
+          <p></p>
+          <!-- 만약에 댓글이 있다면 hr선 + 아래부터 댓글 -->
+          <hr id="line" class="my-1" style="width: 100%">
+          <p></p>
+          <% for(let j = 0; j < comments.length; j++){ %>
+            <% if(comments[j].post_id == posts[i]._id){ %>
+            <h4>댓글 내용 : <%= comments[j].content %><rightAligh style="float: right;">날짜 : <%= comments[j].createdate %></rightAligh></h4>
+            <% } %>
+          <% } %>
         </li>
+        <p></p>
+        <% } %>
+        
+
       </ul>
     </div>
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
   </body>
 </html>
