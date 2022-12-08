@@ -22,7 +22,7 @@
     <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
 
     <h3 class="text-center mt-4" id="viewTitle">숙제 관리</h3>
-    <div class="container text-center">
+    <div class="container form-group text-center">
     <!-- <div class="text-center"> -->
         <div class="mb-2 row col-md-10 col-lg-8 mx-auto border border-1 rounded-3 pt-2">
             <div class="d-grid gap-2 d-md-flex justify-content-md-center">
@@ -30,21 +30,23 @@
             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                 <button class="btn btn-primary btn-sm mb-2" type="button">완료</button>
             </div>
-            <!-- <label for="text" class="col-md-1 col-form-label my-auto">1</label>
-            <div class="col-sm-11">
-              <input type="text" class="form-control col-md-11 form-control-sm">
+            <div id="tbody">
+                
             </div>
-            <label for="text" class="col-md-1 col-form-label my-auto">2</label>
-            <div class="col-sm-11">
-              <input type="text" class="form-control col-md-11 form-control-sm">
-            </div>
-            <label for="text" class="col-md-1 col-form-label my-auto">3</label>
-            <div class="col-sm-11">
-              <input type="text" class="form-control col-md-11 form-control-sm">
-            </div> -->
+                <label for="text" class="col-md-1 col-form-label my-auto">1</label>
+                <div class="col-sm-11">
+                <input type="text" class="form-control col-md-11 form-control-sm">
+                </div>
         </div>
         <button class="btn btn-primary btn-sm" type="submit">완료</button>
     </div>
+
+    <template id="edit-template">
+        <label for="text" class="col-md-1 col-form-label my-auto">1</label>
+        <div class="col-sm-11">
+        <input type="text" class="form-control col-md-11 form-control-sm">
+        </div>
+    </template>
 
     <script>
         //월
@@ -59,9 +61,21 @@
         const lastDate = new Date(viewYear, viewMonth+1, 0).getDate()
         const thisDates = [...Array(lastDate+1).keys()].splice(1)
         console.log(thisDates)
-
         
+        // if('content' in document.createElement('template')){
+        //     var t = $('#edit-template')
+        //     var tb = $('#tbody')
+            
+        //     thisDates.forEach(date=>{
+        //         let clone = document.importNode(t.content, true)
+        //         label.text(`${date}`)
+        //         tb.appendChild(clone)
+        //     })
+        // }
+
+
     </script>
+    
 
 </body>
 </html>

@@ -105,6 +105,35 @@ app.get("/group", (req, res) => {
 app.get("/homework", (req, res) => {
   console.log(getCurrentDate());
 
+  const date = new Date()
+  const thisYear = date.getFullYear()
+  const thisMonth = date.getMonth()+1
+  console.log(thisYear, thisMonth)
+  //일
+  // const prevLast = new date(thisYear, thisMonth, 0)
+  const lastDate = new Date(thisYear, thisMonth, 0).getDate()
+  const thisDates = [...Array(lastDate+1).keys()].splice(1)
+  console.log(thisDates)
+
+  //숙제 데이터 없으면, 특정 그룹명(200)으로 생성
+  // db.collection('homework').find().toArray({ group_id : 200, date : {y: thisYear, m: thisMonth+1}}, (err, result)=>{
+  const gid = 200
+  db.collection('homework').find({ group_id : 200, date : {y: thisYear, m: thisMonth+1}}).toArray((err, result)=>{
+    if(err) console.log(err)
+    console.log(result)
+    console.log(result.length)
+    if(!result.length){
+      res.send(`그룹아이디 ${gid}의 ${thisMonth}월 숙제 데이터가 없습니다.`)
+      // db.collection('homework').insertMany(
+      //   []
+      // )
+
+    }else{
+      return res.render("homework.ejs");
+    }
+
+  })
+
   //test insert
   // db.collection('homework').insertOne({
   //   content: '영어 단어 외우기',
@@ -128,7 +157,6 @@ app.get("/homework", (req, res) => {
   //     console.log("수정완료");
   //   }
   // );
-  return res.render("homework.ejs");
 });
 
 //get korea local time
