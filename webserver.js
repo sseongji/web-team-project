@@ -23,6 +23,7 @@ const handleListening = () => {
 // multer 설정(사진 업로드)
 let multer = require("multer");
 const path = require("path");
+const { validateHeaderName } = require("http");
 //const { Server } = require("http");
 let storage = multer.diskStorage({
   destination: function (req, res, cb) {
@@ -150,8 +151,8 @@ app.get("/group", (req, res) => {
 
 
 app.get("/homework", (req, res) => {
-  console.log(getCurrentDate());
-
+  // console.log(getCurrentDate());
+  //월
   const nowdate = new Date()
   const thisYear = nowdate.getFullYear()
   const thisMonth = nowdate.getMonth()+1
@@ -164,35 +165,52 @@ app.get("/homework", (req, res) => {
 
   //:id == gid, 해당 모임의 해당 월 숙제 데이터 find
   const gid = 200
-  // db.collection('homework').find({ group_id : gid, date : {y: thisYear}, date :{m: thisMonth}}).toArray((err, result)=>{
+  
   db.collection('homework').find({ group_id : gid, 'date.y' : thisYear, 'date.m' : thisMonth}).toArray((err, result)=>{
     if(err) console.log(err)
     console.log(result)
     console.log(result.length)
     if(result.length===0){
       //데이터가 없으면, 해당 월의 날짜만큼 숙제 데이터 insert
-      res.send(`그룹아이디 ${gid}의 ${thisMonth}월 숙제 데이터가 없습니다.`)
-      let hw = []
-      thisDates.forEach(d=>{
-        hw.push({
-          date:{
-            y: thisYear,
-            m: thisMonth,
-            // d: d
-          },
-          group_id : gid
-        })
-      })
-      // console.log(hw)
-      db.collection('homework').insertMany(hw, (err, result)=>{
+      // res.send(`그룹아이디 ${gid}의 ${thisMonth}월 숙제 데이터가 없습니다.`)
+
+      //해당 모임의 모임원 id 가져오고, 숙제 이행 여부(success)를 defalut값(false)으로 적용
+      db.collection('group').findOne({ _id : gid},(err, result)=>{
         if(err) console.log(err)
         console.log(result)
-      })
-    }else{
-      //데이터가 있으면, render
-      return res.render("homework.ejs", result);
-    }
 
+        let hw = []
+        let memSuccess = {}
+        const members = result.member
+
+        members.forEach(member=>{
+          memSuccess[member] = false
+        })  
+        console.log('내부',memSuccess) 
+
+        //insert할 데이터 리스트
+        thisDates.forEach(d=>{
+          hw.push({
+            content: '',
+            date:{
+              y: thisYear,
+              m: thisMonth,
+              d: d
+            },
+            group_id : gid,
+            success : memSuccess
+          })
+        })
+        console.log('내부', hw)
+        //insert
+        db.collection('homework').insertMany(hw, (err, result)=>{
+          if(err) console.log(err)
+          console.log(result)
+        })
+      })
+    }
+    //데이터가 있으면, 바로 render
+    return res.render("homework.ejs", {homeworks: result});
   })
 
   //test insert

@@ -30,50 +30,29 @@
             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                 <button class="btn btn-primary btn-sm mb-2" type="button">완료</button>
             </div>
-            <div id="tbody">
-                
+            
+            <label for="text" class="col-md-1 col-form-label my-auto">1</label>
+            <div class="col-sm-11">
+            <input type="text" class="form-control col-md-11 form-control-sm">
             </div>
-                <label for="text" class="col-md-1 col-form-label my-auto">1</label>
-                <div class="col-sm-11">
-                <input type="text" class="form-control col-md-11 form-control-sm">
-                </div>
         </div>
         <button class="btn btn-primary btn-sm" type="submit">완료</button>
     </div>
-
-    <template id="edit-template">
-        <label for="text" class="col-md-1 col-form-label my-auto">1</label>
-        <div class="col-sm-11">
-        <input type="text" class="form-control col-md-11 form-control-sm">
-        </div>
-    </template>
 
     <script>
         //월
         const date = new Date()
         const viewYear = date.getFullYear()
-        const viewMonth = date.getMonth()
+        const viewMonth = date.getMonth()+1
 
-        $('#viewTitle').text(`${viewMonth+1}월 숙제 관리`)
+        $('#viewTitle').text(`${viewMonth}월 숙제 관리`)
         
-        //일
-        // const prevLast = new date(viewYear, viewMonth, 0)
-        const lastDate = new Date(viewYear, viewMonth+1, 0).getDate()
-        const thisDates = [...Array(lastDate+1).keys()].splice(1)
-        console.log(thisDates)
-        
-        // if('content' in document.createElement('template')){
-        //     var t = $('#edit-template')
-        //     var tb = $('#tbody')
-            
-        //     thisDates.forEach(date=>{
-        //         let clone = document.importNode(t.content, true)
-        //         label.text(`${date}`)
-        //         tb.appendChild(clone)
-        //     })
-        // }
-
-
+        // //일
+        // // const prevLast = new date(viewYear, viewMonth, 0)
+        // const lastDate = new Date(viewYear, viewMonth+1, 0).getDate()
+        // const thisDates = [...Array(lastDate+1).keys()].splice(1)
+        // console.log(thisDates)
+    
     </script>
     
 
