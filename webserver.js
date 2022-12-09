@@ -96,6 +96,31 @@ app.get("/signup", (req, res) => {
   return res.render("signup.ejs");
 });
 
+
+app.post('/signup',(req, res) => {
+  
+  db.collection('user').insertOne({
+      phone : req.body.phone, 
+      name : req.body.name,
+      pw : req.body.pw,
+      birth : req.body.birth,
+      region : req.body.region,
+      tag : req.body.tag,
+      regidate : getCurrentDate()
+  }, function(err, result){
+      console.log('저장완료');
+      
+      //index 카운트
+      // db.collection('counter').updateOne({name : 'usercnt'}, { $inc : {cnt : 1}}, function(err, result){
+      //   //usercnt 1만큼 증가
+      //   if(err) return console.log(err);
+      //   })
+      
+  })
+  res.redirect('/login');
+});
+
+
 //각각의 카테고리 페이지를 아래의 함수 반복으로 처리할 예정
 app.get("/", (req, res) => {
   db.collection("group")
