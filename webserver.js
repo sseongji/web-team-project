@@ -6,6 +6,7 @@ const app = express();
 require("dotenv").config();
 //MongoDB
 const mongoClient = require("mongodb").MongoClient;
+
 //ejs
 app.set("view engine", "ejs");
 //public folder
@@ -23,7 +24,7 @@ const handleListening = () => {
 // multer 설정(사진 업로드)
 let multer = require("multer");
 const path = require("path");
-const { validateHeaderName } = require("http");
+
 //const { Server } = require("http");
 let storage = multer.diskStorage({
   destination: function (req, res, cb) {
@@ -48,6 +49,7 @@ mongoClient.connect(process.env.DB_URL, function (err, client) {
 
   app.listen(process.env.PORT, handleListening);
 });
+let ObjectId = require("mongodb").ObjectId;
 
 //routes
 app.get("/changeprivacy", (req, res) => {
@@ -93,6 +95,31 @@ app.get("/write", function (req, res) {
 app.get("/signup", (req, res) => {
   return res.render("signup.ejs");
 });
+
+
+app.post('/signup',(req, res) => {
+  
+  db.collection('user').insertOne({
+      phone : req.body.phone, 
+      name : req.body.name,
+      pw : req.body.pw,
+      birth : req.body.birth,
+      region : req.body.region,
+      tag : req.body.tag,
+      regidate : getCurrentDate()
+  }, function(err, result){
+      console.log('저장완료');
+      
+      //index 카운트
+      // db.collection('counter').updateOne({name : 'usercnt'}, { $inc : {cnt : 1}}, function(err, result){
+      //   //usercnt 1만큼 증가
+      //   if(err) return console.log(err);
+      //   })
+      
+  })
+  res.redirect('/login');
+});
+
 
 //각각의 카테고리 페이지를 아래의 함수 반복으로 처리할 예정
 app.get("/", (req, res) => {
@@ -161,118 +188,127 @@ app.post("/group_upload", upload.single("Img"), (req, res) => {
 });
 
 app.get("/group/:id", (req, res) => {
-  // console.log(req.params.id);
-  // db.collection("group").findOne(
-  //   { _id: parseInt(req.params.id) },
-  //   function (err, result) {
-  //     if (err) return console.log(err);
-  //     console.log(result);
-  //     res.render("group_info.ejs", { post: result });
-  //   }
-  // );
+  let myId = req.params.id;
+
+  db.collection("group").findOne(
+    { _id: ObjectId(myId) },
+    function (err, result) {
+      if (err) return console.log(err);
+
+      res.render("group_info.ejs", { posts: result });
+    }
+  );
 });
 
-//현재 날짜(nnnn년 n월) 가져오기
-//월
-const nowdate = new Date();
-const thisYear = nowdate.getFullYear();
-const thisMonth = nowdate.getMonth() + 1;
+//현재 날짜(nnnn년 n월 n일) 가져오기
+//연, 월
+const nowdate = new Date()
+const thisYear = nowdate.getFullYear()
+const thisMonth = nowdate.getMonth()+1
 // console.log(thisYear, thisMonth)
 //일
 // const prevLast = new date(thisYear, thisMonth, 0)
-const lastDate = new Date(thisYear, thisMonth, 0).getDate();
-const thisDates = [...Array(lastDate + 1).keys()].splice(1);
-// console.log(thisDates
+const lastDate = new Date(thisYear, thisMonth, 0).getDate()
+const thisDates = [...Array(lastDate+1).keys()].splice(1)
+// console.log(thisDates)
 
 app.get("/homework", (req, res) => {
-  // console.log(getCurrentDate());
-
   //:id == gid, 해당 모임의 해당 월 숙제 데이터 find
-  const gid = 200;
+  const gid = 200
+  
+  db.collection('homework').find({ group_id : gid, 'date.y' : thisYear, 'date.m' : thisMonth}).toArray((err, result)=>{
+    if(err) console.log(err)
+    console.log(result)
+    console.log(result.length)
+    if(result.length===0){
+      //데이터가 없으면, 해당 월의 날짜만큼 숙제 데이터 insert
+      // res.send(`그룹아이디 ${gid}의 ${thisMonth}월 숙제 데이터가 없습니다.`)
 
-  db.collection("homework")
-    .find({ group_id: gid, "date.y": thisYear, "date.m": thisMonth })
-    .toArray((err, result) => {
-      if (err) console.log(err);
-      console.log(result);
-      console.log(result.length);
-      if (result.length === 0) {
-        //데이터가 없으면, 해당 월의 날짜만큼 숙제 데이터 insert
-        // res.send(`그룹아이디 ${gid}의 ${thisMonth}월 숙제 데이터가 없습니다.`)
-        //해당 모임의 모임원 id 가져오고, 숙제 이행 여부(success)를 defalut값(false)으로 적용
-        db.collection("group").findOne({ _id: gid }, (err, result) => {
-          if (err) console.log(err);
-          console.log(result);
-          let hw = [];
-          let memSuccess = {};
-          const members = result.member;
-          members.forEach((member) => {
-            memSuccess[member] = false;
-          });
-          console.log("내부", memSuccess);
-          //insert할 데이터 리스트
-          thisDates.forEach((d) => {
-            hw.push({
-              content: "",
-              date: {
-                y: thisYear,
-                m: thisMonth,
-                d: d,
-              },
-              group_id: gid,
-              success: memSuccess,
-            });
-          });
-          console.log("내부", hw);
-          //insert
-          db.collection("homework").insertMany(hw, (err, result) => {
-            if (err) console.log(err);
-            console.log(result);
-          });
-        });
-      }
-      //데이터가 있으면, 바로 render
-      return res.render("homework.ejs", { homeworks: result });
-    });
+      //해당 모임의 모임원 id 가져오고, 숙제 이행 여부(success)를 defalut값(false)으로 적용
+      db.collection('group').findOne({ _id : gid},(err, result)=>{
+        if(err) console.log(err)
+        console.log(result)
 
-  //test update
-  // db.collection("homework").updateOne(
-  //   { content: "영어 단어 외우기" },
-  //   {
-  //     $set: { "success.one": true, "success.two": true, "success.four": true },
-  //   },
-  //   (err, result) => {
-  //     if (err) return console.log(err);
-  //     console.log("수정완료");
-  //   }
-  // );
-  app.put("/homework", (req, res) => {
-    console.log(req.body);
-    const inputValues = req.body;
-    const gid = 200; //group_id
+        let hw = []
+        let memSuccess = {}
+        const members = result.member
 
-    //날짜별로 update
-    for (const key in inputValues) {
-      // console.log(parseInt(key))
-      db.collection("homework").updateOne(
-        {
-          group_id: gid,
-          "date.y": thisYear,
-          "date.m": thisMonth,
-          "date.d": parseInt(key),
-        },
-        { $set: { content: inputValues[key] } },
-        (err, result) => {
-          if (err) return console.log(err);
-          // console.log('group_id: '+ gid + ', ' + parseInt(key)+'일 숙제수정완료');
-        }
-      );
+        members.forEach(member=>{
+          memSuccess[member] = false
+        })  
+        console.log('내부',memSuccess) 
+
+        //insert할 데이터 리스트
+        thisDates.forEach(d=>{
+          hw.push({
+            content: '',
+            date:{
+              y: thisYear,
+              m: thisMonth,
+              d: d
+            },
+            group_id : gid,
+            success : memSuccess
+          })
+        })
+        console.log('내부', hw)
+        //insert
+        db.collection('homework').insertMany(hw, (err, result)=>{
+          if(err) console.log(err)
+          console.log(result)
+        })
+      })
     }
-    res.status(200).send({
-      message: "put요청으로 데이터를 전달, 해당 그룹의 숙제 수정 완료",
-    });
-  });
+    //데이터가 있으면, 바로 render
+    return res.render("homework.ejs", {homeworks: result});
+  })
 });
+
+app.put('/homework', (req, res)=>{
+  console.log(req.body)
+  const inputValues = req.body
+  const gid = 200 //group_id
+  
+  //날짜별로 update
+  for(const key in inputValues){
+    // console.log(parseInt(key))
+    db.collection('homework').updateOne(
+      { group_id : gid, 'date.y' : thisYear, 'date.m' : thisMonth, 'date.d' : parseInt(key)}, 
+      { $set: { content : inputValues[key] }},
+      (err, result)=>{
+        if (err) return console.log(err);
+        // console.log('group_id: '+ gid + ', ' + parseInt(key)+'일 숙제수정완료');
+    })
+  }
+  res.status(200).send({message : 'put요청으로 데이터 전달, 해당 그룹의 숙제 수정 완료'})
+})
+
+app.get("/bat", (req, res) => {
+  //gid == group_id
+  const gid = 200
+  
+  db.collection('homework').find({ group_id : gid, 'date.y' : thisYear, 'date.m' : thisMonth}).toArray((err, result)=>{
+    if(err) console.log(err)
+    console.log(result)
+    console.log(result.length)
+    if(result.length===0){
+      //해당 그룹의 해당 월 숙제 데이터가 없는 상태.
+      //#### 방장이면, 숙제 처리로 이동? 나머지 인원은 모달창 띄워줌? #### 어떻게 할 것???
+      return res.render("homework.ejs");
+    }
+    //모임원
+    const mems = result[result.length-1].success
+    console.log(Object.keys(mems))
+
+    //오늘의 숙제
+    // console.log(nowdate.getDate())
+    const todayHomework = result[nowdate.getDate()-1].content
+    console.log(todayHomework)
+
+    return res.render("bat.ejs", {homeworks: result, members: Object.keys(mems), todayHomework : todayHomework});
+  })
+
+})
 
 //get korea local time
 const getCurrentDate = () => {
