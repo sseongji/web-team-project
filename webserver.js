@@ -149,19 +149,20 @@ app.get("/group", (req, res) => {
   return res.render("group_info.ejs");
 });
 
+//현재 날짜(nnnn년 n월) 가져오기
+//월
+const nowdate = new Date()
+const thisYear = nowdate.getFullYear()
+const thisMonth = nowdate.getMonth()+1
+// console.log(thisYear, thisMonth)
+//일
+// const prevLast = new date(thisYear, thisMonth, 0)
+const lastDate = new Date(thisYear, thisMonth, 0).getDate()
+const thisDates = [...Array(lastDate+1).keys()].splice(1)
+// console.log(thisDates)
 
 app.get("/homework", (req, res) => {
   // console.log(getCurrentDate());
-  //월
-  const nowdate = new Date()
-  const thisYear = nowdate.getFullYear()
-  const thisMonth = nowdate.getMonth()+1
-  // console.log(thisYear, thisMonth)
-  //일
-  // const prevLast = new date(thisYear, thisMonth, 0)
-  const lastDate = new Date(thisYear, thisMonth, 0).getDate()
-  const thisDates = [...Array(lastDate+1).keys()].splice(1)
-  // console.log(thisDates)
 
   //:id == gid, 해당 모임의 해당 월 숙제 데이터 find
   const gid = 200
@@ -228,8 +229,21 @@ app.get("/homework", (req, res) => {
 
 app.put('/homework', (req, res)=>{
   console.log(req.body)
-
-  res.status(200).send({message : 'put 요청으로 데이터를 전달했습니다.'})
+  const inputValues = req.body
+  const gid = 200 //group_id
+  
+  //날짜별로 update
+  for(const key in inputValues){
+    // console.log(parseInt(key))
+    db.collection('homework').updateOne(
+      { group_id : gid, 'date.y' : thisYear, 'date.m' : thisMonth, 'date.d' : parseInt(key)}, 
+      { $set: { content : inputValues[key] }},
+      (err, result)=>{
+        if (err) return console.log(err);
+        // console.log('group_id: '+ gid + ', ' + parseInt(key)+'일 숙제수정완료');
+    })
+  }
+  res.status(200).send({message : 'put요청으로 데이터를 전달, 해당 그룹의 숙제 수정 완료'})
 })
 
 //get korea local time

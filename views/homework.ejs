@@ -58,10 +58,13 @@
         console.log()
         $('#btn-update').click((e)=>{
             let inputValues={}
+            // let inputValues=[]
+
             //{input tag id : input value}
             $('input').each((index, item)=>{
                 // console.log(item.id +', '+item.value)
                 inputValues[item.id] = item.value
+                // inputValues.push(item.value)
             })
             console.log(inputValues)
 
