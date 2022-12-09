@@ -67,7 +67,6 @@ app.get("/post", (req, res) => {
     .toArray((err, postResult) => {
       // post 게시물 id를 기준으로 그 게시물의 댓글들만 가져옴
       db.collection("comment")
-        // { post_id : postResult._id } 뒤에 아무거나 넣으면 모든 데이터가 나옴 웨나옴?
         .find()
         .toArray((err, commentResult) => {
           // 게시물, 댓글을 post.ejs로 전달
@@ -79,15 +78,150 @@ app.get("/post", (req, res) => {
     });
 });
 
-app.get("/test", (req, res) => {
-  db.collection("comment")
-    .find({ post_id: 0 })
-    .toArray((err, postResult) => {
-      console.log("3");
-      console.log(postResult);
-    });
+// 게시물 작성
+app.post("/add", (req, res) => {
+  console.log(`글 내용 : ${req.body.contents}`);
+
+  db.collection("index").findOne({ name: "postcnt" }, (err, result) => {
+    console.log(`result.cnt : ${result.cnt}`);
+
+    var totalcount = result.cnt;
+
+    db.collection("post").insertOne(
+      {
+        _id: totalcount + 1,
+        content: req.body.contents,
+        createdate: getCurrentDate(),
+        writer: req.body.writer,
+        count_id: totalcount + 1
+      },
+      (err, result) => {
+        console.log("저장완료");
+        //counter라는 컬렉션에 있는 totalPost 1증가시켜주어야 함.
+        db.collection("index").updateOne(
+          { name: "postcnt" },
+          { $inc: { cnt: 1 } },
+          () => {
+            if (err) return console.log(err);
+          }
+        );
+      });
+  });
+  res.redirect("/post");
 });
 
+app.put('/edit', (req, res) => {
+  console.log(req.body)
+  console.log("진입은 하니?")
+  db.collection('post').updateOne(
+      { _id : parseInt(req.body.id) },
+      { $set : { content : req.body.contents } },
+      (err, result) => {
+          if (err) return console.log(err);
+          console.log(result);
+          console.log('수정 완료')
+          res.redirect("/post");
+      }
+  )
+})
+
+app.get('/edit/:id', (req, res) => {
+  console.log(req.params.id);
+
+  db.collection('post').findOne({_id : parseInt(req.params.id)}, function(err, result){
+      if (err) return console.log(err);
+      console.log(result);
+      res.render('edit.ejs', {post : result});
+  })
+})
+
+// 게시물 삭제
+app.delete('/delete', (req, res) => {
+  console.log(`게시물 id : ${req.body._id}`)
+  req.body._id = parseInt(req.body._id);
+                   // post에 저장된 _id, 로그인한 유저의 _id
+  var deleteData = {_id : req.body._id, _id : req.body._id}
+  console.log(deleteData);
+
+  // post에 저장된 _id, 로그인한 유저의 _id의 값이 동일하면 db에서 삭제 요청
+  db.collection('post').deleteOne(deleteData, (err, result) => {
+      if (err) return console.log(err);
+      // 성공하면 200이라는 코드를 보내줌
+      console.log('result.deletedCount = ' + result.deletedCount)
+      if (result.deletedCount == 1){
+          console.log('삭제 성공');
+          res.status(200).send({message : '성공'});
+      }
+      // 실패하면 400이라는 코드를 보내줌
+      else if (result.deletedCount == 0){
+          console.log('삭제 실패');
+          res.status(400).send({message : '실패'});
+      }
+      // 아이디까지 똑같을떄만 삭제했다는 메시지를 보낼거임
+      // 그래야 진짜 삭제했을때만 list.ejs에서 삭제 처리를 할거임
+  });
+})
+
+// 댓글 삭제
+app.delete('/deleteComment', (req, res) => {
+  console.log(`댓글 id : ${req.body._id}`)
+  req.body._id = parseInt(req.body._id);
+                   // post에 저장된 _id, 로그인한 유저의 _id
+  var deleteData = {_id : req.body._id, _id : req.body._id}
+  console.log(deleteData);
+
+  // post에 저장된 _id, 로그인한 유저의 _id의 값이 동일하면 db에서 삭제 요청
+  db.collection('comment').deleteOne(deleteData, (err, result) =>{
+      if (err) return console.log(err);
+      // 성공하면 200이라는 코드를 보내줌
+      console.log('result.deletedCount = ' + result.deletedCount)
+      if (result.deletedCount == 1){
+          console.log('삭제 성공');
+          res.status(200).send({message : '성공'});
+      }
+      // 실패하면 400이라는 코드를 보내줌
+      else if (result.deletedCount == 0){
+          console.log('삭제 실패');
+          res.status(400).send({message : '실패'});
+      }
+      // 아이디까지 똑같을떄만 삭제했다는 메시지를 보낼거임
+      // 그래야 진짜 삭제했을때만 list.ejs에서 삭제 처리를 할거임
+  });
+})
+
+// 댓글 달기
+app.post("/addComment", (req, res) => {
+  console.log(`댓글 내용 : ${req.body.comment}`);
+
+  db.collection("index").findOne({ name: "commentcnt" }, (err, result) => {
+    console.log(`result.cnt : ${result.cnt}`);
+
+    var totalcount = result.cnt;
+
+    db.collection("comment").insertOne(
+      {
+        _id: totalcount + 1,
+        content: req.body.comment,
+        createdate: getCurrentDate(),
+        writer: req.body.writer,
+        post_id: req.body.post_id
+      },
+      (err, result) => {
+        console.log("저장완료");
+        //counter라는 컬렉션에 있는 totalPost 1증가시켜주어야 함.
+        db.collection("index").updateOne(
+          { name: "commentcnt" },
+          { $inc: { cnt: 1 } },
+          () => {
+            if (err) return console.log(err);
+          }
+        );
+      });
+  });
+  res.redirect("/post");
+});
+
+// 글쓰기 버튼 누르면 진입
 app.get("/write", function (req, res) {
   res.render("write.ejs");
 });
@@ -120,7 +254,6 @@ app.post('/signup',(req, res) => {
   res.redirect('/login');
 });
 
-
 //각각의 카테고리 페이지를 아래의 함수 반복으로 처리할 예정
 app.get("/", (req, res) => {
   db.collection("group")
@@ -134,38 +267,6 @@ app.get("/group_add", (req, res) => {
   return res.render("group_sign.ejs");
 });
 
-app.post("/add", (req, res) => {
-  console.log(req.body.title);
-  console.log(req.body.date);
-
-  db.collection("counter").findOne({ name: "postcnt" }, (err, result) => {
-    if (err) return console.log(err);
-    console.log("토탈포스트는 : " + result.cnt);
-    var postCount = result.cnt;
-
-    // passport.serializeUser(function(user, done)에 있는 user를 받아서 사용
-    db.collection("post").insert(
-      {
-        _id: postCount + 1,
-        writer: req.user._id,
-        content: req.body.content,
-        createdate: getCurrentDate(),
-      },
-      function (err, result) {
-        console.log("저장 완료");
-
-        db.collection("counter").updateOne(
-          { name: "postcnt" },
-          { $inc: { cnt: 1 } },
-          function () {
-            if (err) return console.log(err);
-          }
-        );
-      }
-    );
-  });
-  res.redirect("/post");
-});
 app.post("/group_upload", upload.single("Img"), (req, res) => {
   let members = req.body.member.split(",");
 
@@ -324,3 +425,8 @@ const getCurrentDate = () => {
     Date.UTC(year, month, today, hours, minutes, seconds, milliseconds)
   );
 };
+
+// 페이지를 찾을 수 없을때 표시
+app.all('*', (req, res) => {//등록되지 않은 패스에 대해 페이지 오류 응답
+  res.status(404).send('<h1>ERROR - 페이지를 찾을 수 없습니다.</h1>');
+})
