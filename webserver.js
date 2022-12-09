@@ -259,6 +259,7 @@ app.put('/homework', (req, res)=>{
 })
 
 app.get("/bat", (req, res) => {
+  //gid == group_id
   const gid = 200
   
   db.collection('homework').find({ group_id : gid, 'date.y' : thisYear, 'date.m' : thisMonth}).toArray((err, result)=>{
@@ -270,9 +271,16 @@ app.get("/bat", (req, res) => {
       //#### 방장이면, 숙제 처리로 이동? 나머지 인원은 모달창 띄워줌? #### 어떻게 할 것???
       return res.render("homework.ejs");
     }
-    console.log(result)
-    // console.log(result[result.legth-1])
-    return res.render("bat.ejs", {homeworks: result});
+    //모임원
+    const mems = result[result.length-1].success
+    console.log(Object.keys(mems))
+
+    //오늘의 숙제
+    // console.log(nowdate.getDate())
+    const todayHomework = result[nowdate.getDate()-1].content
+    console.log(todayHomework)
+
+    return res.render("bat.ejs", {homeworks: result, members: Object.keys(mems), todayHomework : todayHomework});
   })
 
 })

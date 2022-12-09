@@ -13,7 +13,6 @@
             width: 1130px;
             margin: 0 auto;
         } */
-
     </style>
 <body>
     <!-- nav bar -->
@@ -23,9 +22,7 @@
     <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
 
     <h3 class="text-center mt-4 mb-4" id="viewTitle">숙제 관리</h3>
-    <!-- <form action="/add" method="post"> -->
         <div class="container form-group text-center" id="input-hw-form">
-        <!-- <div class="text-center"> -->
             <div class="mb-2 row col-md-10 col-lg-8 mx-auto border border-1 rounded-3 pt-2">
                 <div class="d-grid gap-2 d-md-flex justify-content-md-center">
                 </div>
@@ -41,7 +38,6 @@
             </div>
             <!-- <button class="btn btn-primary btn-sm" type="button" id="btn-update">완료</button> -->
         </div>
-    <!-- </form> -->
     <script>
         //월
         const date = new Date()
@@ -71,12 +67,11 @@
                 //update 성공
                 console.log(result)
             }).fail((xhr, textStatus, errorThrown)=>{
-            //update 실패
-            console.log('homework collection update failed...', xhr, textStatus, errorThrown)
+                //update 실패
+                console.log('homework collection update failed...', xhr, textStatus, errorThrown)
             })
         })
 
     </script>
-
 </body>
 </html>

@@ -13,8 +13,6 @@
             width: 1130px;
             margin: 0 auto;
         } */
-
-
     </style>
 <body>
     <!-- nav bar -->
@@ -25,21 +23,20 @@
 
     <h3 class="text-center mt-4 mb-4" id="viewTitle">밭 가꾸기</h3>
     <div class="container text-center">
-        <div class="mb-2 row col-md-12 col-lg-8 mx-auto border border-1 rounded-3 pt-2">
-            <div class="d-flex flex-row" id="firstID">
-                <% homeworks.forEach(hw=>{ %>
-                    <div class="d-flex flex-column mx-auto">
-                        <div><%=hw.date.d%></div>
-                        <div><i class="bi bi-check-lg" id="firstID<%=hw.date.d%>"></i></div>
-                    </div>
-                <% }) %>
-                <!-- <div id="calendar">
-                    <div>
-                        <span>5<i class="bi bi-check-square-fill"></i></span> 
-                    </div>
-                </div> -->
-            </div>
-        </div> 
+        <p><%=todayHomework%></p>
+        <% members.forEach(mem=>{ %>
+            <h6><%=mem%></h6>
+            <div class="mb-4 row col-md-12 col-lg-10 mx-auto border border-1 rounded-3 pt-2">
+                <div class="d-flex flex-row" id="<%=mem%>">
+                    <% homeworks.forEach(hw=>{ %>
+                        <div class="d-flex flex-column mx-auto">
+                            <div><%=hw.date.d%></div>
+                            <div><i class="bi bi-check-lg" id="firstID<%=hw.date.d%>"></i></div>
+                        </div>
+                    <% }) %>
+                </div>
+            </div> 
+        <% }) %>
     </div>
 
     <script>
