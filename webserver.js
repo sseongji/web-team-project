@@ -149,8 +149,8 @@ app.get("/group", (req, res) => {
   return res.render("group_info.ejs");
 });
 
-//현재 날짜(nnnn년 n월) 가져오기
-//월
+//현재 날짜(nnnn년 n월 n일) 가져오기
+//연, 월
 const nowdate = new Date()
 const thisYear = nowdate.getFullYear()
 const thisMonth = nowdate.getMonth()+1
@@ -162,8 +162,6 @@ const thisDates = [...Array(lastDate+1).keys()].splice(1)
 // console.log(thisDates)
 
 app.get("/homework", (req, res) => {
-  // console.log(getCurrentDate());
-
   //:id == gid, 해당 모임의 해당 월 숙제 데이터 find
   const gid = 200
   
@@ -213,18 +211,6 @@ app.get("/homework", (req, res) => {
     //데이터가 있으면, 바로 render
     return res.render("homework.ejs", {homeworks: result});
   })
-
-  //test update
-  // db.collection("homework").updateOne(
-  //   { content: "영어 단어 외우기" },
-  //   {
-  //     $set: { "success.one": true, "success.two": true, "success.four": true },
-  //   },
-  //   (err, result) => {
-  //     if (err) return console.log(err);
-  //     console.log("수정완료");
-  //   }
-  // );
 });
 
 app.put('/homework', (req, res)=>{
@@ -243,7 +229,26 @@ app.put('/homework', (req, res)=>{
         // console.log('group_id: '+ gid + ', ' + parseInt(key)+'일 숙제수정완료');
     })
   }
-  res.status(200).send({message : 'put요청으로 데이터를 전달, 해당 그룹의 숙제 수정 완료'})
+  res.status(200).send({message : 'put요청으로 데이터 전달, 해당 그룹의 숙제 수정 완료'})
+})
+
+app.get("/bat", (req, res) => {
+  const gid = 200
+  
+  db.collection('homework').find({ group_id : gid, 'date.y' : thisYear, 'date.m' : thisMonth}).toArray((err, result)=>{
+    if(err) console.log(err)
+    console.log(result)
+    console.log(result.length)
+    if(result.length===0){
+      //해당 그룹의 해당 월 숙제 데이터가 없는 상태.
+      //#### 방장이면, 숙제 처리로 이동? 나머지 인원은 모달창 띄워줌? #### 어떻게 할 것???
+      return res.render("homework.ejs");
+    }
+    console.log(result)
+    // console.log(result[result.legth-1])
+    return res.render("bat.ejs", {homeworks: result});
+  })
+
 })
 
 //get korea local time

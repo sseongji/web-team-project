@@ -16,6 +16,7 @@
 
     </style>
 <body>
+    <!-- nav bar -->
     <%- include('nav.html') %>
 
     <!-- jquery -->
@@ -32,10 +33,10 @@
                     <button class="btn btn-primary btn-sm mb-2" type="button" id="btn-update">완료</button>
                 </div>
                 <% homeworks.forEach(hw=>{ %>
-                <label for="text" class="col-md-1 col-form-label my-auto"><%=hw.date.d%></label>
-                <div class="col-sm-11">
-                <input type="text" class="form-control col-md-11 form-control-sm" id="<%=hw.date.d%>" value="<%=hw.content%>">
-                </div>
+                    <label for="text" class="col-md-1 col-form-label my-auto"><%=hw.date.d%></label>
+                    <div class="col-sm-11">
+                    <input type="text" class="form-control col-md-11 form-control-sm" id="<%=hw.date.d%>" value="<%=hw.content%>">
+                    </div>
                 <% }) %>
             </div>
             <!-- <button class="btn btn-primary btn-sm" type="button" id="btn-update">완료</button> -->
@@ -49,12 +50,6 @@
 
         $('#viewTitle').text(`${viewMonth}월 숙제 관리`)
         
-        //일
-        // const prevLast = new date(viewYear, viewMonth, 0)
-        // const lastDate = new Date(viewYear, viewMonth+1, 0).getDate()
-        // const thisDates = [...Array(lastDate+1).keys()].splice(1)
-        // console.log(thisDates)
-
         console.log()
         $('#btn-update').click((e)=>{
             let inputValues={}
@@ -82,7 +77,6 @@
         })
 
     </script>
-    
 
 </body>
 </html>
