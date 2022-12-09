@@ -24,7 +24,7 @@ const handleListening = () => {
 // multer 설정(사진 업로드)
 let multer = require("multer");
 const path = require("path");
-const { validateHeaderName } = require("http");
+
 //const { Server } = require("http");
 let storage = multer.diskStorage({
   destination: function (req, res, cb) {
@@ -164,6 +164,7 @@ app.post("/group_upload", upload.single("Img"), (req, res) => {
 
 app.get("/group/:id", (req, res) => {
   let myId = req.params.id;
+
   db.collection("group").findOne(
     { _id: ObjectId(myId) },
     function (err, result) {
