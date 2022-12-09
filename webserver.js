@@ -213,18 +213,6 @@ app.get("/homework", (req, res) => {
     return res.render("homework.ejs", {homeworks: result});
   })
 
-  //test insert
-  // db.collection('homework').insertOne({
-  //   content: '영어 단어 외우기',
-  //   date: getCurrentDate(),
-  //   success: {one: false, two: true, three: true},
-  //   createdate: getCurrentDate(),
-  //   group_id: 200
-  //   },(err, result)=>{
-  //     if(err) return console.log(err)
-  //     console.log('저장완료')
-  // })
-
   //test update
   // db.collection("homework").updateOne(
   //   { content: "영어 단어 외우기" },
@@ -237,6 +225,12 @@ app.get("/homework", (req, res) => {
   //   }
   // );
 });
+
+app.put('/homework', (req, res)=>{
+  console.log(req.body)
+
+  res.status(200).send({message : 'put 요청으로 데이터를 전달했습니다.'})
+})
 
 //get korea local time
 const getCurrentDate = () => {
