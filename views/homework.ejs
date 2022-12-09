@@ -16,6 +16,7 @@
 
     </style>
 <body>
+    <!-- nav bar -->
     <%- include('nav.html') %>
 
     <!-- jquery -->
@@ -23,23 +24,22 @@
 
     <h3 class="text-center mt-4 mb-4" id="viewTitle">숙제 관리</h3>
     <!-- <form action="/add" method="post"> -->
-        <div class="container form-group text-center">
+        <div class="container form-group text-center" id="input-hw-form">
         <!-- <div class="text-center"> -->
             <div class="mb-2 row col-md-10 col-lg-8 mx-auto border border-1 rounded-3 pt-2">
                 <div class="d-grid gap-2 d-md-flex justify-content-md-center">
                 </div>
                 <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                    <button class="btn btn-primary btn-sm mb-2" type="button">완료</button>
+                    <button class="btn btn-primary btn-sm mb-2" type="button" id="btn-update">완료</button>
                 </div>
-
                 <% homeworks.forEach(hw=>{ %>
-                <label for="text" class="col-md-1 col-form-label my-auto"><%=hw.date.d%></label>
-                <div class="col-sm-11">
-                <input type="text" class="form-control col-md-11 form-control-sm" value="<%=hw.content%>">
-                </div>
+                    <label for="text" class="col-md-1 col-form-label my-auto"><%=hw.date.d%></label>
+                    <div class="col-sm-11">
+                    <input type="text" class="form-control col-md-11 form-control-sm" id="<%=hw.date.d%>" value="<%=hw.content%>">
+                    </div>
                 <% }) %>
             </div>
-            <button class="btn btn-primary btn-sm" type="button" id="btn-update">완료</button>
+            <!-- <button class="btn btn-primary btn-sm" type="button" id="btn-update">완료</button> -->
         </div>
     <!-- </form> -->
     <script>
@@ -50,23 +50,33 @@
 
         $('#viewTitle').text(`${viewMonth}월 숙제 관리`)
         
-        //일
-        // const prevLast = new date(viewYear, viewMonth, 0)
-        const lastDate = new Date(viewYear, viewMonth+1, 0).getDate()
-        const thisDates = [...Array(lastDate+1).keys()].splice(1)
-        console.log(thisDates)
-
         console.log()
-        // $('#btn-update').click(()=>{
-        //     $.ajax({
-        //         method: 'PUT',
-        //         url : '/homework/update',
-        //         data : 
-        //     })
-        // })
+        $('#btn-update').click((e)=>{
+            let inputValues={}
+            // let inputValues=[]
+
+            //{input tag id : input value}
+            $('input').each((index, item)=>{
+                // console.log(item.id +', '+item.value)
+                inputValues[item.id] = item.value
+                // inputValues.push(item.value)
+            })
+            console.log(inputValues)
+
+            $.ajax({
+                method: 'PUT',
+                url : '/homework',
+                data : inputValues
+            }).done((result)=>{
+                //update 성공
+                console.log(result)
+            }).fail((xhr, textStatus, errorThrown)=>{
+            //update 실패
+            console.log('homework collection update failed...', xhr, textStatus, errorThrown)
+            })
+        })
 
     </script>
-    
 
 </body>
 </html>

@@ -6,6 +6,7 @@ const app = express();
 require("dotenv").config();
 //MongoDB
 const mongoClient = require("mongodb").MongoClient;
+
 //ejs
 app.set("view engine", "ejs");
 //public folder
@@ -23,7 +24,7 @@ const handleListening = () => {
 // multer 설정(사진 업로드)
 let multer = require("multer");
 const path = require("path");
-const { validateHeaderName } = require("http");
+
 //const { Server } = require("http");
 let storage = multer.diskStorage({
   destination: function (req, res, cb) {
@@ -48,6 +49,7 @@ mongoClient.connect(process.env.DB_URL, function (err, client) {
 
   app.listen(process.env.PORT, handleListening);
 });
+let ObjectId = require("mongodb").ObjectId;
 
 //routes
 app.get("/changeprivacy", (req, res) => {
@@ -58,39 +60,42 @@ app.get("/login", (req, res) => {
   return res.render("login.ejs");
 });
 
-  // db의 post collection을 post.ejs에 result로 전달 (게시물)
+// db의 post collection을 post.ejs에 result로 전달 (게시물)
 app.get("/post", (req, res) => {
   db.collection("post")
-      .find()
-      .toArray( (err, postResult) => {
-
-        // post 게시물 id를 기준으로 그 게시물의 댓글들만 가져옴
-        db.collection("comment")
-            // { post_id : postResult._id } 뒤에 아무거나 넣으면 모든 데이터가 나옴 웨나옴?
-            .find()
-            .toArray( (err, commentResult) => {
-              // 게시물, 댓글을 post.ejs로 전달
-              res.render("post.ejs", { posts: postResult, comments: commentResult });
-            });
-      });
+    .find()
+    .toArray((err, postResult) => {
+      // post 게시물 id를 기준으로 그 게시물의 댓글들만 가져옴
+      db.collection("comment")
+        // { post_id : postResult._id } 뒤에 아무거나 넣으면 모든 데이터가 나옴 웨나옴?
+        .find()
+        .toArray((err, commentResult) => {
+          // 게시물, 댓글을 post.ejs로 전달
+          res.render("post.ejs", {
+            posts: postResult,
+            comments: commentResult,
+          });
+        });
+    });
 });
 
 app.get("/test", (req, res) => {
   db.collection("comment")
-      .find( {post_id : 0})
-      .toArray( (err, postResult) => {
-        console.log("3")
-        console.log(postResult) 
-      })
-})
+    .find({ post_id: 0 })
+    .toArray((err, postResult) => {
+      console.log("3");
+      console.log(postResult);
+    });
+});
 
-app.get('/write', function(req, res){
-  res.render('write.ejs');
-})
+app.get("/write", function (req, res) {
+  res.render("write.ejs");
+});
 
 app.get("/signup", (req, res) => {
   return res.render("signup.ejs");
 });
+
 
 app.post('/signup',(req, res) => {
   
@@ -115,6 +120,8 @@ app.post('/signup',(req, res) => {
   res.redirect('/login');
 });
 
+
+//각각의 카테고리 페이지를 아래의 함수 반복으로 처리할 예정
 app.get("/", (req, res) => {
   db.collection("group")
     .find()
@@ -127,26 +134,38 @@ app.get("/group_add", (req, res) => {
   return res.render("group_sign.ejs");
 });
 
-app.post('/add', (req, res) =>{
-  console.log(req.body.title)
-  console.log(req.body.date)
+app.post("/add", (req, res) => {
+  console.log(req.body.title);
+  console.log(req.body.date);
 
-  db.collection('counter').findOne({name :'postcnt'}, (err, result) =>{
-      if(err) return console.log(err);
-      console.log("토탈포스트는 : " + result.cnt);
-      var postCount = result.cnt
+  db.collection("counter").findOne({ name: "postcnt" }, (err, result) => {
+    if (err) return console.log(err);
+    console.log("토탈포스트는 : " + result.cnt);
+    var postCount = result.cnt;
 
-      // passport.serializeUser(function(user, done)에 있는 user를 받아서 사용
-      db.collection('post').insert({_id : postCount + 1, writer : req.user._id, content : req.body.content, createdate : getCurrentDate()}, function(err, result){
-          console.log('저장 완료');
+    // passport.serializeUser(function(user, done)에 있는 user를 받아서 사용
+    db.collection("post").insert(
+      {
+        _id: postCount + 1,
+        writer: req.user._id,
+        content: req.body.content,
+        createdate: getCurrentDate(),
+      },
+      function (err, result) {
+        console.log("저장 완료");
 
-          db.collection('counter').updateOne({name : 'postcnt'} , { $inc : {cnt : 1}}, function(){
-              if(err) return console.log(err);
-          })
-      })
-  })
+        db.collection("counter").updateOne(
+          { name: "postcnt" },
+          { $inc: { cnt: 1 } },
+          function () {
+            if (err) return console.log(err);
+          }
+        );
+      }
+    );
+  });
   res.redirect("/post");
-})
+});
 app.post("/group_upload", upload.single("Img"), (req, res) => {
   let members = req.body.member.split(",");
 
@@ -168,24 +187,32 @@ app.post("/group_upload", upload.single("Img"), (req, res) => {
   );
 });
 
-app.get("/group", (req, res) => {
-  return res.render("group_info.ejs");
+app.get("/group/:id", (req, res) => {
+  let myId = req.params.id;
+
+  db.collection("group").findOne(
+    { _id: ObjectId(myId) },
+    function (err, result) {
+      if (err) return console.log(err);
+
+      res.render("group_info.ejs", { posts: result });
+    }
+  );
 });
 
+//현재 날짜(nnnn년 n월 n일) 가져오기
+//연, 월
+const nowdate = new Date()
+const thisYear = nowdate.getFullYear()
+const thisMonth = nowdate.getMonth()+1
+// console.log(thisYear, thisMonth)
+//일
+// const prevLast = new date(thisYear, thisMonth, 0)
+const lastDate = new Date(thisYear, thisMonth, 0).getDate()
+const thisDates = [...Array(lastDate+1).keys()].splice(1)
+// console.log(thisDates)
 
 app.get("/homework", (req, res) => {
-  // console.log(getCurrentDate());
-  //월
-  const nowdate = new Date()
-  const thisYear = nowdate.getFullYear()
-  const thisMonth = nowdate.getMonth()+1
-  // console.log(thisYear, thisMonth)
-  //일
-  // const prevLast = new date(thisYear, thisMonth, 0)
-  const lastDate = new Date(thisYear, thisMonth, 0).getDate()
-  const thisDates = [...Array(lastDate+1).keys()].splice(1)
-  // console.log(thisDates)
-
   //:id == gid, 해당 모임의 해당 월 숙제 데이터 find
   const gid = 200
   
@@ -235,31 +262,45 @@ app.get("/homework", (req, res) => {
     //데이터가 있으면, 바로 render
     return res.render("homework.ejs", {homeworks: result});
   })
-
-  //test insert
-  // db.collection('homework').insertOne({
-  //   content: '영어 단어 외우기',
-  //   date: getCurrentDate(),
-  //   success: {one: false, two: true, three: true},
-  //   createdate: getCurrentDate(),
-  //   group_id: 200
-  //   },(err, result)=>{
-  //     if(err) return console.log(err)
-  //     console.log('저장완료')
-  // })
-
-  //test update
-  // db.collection("homework").updateOne(
-  //   { content: "영어 단어 외우기" },
-  //   {
-  //     $set: { "success.one": true, "success.two": true, "success.four": true },
-  //   },
-  //   (err, result) => {
-  //     if (err) return console.log(err);
-  //     console.log("수정완료");
-  //   }
-  // );
 });
+
+app.put('/homework', (req, res)=>{
+  console.log(req.body)
+  const inputValues = req.body
+  const gid = 200 //group_id
+  
+  //날짜별로 update
+  for(const key in inputValues){
+    // console.log(parseInt(key))
+    db.collection('homework').updateOne(
+      { group_id : gid, 'date.y' : thisYear, 'date.m' : thisMonth, 'date.d' : parseInt(key)}, 
+      { $set: { content : inputValues[key] }},
+      (err, result)=>{
+        if (err) return console.log(err);
+        // console.log('group_id: '+ gid + ', ' + parseInt(key)+'일 숙제수정완료');
+    })
+  }
+  res.status(200).send({message : 'put요청으로 데이터 전달, 해당 그룹의 숙제 수정 완료'})
+})
+
+app.get("/bat", (req, res) => {
+  const gid = 200
+  
+  db.collection('homework').find({ group_id : gid, 'date.y' : thisYear, 'date.m' : thisMonth}).toArray((err, result)=>{
+    if(err) console.log(err)
+    console.log(result)
+    console.log(result.length)
+    if(result.length===0){
+      //해당 그룹의 해당 월 숙제 데이터가 없는 상태.
+      //#### 방장이면, 숙제 처리로 이동? 나머지 인원은 모달창 띄워줌? #### 어떻게 할 것???
+      return res.render("homework.ejs");
+    }
+    console.log(result)
+    // console.log(result[result.legth-1])
+    return res.render("bat.ejs", {homeworks: result});
+  })
+
+})
 
 //get korea local time
 const getCurrentDate = () => {
