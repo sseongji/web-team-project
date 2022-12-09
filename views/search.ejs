@@ -14,7 +14,7 @@
     <style>
       #album{
         width: 1130px;
-        margin-left: 20%;
+        margin-left: 12%;
       }
 
     </style>
@@ -23,6 +23,8 @@
   </head>
   
     <body>
+      <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
+  
       <%- include('nav.html') %>
       
 
@@ -32,16 +34,16 @@
           
             <h1 style="color: #4AB186;">모임에 참여해보세요!</h1>
       
-          <a href="./group_add" style="display: flex; justify-content:end; color: #F16B6F; "><p>원하는 모임이 없으신가요?</p></a>
+          <p style="display: flex; justify-content:flex-end;"><a href="./group_add">원하는 모임이 없으신가요?</a> </p>
           <form class="input-group mb-3" style="padding: 2rem; background-color: rgba(255, 255, 255, 0.5); border: 1px solid #adb5bd;; border-radius: 5px;">
   
-              <div style="display: flex;" >
-              <select class="form-select" aria-label="Default select example">
-              <option value="1">면접</option>
-              <option value="2">인적성</option>
-              <option value="3">언어</option>
-              <option value="4">자소서</option>
-              <option value="5">자격증</option>
+          <div style="display: flex;" >
+            <select class="form-select" aria-label="Default select example" id="category">
+              <option >면접</option>
+              <option >인적성</option>
+              <option >언어</option>
+              <option >자소서</option>
+              <option >자격증</option>
             </select>
             <select class="form-select" aria-label="Default select example">
               <option value="1">서울</option>
@@ -53,20 +55,25 @@
               <option value="7">경상</option>
               <option value="8">부산</option>
             </select>
-            </div>
+          </div>
         
             <input type="text" class="form-control" aria-label="Text input with dropdown button">
             <button class="btn btn-primary" type="submit">버튼</button>
             
           </form>
         </div>
+
+        
+
           
         </section>
-
+        
         <div class="album py-5 bg-light" id="album">
           <div class="container">
             <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
-              <% for(var i = 0; i < posts.length; i++){ if(posts[i].tag == '면접'){%>
+              <% for(var i = 0; i < posts.length; i++){ 
+                  
+                if(posts[i].tag == '면접' ){%>
               <div class="col">
                 <div class="card shadow-sm">
                   <img
@@ -78,18 +85,18 @@
                     aria-label="Placeholder: صورة مصغرة"
                     preserveAspectRatio="xMidYMid slice"
                     focusable="false"
+                    style="margin-bottom:10px;" 
                   />
                     <title>Placeholder</title>
                     <rect width="100%" height="100%" fill="#55595c" />
-                    <text x="50%" y="50%" fill="#eceeef" dy=".3em">
-                      صورة مصغرة
+                    <text x="50%" y="50%" fill="#eceeef" dy=".3em" style="margin-left: 10px; ">
+                      <%=posts[i].name%>
                     </text>
                   </svg>
 
                   <div class="card-body">
                     <p class="card-text">
-                      هذه بطاقة أوسع مع نص داعم أدناه كمقدمة طبيعية لمحتوى
-                      إضافي. هذا المحتوى أطول قليلاً.
+                      <%=posts[i].notice%>
                     </p>
                     <div
                       class="d-flex justify-content-between align-items-center"
@@ -99,16 +106,10 @@
                           type="button"
                           class="btn btn-sm btn-outline-secondary"
                         >
-                          عرض
-                        </button>
-                        <button
-                          type="button"
-                          class="btn btn-sm btn-outline-secondary"
-                        >
-                          تعديل
+                          <a href="/group/<%=posts[i]._id %>">참여하기</a>
                         </button>
                       </div>
-                      <small class="text-muted">9 دقائق</small>
+                      <small class="text-muted">참여인원 :<%=posts[i].member.length%></small>
                     </div>
                   </div>
                 </div>
