@@ -6,6 +6,7 @@ const app = express();
 require("dotenv").config();
 //MongoDB
 const mongoClient = require("mongodb").MongoClient;
+
 //ejs
 app.set("view engine", "ejs");
 //public folder
@@ -48,6 +49,7 @@ mongoClient.connect(process.env.DB_URL, function (err, client) {
 
   app.listen(process.env.PORT, handleListening);
 });
+let ObjectId = require("mongodb").ObjectId;
 
 //routes
 app.get("/changeprivacy", (req, res) => {
@@ -161,15 +163,15 @@ app.post("/group_upload", upload.single("Img"), (req, res) => {
 });
 
 app.get("/group/:id", (req, res) => {
-  // console.log(req.params.id);
-  // db.collection("group").findOne(
-  //   { _id: parseInt(req.params.id) },
-  //   function (err, result) {
-  //     if (err) return console.log(err);
-  //     console.log(result);
-  //     res.render("group_info.ejs", { post: result });
-  //   }
-  // );
+  let myId = req.params.id;
+  db.collection("group").findOne(
+    { _id: ObjectId(myId) },
+    function (err, result) {
+      if (err) return console.log(err);
+
+      res.render("group_info.ejs", { posts: result });
+    }
+  );
 });
 
 //현재 날짜(nnnn년 n월) 가져오기
