@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
   <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -18,5 +18,30 @@
   </head>
   <body>
     <%- include('nav.html') %>
+
+    <div
+      class="card mb-3 container"
+      style="max-width: 1000px; margin-top: 30px; height: 300px"
+    >
+      <div class="row g-0">
+        <div class="col-md-4">
+          <img
+            src="/public/image/<%= posts.img %>"
+            class="img-fluid rounded-start"
+            alt="..."
+          />
+        </div>
+        <div class="col-md-8">
+          <div class="card-body">
+            <h5 class="card-title"><%=posts.name %></h5>
+            <p class="card-text"><%=posts.intro %></p>
+            <p class="card-text">
+              <small class="text-muted">#<%=posts.tag %></small>
+              <small class="text-muted">#<%=posts.member.length %>명</small>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
   </body>
 </html>
