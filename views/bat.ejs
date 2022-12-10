@@ -33,11 +33,12 @@
             <% members.forEach(mem=>{ %>
                 <h6><%=mem%></h6>
                 <div class="mb-4 border border-1 rounded-3 pt-2">
-                    <div class="d-flex flex-row" id="<%=mem%>">
+                    <div class="d-flex flex-row memids" id="<%=mem%>">
                         <% homeworks.forEach(hw=>{ %>
                             <div class="d-flex flex-column mx-auto text-center">
                                 <div><%=hw.date.d%></div>
-                                <div><i class="bi bi-check-lg" id="firstID<%=hw.date.d%>"></i></div>
+                                <!-- <div id="<%=mem%>-<%=hw.date.d%>"></div> -->
+                                <div><i class="bi bi-check-lg" id="<%=mem%>-<%=hw.date.d%>"></i></div>
                             </div>
                         <% }) %>
                     </div>
@@ -62,9 +63,28 @@
         const thisFirstDay = (prevLast.getDay()+1)%7 //이번 달 1일 요일
         console.log(thisFirstDay)
 
+        //숙제관리 페이지로 이동
         $('#btn-homework-setting').click(()=>{
             location.href='/homework'
         })
+
+        //1일에서 오늘날짜까지만 아이콘 보여주기, 나머지는 hidden
+        const today = nowdate.getDate()
+        // console.log(today)
+        const hiddenIcons = [...thisDates].splice(today)
+        // console.log(hiddenIcons)
+
+        console.log($('.memids'))
+        $('.memids').each((index, mem)=>{
+            hiddenIcons.forEach(icon=>{
+            $('#'+mem.id+'-'+icon).css('visibility', 'hidden')
+            })
+        })
+       
+        
+
+
+        //클릭 가능한 아이콘 id: 'member_id-date' (예) firstID-31)
     </script>
 </body>
 </html>

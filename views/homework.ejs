@@ -39,23 +39,41 @@
             <!-- <button class="btn btn-primary btn-sm" type="button" id="btn-update">완료</button> -->
         </div>
     <script>
-        //월
-        const date = new Date()
-        const viewYear = date.getFullYear()
-        const viewMonth = date.getMonth()+1
+        //현재 날짜(nnnn년 n월 n일) 가져오기
+        //연, 월
+        const nowdate = new Date()
+        const thisYear = nowdate.getFullYear()
+        const thisMonth = nowdate.getMonth()+1
+        // console.log(thisYear, thisMonth)
+        //일
+        const prevLast = new Date(thisYear, thisMonth-1, 0) //저번 달 마지막 날
+        const lastDate = new Date(thisYear, thisMonth, 0).getDate() //이번 달 마지막 날
+        const thisDates = [...Array(lastDate+1).keys()].splice(1)
+        console.log(thisDates)
 
-        $('#viewTitle').text(`${viewMonth}월 숙제 관리`)
+        //제목에 n월 표시
+        $('#viewTitle').text(`${thisMonth}월 숙제 관리`)
         
-        console.log()
-        $('#btn-update').click((e)=>{
-            let inputValues={}
-            // let inputValues=[]
+        //해당 날짜 이전 데이터는 비활성화 처리
+        const today = nowdate.getDate() //오늘
+        const disInputs = [...Array(today).keys()].splice(1)
+        console.log(disInputs)
 
-            //{input tag id : input value}
-            $('input').each((index, item)=>{
-                // console.log(item.id +', '+item.value)
-                inputValues[item.id] = item.value
-                // inputValues.push(item.value)
+        disInputs.forEach(input =>{
+            $('#'+input).attr('disabled', true)
+        })
+
+       //update 처리
+        $('#btn-update').click((e)=>{
+            const inputIds = [...thisDates].splice(today)
+            console.log(inputIds)
+            let inputValues={}
+
+            //오늘~마지막날 데이터만 업데이트
+            //key:value = {input tag id : input value}
+            inputIds.forEach((inputId)=>{
+                console.log(inputId +', '+$('#'+inputId).val())
+                inputValues[inputId] = $('#'+inputId).val()
             })
             console.log(inputValues)
 
@@ -71,6 +89,12 @@
                 console.log('homework collection update failed...', xhr, textStatus, errorThrown)
             })
         })
+
+        //숙제 일괄 등록???
+        // $('input').each((index, item)=>{ //(1일~마지막날)
+        //     // console.log(item.id +', '+item.value)
+        //     inputValues[item.id] = item.value
+        // })
 
     </script>
 </body>

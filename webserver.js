@@ -370,7 +370,7 @@ app.put('/homework', (req, res)=>{
   const inputValues = req.body
   const gid = 200 //group_id
   
-  //날짜별로 update
+  //날짜별로 update, (오늘부터 마지막날)
   for(const key in inputValues){
     // console.log(parseInt(key))
     db.collection('homework').updateOne(
