@@ -313,10 +313,11 @@ const lastDate = new Date(thisYear, thisMonth, 0).getDate()
 const thisDates = [...Array(lastDate+1).keys()].splice(1)
 // console.log(thisDates)
 
-const gid = 400
+const gid = 200
 
 app.get("/homework", (req, res) => {
-  //:id == gid, 해당 모임의 해당 월 숙제 데이터 find
+  //해당 모임의 해당 월 숙제 데이터 find
+  // const gid = group_id
 
   db.collection('homework').find({ group_id : gid, 'date.y' : thisYear, 'date.m' : thisMonth}).toArray((err, result)=>{
     if(err) console.log(err)
@@ -340,6 +341,7 @@ app.get("/homework", (req, res) => {
 });
 
 app.put('/homework', (req, res)=>{
+  // const gid = group_id
   console.log(req.body)
   const inputValues = req.body
   
@@ -359,19 +361,20 @@ app.put('/homework', (req, res)=>{
 
 app.get("/bat", (req, res) => {
   //gid == group_id
+  // const gid = group_id
   //render할 데이터 세팅
   const setReturn = (result) =>{
     //모임원
     const mems = result[result.length-1].success
+    const memIds = Object.keys(mems)
     console.log(Object.keys(mems))
-
     //오늘의 숙제
     // console.log(nowdate.getDate())
     const idx = result.length + nowdate.getDate() - lastDate - 1 //(길이 + 오늘(일) - 이번달마지막(일) - 1)
     const todayHomework = result[idx].content
     console.log(todayHomework)
 
-    return res.render("bat.ejs", {homeworks: result, members: Object.keys(mems), todayHomework : todayHomework});
+    return res.render("bat.ejs", {homeworks: result, members: memIds, todayHomework : todayHomework});
   }
 
   db.collection('homework').find({ group_id : gid, 'date.y' : thisYear, 'date.m' : thisMonth}).toArray((err, result)=>{
@@ -395,11 +398,28 @@ app.get("/bat", (req, res) => {
   })
 })
 
-//테스트 homework 데이터 삭제 쿼리
-app.get("/test", (req, res) => {
-  db.collection('homework').deleteMany({group_id : 400})
-  res.send('테스트 데이터 삭제완료.')
+app.put("/bat", (req, res) => {
+  console.log(req.body)
+  const inputValues = req.body
+  const setKeyString = 'success.'+inputValues.id
+  console.log(setKeyString)
+
+  db.collection('homework').updateOne(
+    { group_id : gid, 'date.y' : thisYear, 'date.m' : thisMonth, 'date.d' : nowdate.getDate()},
+    { $set: { [setKeyString] : JSON.parse(inputValues.success) }},
+    (err, result)=>{
+    if(err) console.log(err)
+    console.log(result)
+  })
+
+  res.status(200).send({message : 'put요청으로 데이터 전달, 선택한 모임원 점수와 이행 여부 업데이트 완료'})
 })
+
+//테스트 homework 데이터 삭제 쿼리
+// app.get("/test", (req, res) => {
+//   db.collection('homework').deleteMany({group_id : 400})
+//   res.send('테스트 데이터 삭제완료.')
+// })
 
 // 데이터가 없으면, 해당 월의 오늘 포함 이후 날짜만큼 숙제 데이터 insert하고, homework로 render하는 함수
 const insertHomeworkData = (gid) =>{
