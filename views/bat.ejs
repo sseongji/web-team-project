@@ -38,7 +38,14 @@
                             <div class="d-flex flex-column mx-auto text-center">
                                 <div class="show-date-<%=hw.date.d%>"><%=hw.date.d%></div>
                                 <!-- <div id="<%=mem%>-<%=hw.date.d%>"></div> -->
-                                <div class="<%=hw.date.d%>" id="<%=mem%>-<%=hw.date.d%>"><i class="bi bi-check-lg"></i></div>
+                                <div class="<%=hw.date.d%>" id="<%=mem%>-<%=hw.date.d%>">
+                                    <% if(hw.success[mem] === true) { %>
+                                    <i class="bi bi-check-square-fill"></i>
+                                    <%} else {%>
+                                        <i class="bi bi-check-lg"></i>
+                                    <%}%>     
+                                    <!-- <i class="bi bi-check-lg"></i> -->
+                                </div>
                             </div>
                         <% }) %>
                     </div>
@@ -101,16 +108,30 @@
             console.log(e.target.parentElement.id)
             const changedTarget = e.target.parentElement.id
             const checkedIcon = [
-                '<i class="bi bi-check-lg"></i>',
-                '<i class="bi bi-check-square-fill"></i>'
-            ] //0: 숙제 안함, 1: 숙제 함
+                'bi bi-check-lg',
+                'bi bi-check-square-fill'
+            ]
+            // const checkedIcon = [
+            //     '<i class="bi bi-check-lg"></i>',
+            //     '<i class="bi bi-check-square-fill"></i>'
+            // ] //0: 숙제 안함, 1: 숙제 함
             let success = true
-            if($('#'+changedTarget).html() === checkedIcon[0]){
+
+            // if($('#'+changedTarget).html() === checkedIcon[0]){
+            //     console.log('0->1')
+            //     $('#'+changedTarget).html(checkedIcon[1])
+            // }else if($('#'+changedTarget).html() === checkedIcon[1]){
+            //     console.log('1->0')
+            //     $('#'+changedTarget).html(checkedIcon[0])
+            //     success = false
+            // }
+
+            if($('#'+changedTarget+'>i').attr('class') === checkedIcon[0]){
                 console.log('0->1')
-                $('#'+changedTarget).html(checkedIcon[1])
-            }else if($('#'+changedTarget).html() === checkedIcon[1]){
+                $('#'+changedTarget+'>i').attr('class',checkedIcon[1])
+            }else if($('#'+changedTarget+'>i').attr('class') === checkedIcon[1]){
                 console.log('1->0')
-                $('#'+changedTarget).html(checkedIcon[0])
+                $('#'+changedTarget+'>i').attr('class',checkedIcon[0])
                 success = false
             }
 
