@@ -313,21 +313,29 @@ const lastDate = new Date(thisYear, thisMonth, 0).getDate()
 const thisDates = [...Array(lastDate+1).keys()].splice(1)
 // console.log(thisDates)
 
-const gid = 300
+const gid = 400
 
 app.get("/homework", (req, res) => {
   //:id == gid, 해당 모임의 해당 월 숙제 데이터 find
 
   db.collection('homework').find({ group_id : gid, 'date.y' : thisYear, 'date.m' : thisMonth}).toArray((err, result)=>{
     if(err) console.log(err)
-    console.log(result)
+    // console.log(result)
     console.log(result.length)
     if(result.length===0){
-      // res.send(`그룹아이디 ${gid}의 ${thisMonth}월 숙제 데이터가 없습니다.`)
+      //데이터 없으면, insert
       insertHomeworkData(gid)
+      //다시 조회
+      db.collection('homework').find({ group_id : gid, 'date.y' : thisYear, 'date.m' : thisMonth}).toArray((err, result)=>{
+        if(err) console.log(err)
+        console.log(result)
+        return res.render("homework.ejs", {homeworks: result});
+       })
     }
     //데이터가 있으면, 바로 render
-    return res.render("homework.ejs", {homeworks: result});
+    else{
+      return res.render("homework.ejs", {homeworks: result});
+    }
   })
 });
 
@@ -351,18 +359,8 @@ app.put('/homework', (req, res)=>{
 
 app.get("/bat", (req, res) => {
   //gid == group_id
-
-  db.collection('homework').find({ group_id : gid, 'date.y' : thisYear, 'date.m' : thisMonth}).toArray((err, result)=>{
-    if(err) console.log(err)
-    console.log(result)
-    console.log(result.length)
-    if(result.length===0){
-      //해당 그룹의 해당 월 숙제 데이터가 없는 상태.
-      //#### 방장이면, 숙제 처리로 이동? 나머지 인원은 모달창 띄워줌? #### 어떻게 할 것???
-      // res.send(`그룹아이디 ${gid}의 ${thisMonth}월 숙제 데이터가 없습니다.`)
-      insertHomeworkData(gid)
-      // return res.render("homework.ejs", {homeworks: result});
-    }
+  //render할 데이터 세팅
+  const setReturn = (result) =>{
     //모임원
     const mems = result[result.length-1].success
     console.log(Object.keys(mems))
@@ -374,12 +372,37 @@ app.get("/bat", (req, res) => {
     console.log(todayHomework)
 
     return res.render("bat.ejs", {homeworks: result, members: Object.keys(mems), todayHomework : todayHomework});
+  }
+
+  db.collection('homework').find({ group_id : gid, 'date.y' : thisYear, 'date.m' : thisMonth}).toArray((err, result)=>{
+    if(err) console.log(err)
+    console.log(result)
+    console.log(result.length)
+    if(result.length===0){
+      //해당 그룹의 해당 월 숙제 데이터가 없는 상태.
+      //#### 방장이면, 숙제 처리로 이동? 나머지 인원은 모달창 띄워줌? #### 어떻게 할 것???
+
+      //데이터 없으면, insert
+      insertHomeworkData(gid)
+      db.collection('homework').find({ group_id : gid, 'date.y' : thisYear, 'date.m' : thisMonth}).toArray((err, result)=>{
+        if(err) console.log(err)
+        console.log(result)
+        setReturn(result)
+      })
+    }else{
+      setReturn(result)
+    }
   })
 })
 
-const insertHomeworkData = (gid) =>{
-  // 데이터가 없으면, 해당 월의 오늘 포함 이후 날짜만큼 숙제 데이터 insert
+//테스트 homework 데이터 삭제 쿼리
+app.get("/test", (req, res) => {
+  db.collection('homework').deleteMany({group_id : 400})
+  res.send('테스트 데이터 삭제완료.')
+})
 
+// 데이터가 없으면, 해당 월의 오늘 포함 이후 날짜만큼 숙제 데이터 insert하고, homework로 render하는 함수
+const insertHomeworkData = (gid) =>{
   //해당 모임의 모임원 id 가져오고, 숙제 이행 여부(success)를 defalut값(false)으로 적용
   db.collection('group').findOne({ _id : gid},(err, result)=>{
     if(err) console.log(err)
@@ -392,7 +415,7 @@ const insertHomeworkData = (gid) =>{
     members.forEach(member=>{
       memSuccess[member] = false
     })  
-    console.log('내부',memSuccess) 
+    // console.log('내부',memSuccess) 
 
     //insert할 데이터 리스트 (오늘 ~ 마지막 날)
     const inputIds = [...thisDates].splice(nowdate.getDate()-1)
@@ -409,11 +432,11 @@ const insertHomeworkData = (gid) =>{
         success : memSuccess
       })
     })
-    console.log('내부', hw)
+    // console.log('내부', hw)
     //insert
     db.collection('homework').insertMany(hw, (err, result)=>{
       if(err) console.log(err)
-      console.log(result)
+      // console.log(result)
     })
   })
 }
