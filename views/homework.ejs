@@ -51,11 +51,16 @@
         const thisDates = [...Array(lastDate+1).keys()].splice(1)
         console.log(thisDates)
 
+        //오늘 날짜
+        const today = nowdate.getDate()
+
         //제목에 n월 표시
         $('#viewTitle').text(`${thisMonth}월 숙제 관리`)
+
+        //오늘 날짜 input에 커서 포커스
+        $('#'+today).focus();
         
         //해당 날짜 이전 데이터는 비활성화 처리
-        const today = nowdate.getDate() //오늘
         const disInputs = [...Array(today).keys()].splice(1)
         console.log(disInputs)
 
@@ -65,7 +70,7 @@
 
        //update 처리
         $('#btn-update').click((e)=>{
-            const inputIds = [...thisDates].splice(today)
+            const inputIds = [...thisDates].splice(today-1)
             console.log(inputIds)
             let inputValues={}
 
