@@ -374,6 +374,37 @@ app.get("/bat", (req, res) => {
     const todayHomework = result[idx].content
     console.log(todayHomework)
 
+    //이번 달, 참여한 숙제 수
+    let score = []
+    memIds.forEach(memId=>{
+      let attendCnt = 0
+      let trueCnt = 0
+      // (hw.success[mem] === true)
+      result.forEach(r=>{
+        console.log(r.success)
+
+        if(memId in r.success){
+          attendCnt += 1
+          if(r.success[memId] === true){
+            trueCnt += 1
+          }
+        }
+      })
+      console.log(memId+', '+trueCnt+' / '+attendCnt)
+    })
+    
+    // let attendHW = {}
+    // memIds.forEach(memId=>{
+    //   let keyString = 'success.'+memId
+    //   // console.log(keyString)
+    //   db.collection('homework').find({group_id : gid, [keyString]: { $exists: true }}).toArray((err, result)=>{
+    //     // console.log(result)
+    //     console.log(memId+'가 참여한 숙제 개수: '+ result.length)
+    //     attendHW[memId] = result
+    //   })
+    //   console.log(attendHW)
+    // })
+
     return res.render("bat.ejs", {homeworks: result, members: memIds, todayHomework : todayHomework});
   }
 

@@ -39,11 +39,13 @@
                                 <div class="show-date-<%=hw.date.d%>"><%=hw.date.d%></div>
                                 <!-- <div id="<%=mem%>-<%=hw.date.d%>"></div> -->
                                 <div class="<%=hw.date.d%>" id="<%=mem%>-<%=hw.date.d%>">
+                                <%if(mem in hw.success === true){%>
                                     <% if(hw.success[mem] === true) { %>
                                         <i class="bi bi-check-square-fill"></i>
                                     <%} else {%>
                                         <i class="bi bi-square"></i>
                                     <%}%>     
+                                <%}%>  
                                     <!-- <i class="bi bi-check-lg"></i> -->
                                 </div>
                             </div>
