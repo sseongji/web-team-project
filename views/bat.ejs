@@ -33,10 +33,15 @@
             <% members.forEach(mem=>{ %>
                 <div class="d-grid gap-2 d-md-flex">
                     <h6 class="me-auto"><%=mem%></h6>
-                    <div>
-                        <h6>( <%=score[mem].success%> / <%=score[mem].attend%> ), </h6>
-                    </div>
-                    <h6><%=score[mem].percentage%>%</h6>
+                    <!-- <h6>( <%=score[mem].success%> / <%=score[mem].attend%> ), </h6> -->
+                    <!-- 버튼 클릭 시 업데이트 처리하기 위해 나눔 -->
+                    <h6>( </h6>
+                    <h6 class="score" id="<%=mem%>-score-num"><%=score[mem].success%></h6>
+                    <h6> / </h6>
+                    <h6 class="score" id="<%=mem%>-attend-num"><%=score[mem].attend%></h6>
+                    <h6> ), </h6>
+                    <h6 class="score" id="<%=mem%>-score-per"><%=score[mem].percentage%></h6>
+                    <h6>(%)</h6>
                 </div>
                 <div class="mb-4 border border-1 rounded-3 pt-2">
                     <div class="d-flex flex-row memids" id="<%=mem%>">
@@ -110,6 +115,9 @@
             })
         })
 
+        //점수 뷰어 강조
+        $('.score').css('color','#F16A6E')
+
         //update
         //클릭 가능한 아이콘 id: 'member_id-date' (예) firstID-31)
         $('.'+today).css('cursor','pointer').click((e)=>{
@@ -131,9 +139,9 @@
             }
 
             //update 보낼 데이터
-            const inputId = changedTarget.split('-')[0]
-            console.log(inputId)
-            inputValues = {'id': inputId, 'success' : success}
+            const id = changedTarget.split('-')[0]
+            console.log(id)
+            inputValues = {'id': id, 'success' : success}
 
             $.ajax({
                 method: 'PUT',
@@ -142,6 +150,31 @@
             }).done((result)=>{
                 //update 성공
                 console.log(result)
+
+                //update 후, 점수(값, 백분율) 변경 처리
+                const showScoreNumT = $('#'+id+'-score-num')
+                const showScorePerT = $('#'+id+'-score-per')
+                const attendNum = Number($('#'+id+'-attend-num').html())
+                let showScore = Number(showScoreNumT.html())
+                console.log(showScore)
+
+                //숙제 점수
+                if(success){
+                    //0->1(false->true), +1
+                    // console.log(showScoreNumT + 1)
+                    showScore += 1
+                    showScoreNumT.html(`${showScore}`)
+                }else{
+                    //1->0(true->false), -1
+                    // console.log(showScoreNumT- 1)
+                    showScore -= 1
+                    showScoreNumT.html(`${showScore}`)
+                }
+                //숙제 백분율
+                const showPer = ((showScore / attendNum) * 100).toFixed(2)
+                console.log(showPer)
+                showScorePerT.html(`${showPer}`)
+
             }).fail((xhr, textStatus, errorThrown)=>{
                 //update 실패
                 console.log('group collection update failed...', xhr, textStatus, errorThrown)
