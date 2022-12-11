@@ -31,7 +31,13 @@
             </div>
             <p class="text-center"><%=todayHomework%></p>
             <% members.forEach(mem=>{ %>
-                <h6><%=mem%></h6>
+                <div class="d-grid gap-2 d-md-flex">
+                    <h6 class="me-auto"><%=mem%></h6>
+                    <div>
+                        <h6>( <%=score[mem].success%> / <%=score[mem].attend%> ), </h6>
+                    </div>
+                    <h6><%=score[mem].percentage%>%</h6>
+                </div>
                 <div class="mb-4 border border-1 rounded-3 pt-2">
                     <div class="d-flex flex-row memids" id="<%=mem%>">
                         <% homeworks.forEach(hw=>{ %>

@@ -26,8 +26,9 @@
             <div class="mb-2 row col-md-10 col-lg-8 mx-auto border border-1 rounded-3 pt-2">
                 <div class="d-grid gap-2 d-md-flex justify-content-md-center">
                 </div>
-                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                    <button class="btn btn-primary btn-sm mb-2" type="button" id="btn-update">완료</button>
+                <div class="d-grid gap-2 d-md-flex">
+                    <button class="btn btn-light btn-sm mb-2" id="btn-back"><i class="bi bi-arrow-left"></i></button>
+                    <button class="btn btn-primary btn-sm mb-2 ms-auto" type="button" id="btn-update">완료</button>
                 </div>
                 <% homeworks.forEach(hw=>{ %>
                     <label for="text" class="col-md-1 col-form-label my-auto"><%=hw.date.d%></label>
@@ -95,6 +96,10 @@
             })
         })
 
+        //밭으로 이동
+        $('#btn-back').click(()=>{
+            location.href='/bat'
+        })
         //숙제 일괄 등록???
         // $('input').each((index, item)=>{ //(1일~마지막날)
         //     // console.log(item.id +', '+item.value)

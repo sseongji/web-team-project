@@ -375,14 +375,16 @@ app.get("/bat", (req, res) => {
     console.log(todayHomework)
 
     //이번 달, 참여한 숙제 수
+    // [...thisDates].splice(today)
     let score = []
+    let percentageScore = 0
     memIds.forEach(memId=>{
       let attendCnt = 0
       let trueCnt = 0
       // (hw.success[mem] === true)
-      result.forEach(r=>{
-        console.log(r.success)
-
+      // console.log(result.slice(0, nowdate.getDate()))
+      result.slice(0, nowdate.getDate()).forEach(r=>{
+        // console.log(r.success)
         if(memId in r.success){
           attendCnt += 1
           if(r.success[memId] === true){
@@ -390,22 +392,13 @@ app.get("/bat", (req, res) => {
           }
         }
       })
-      console.log(memId+', '+trueCnt+' / '+attendCnt)
+      percentageScore = (trueCnt/attendCnt) * 100 
+      console.log(memId+', '+trueCnt+' / '+attendCnt+', '+Number(percentageScore.toFixed(2))+'(%)') //소수점둘째자리까지
+      //attend(할당된 숙제 개수), success(할당된 숙제 완료한 개수)
+      score[memId] = {'attend' : attendCnt, 'success': trueCnt, 'percentage': Number(percentageScore.toFixed(2))}
     })
-    
-    // let attendHW = {}
-    // memIds.forEach(memId=>{
-    //   let keyString = 'success.'+memId
-    //   // console.log(keyString)
-    //   db.collection('homework').find({group_id : gid, [keyString]: { $exists: true }}).toArray((err, result)=>{
-    //     // console.log(result)
-    //     console.log(memId+'가 참여한 숙제 개수: '+ result.length)
-    //     attendHW[memId] = result
-    //   })
-    //   console.log(attendHW)
-    // })
-
-    return res.render("bat.ejs", {homeworks: result, members: memIds, todayHomework : todayHomework});
+    console.log(score)
+    return res.render("bat.ejs", {homeworks: result, members: memIds, todayHomework : todayHomework, score: score});
   }
 
   db.collection('homework').find({ group_id : gid, 'date.y' : thisYear, 'date.m' : thisMonth}).toArray((err, result)=>{
