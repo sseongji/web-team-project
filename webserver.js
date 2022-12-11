@@ -51,6 +51,20 @@ mongoClient.connect(process.env.DB_URL, function (err, client) {
 });
 let ObjectId = require("mongodb").ObjectId;
 
+//session
+const session = require('express-session');
+app.use(session({
+    secret: '1111',
+    resave: false,
+    saveUninitialized: true
+}));
+
+//passport
+const passport = require('passport');
+const LocalStrategy = require('passport-local').Strategy;
+app.use(passport.initialize());
+app.use(passport.session());
+
 //routes
 app.get("/changeprivacy", (req, res) => {
   return res.render("changeprivacy.ejs");
@@ -58,6 +72,44 @@ app.get("/changeprivacy", (req, res) => {
 
 app.get("/login", (req, res) => {
   return res.render("login.ejs");
+});
+
+
+//passport를 이용한 인증 방식
+app.post('/login', passport.authenticate('local', {
+            failureRedirect : '/login',
+        }),(req, res) => {
+        res.redirect('/');
+});
+
+passport.use(new LocalStrategy({
+    usernameField : 'phone',
+    passwordField : 'pw',
+    session : true,
+    passReqToCallback : false,
+    }, function(inputid, inputpw, done){
+
+    db.collection('user').findOne({phone : inputid}, function(err, result){
+        if(err) return done(err);
+        if(!result) {
+            return done(null, false, {message : '존재하지 않는 아이디입니다.'})
+        }
+        if(result.pw == inputpw){
+            return done(null, result);
+        }else{
+            return done(null, false, {message : '비밀번호가 일치하지 않습니다.'})
+        }
+    })
+}));
+passport.serializeUser(function(user, done){
+    done(null, user.phone); 
+});
+
+passport.deserializeUser(function(userid, done){  
+    db.collection('user').findOne({phone : userid}, function(err, result){
+        done(null, result);
+        console.log(result);
+    })
 });
 
 // db의 post collection을 post.ejs에 result로 전달 (게시물)
