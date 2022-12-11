@@ -39,6 +39,7 @@ let upload = multer({
   storage: storage,
   limits: { fieldSize: 1024 * 1024 * 3 },
 });
+
 //db
 var db;
 mongoClient.connect(process.env.DB_URL, function (err, client) {
@@ -56,7 +57,7 @@ const session = require('express-session');
 app.use(session({
     secret: '1111',
     resave: false,
-    saveUninitialized: true
+    saveUninitialized: true,
 }));
 
 //passport
@@ -65,19 +66,75 @@ const LocalStrategy = require('passport-local').Strategy;
 app.use(passport.initialize());
 app.use(passport.session());
 
+//flash message
+const flash = require('connect-flash');
+app.use(flash());
+
+//템플릿용 변수 설정
+app.use(function(req,res,next){
+  res.locals.currentUser = req.user;
+  res.locals.errors = req.flash("error");
+  res.locals.infos = req.flash("info");
+  next();
+});
+
+//암호화 bcrypt
+const bcrypt = require('bcrypt');
+
 //routes
 app.get("/changeprivacy", (req, res) => {
   return res.render("changeprivacy.ejs");
 });
 
-app.get("/login", (req, res) => {
-  return res.render("login.ejs");
+//회원가입
+app.get("/signup", (req, res) => {
+  return res.render("signup.ejs");
 });
 
+app.post('/signup',(req, res, next) => {
+  const userphone = req.body.phone;
+  const password = req.body.pw;
+  const saltRounds = 10;
+
+  bcrypt.hash(password, saltRounds, (err, hash) => {
+    db.collection('user').findOne({ phone : userphone }, (err, user) => {
+      if (user) {
+        req.flash("error", "중복된 아이디입니다.");
+        return res.redirect("/signup");
+      }
+      else {
+        db.collection('user').insertOne({
+          phone : userphone, 
+          name : req.body.name,
+          pw : hash,
+          birth : req.body.birth,
+          region : req.body.region,
+          tag : req.body.tag,
+          regidate : getCurrentDate()
+        }, function(err, result){
+            console.log('저장완료');
+            
+            //index 카운트
+            // db.collection('counter').updateOne({name : 'usercnt'}, { $inc : {cnt : 1}}, function(err, result){
+            //   //usercnt 1만큼 증가
+            //   if(err) return console.log(err);
+            //   })
+        })
+        res.redirect('/login');
+      }
+    })
+  })
+});
+
+//로그인
+app.get("/login", (req, res, next) => {
+  return res.render("login.ejs");
+});
 
 //passport를 이용한 인증 방식
 app.post('/login', passport.authenticate('local', {
             failureRedirect : '/login',
+            failureFlash: true
         }),(req, res) => {
         res.redirect('/');
 });
@@ -87,25 +144,27 @@ passport.use(new LocalStrategy({
     passwordField : 'pw',
     session : true,
     passReqToCallback : false,
-    }, function(inputid, inputpw, done){
-
-    db.collection('user').findOne({phone : inputid}, function(err, result){
+    
+    }, function(inputid, inputpw, done){ 
+    db.collection('user').findOne({phone : inputid}, function(err, user){
         if(err) return done(err);
-        if(!result) {
-            return done(null, false, {message : '존재하지 않는 아이디입니다.'})
+        if(!user) {
+            return done(null, false, {message : "존재하지 않는 아이디입니다."})
         }
-        if(result.pw == inputpw){
-            return done(null, result);
-        }else{
-            return done(null, false, {message : '비밀번호가 일치하지 않습니다.'})
-        }
+        bcrypt.compare(inputpw, user.pw, function(err, result){
+          if(result) {
+            return done(null, user);
+          }
+          else {
+            return done(null, false, {message : "비밀번호가 일치하지 않습니다."})
+          }
+        })
     })
 }));
-passport.serializeUser(function(user, done){
+passport.serializeUser((user, done)=>{
     done(null, user.phone); 
 });
-
-passport.deserializeUser(function(userid, done){  
+passport.deserializeUser((userid, done)=>{  
     db.collection('user').findOne({phone : userid}, function(err, result){
         done(null, result);
         console.log(result);
@@ -278,33 +337,8 @@ app.get("/write", function (req, res) {
   res.render("write.ejs");
 });
 
-app.get("/signup", (req, res) => {
-  return res.render("signup.ejs");
-});
 
 
-app.post('/signup',(req, res) => {
-  
-  db.collection('user').insertOne({
-      phone : req.body.phone, 
-      name : req.body.name,
-      pw : req.body.pw,
-      birth : req.body.birth,
-      region : req.body.region,
-      tag : req.body.tag,
-      regidate : getCurrentDate()
-  }, function(err, result){
-      console.log('저장완료');
-      
-      //index 카운트
-      // db.collection('counter').updateOne({name : 'usercnt'}, { $inc : {cnt : 1}}, function(err, result){
-      //   //usercnt 1만큼 증가
-      //   if(err) return console.log(err);
-      //   })
-      
-  })
-  res.redirect('/login');
-});
 
 //각각의 카테고리 페이지를 아래의 함수 반복으로 처리할 예정
 app.get("/", (req, res) => {
