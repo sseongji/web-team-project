@@ -69,9 +69,9 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // method-override 사용
-const methodOverride = require('method-override');   // 미들웨어
-const { brotliDecompress } = require('zlib');
-app.use(methodOverride('_method'));
+const methodOverride = require("method-override"); // 미들웨어
+const { brotliDecompress } = require("zlib");
+app.use(methodOverride("_method"));
 
 //flash message
 const flash = require("connect-flash");
@@ -240,19 +240,19 @@ app.post("/add", (req, res) => {
   res.redirect("/post");
 });
 
-app.put('/edit', (req, res) => {
-  console.log(req.body)
-  db.collection('post').updateOne(
-      { _id : parseInt(req.body.id) },
-      { $set : { content : req.body.editContent } },
-      (err, result) => {
-          if (err) return console.log(err);
-          console.log(result);
-          console.log('수정 완료')
-          res.redirect("/post");
-      }
-  )
-})
+app.put("/edit", (req, res) => {
+  console.log(req.body);
+  db.collection("post").updateOne(
+    { _id: parseInt(req.body.id) },
+    { $set: { content: req.body.editContent } },
+    (err, result) => {
+      if (err) return console.log(err);
+      console.log(result);
+      console.log("수정 완료");
+      res.redirect("/post");
+    }
+  );
+});
 
 app.get("/edit/:id", (req, res) => {
   console.log(req.params.id);
@@ -292,7 +292,7 @@ app.delete("/delete", (req, res) => {
     // 아이디까지 똑같을떄만 삭제했다는 메시지를 보낼거임
     // 그래야 진짜 삭제했을때만 list.ejs에서 삭제 처리를 할거임
   });
-})
+});
 
 // 댓글 삭제
 app.delete("/deleteComment", (req, res) => {
@@ -359,48 +359,47 @@ app.get("/write", function (req, res) {
   res.render("write.ejs");
 });
 
-
-
+let array = ["면접", "인적성", "언어", "자소서", "자격증"];
 
 app.get("/", (req, res) => {
   db.collection("group")
     .find()
     .toArray(function (err, result) {
-      res.render("search.ejs", { posts: result });
+      res.render("search.ejs", { posts: result, array: array[0] });
     });
 });
 
-// app.get("/aptitute", (req, res) => {
-//   db.collection("group")
-//     .find()
-//     .toArray(function (err, result) {
-//       res.render("search.ejs", { posts: result, array: array });
-//     });
-// });
+app.get("/aptitute", (req, res) => {
+  db.collection("group")
+    .find()
+    .toArray(function (err, result) {
+      res.render("search.ejs", { posts: result, array: array[1] });
+    });
+});
 
-// app.get("/language", (req, res) => {
-//   db.collection("group")
-//     .find()
-//     .toArray(function (err, result) {
-//       res.render("search.ejs", { posts: result, array: array });
-//     });
-// });
+app.get("/language", (req, res) => {
+  db.collection("group")
+    .find()
+    .toArray(function (err, result) {
+      res.render("search.ejs", { posts: result, array: array[2] });
+    });
+});
 
-// app.get("/resume", (req, res) => {
-//   db.collection("group")
-//     .find()
-//     .toArray(function (err, result) {
-//       res.render("search.ejs", { posts: result, array: array });
-//     });
-// });
+app.get("/resume", (req, res) => {
+  db.collection("group")
+    .find()
+    .toArray(function (err, result) {
+      res.render("search.ejs", { posts: result, array: array[3] });
+    });
+});
 
-// app.get("/license", (req, res) => {
-//   db.collection("group")
-//     .find()
-//     .toArray(function (err, result) {
-//       res.render("search.ejs", { posts: result });
-//     });
-// });
+app.get("/license", (req, res) => {
+  db.collection("group")
+    .find()
+    .toArray(function (err, result) {
+      res.render("search.ejs", { posts: result, array: array[4] });
+    });
+});
 
 //그룹 생성 페이지
 app.get("/group_add", (req, res) => {
@@ -437,9 +436,14 @@ app.get("/group/:id", (req, res) => {
     function (err, result) {
       if (err) return console.log(err);
 
-      res.render("group_info.ejs", { posts: result });
+      res.render("group_info.ejs", { posts: result, myId });
     }
   );
+});
+
+//유저 그룹 가입 기능
+app.get("/group/:id/register", (req, res) => {
+  res.render("group_register");
 });
 
 //현재 날짜(nnnn년 n월 n일) 가져오기

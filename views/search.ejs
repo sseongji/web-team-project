@@ -14,7 +14,7 @@
     <style>
       #album{
         width: 1130px;
-        margin-left: 12%;
+        margin-left: 20%;
       }
 
     </style>
@@ -73,7 +73,7 @@
             <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
               <% for(var i = 0; i < posts.length; i++){ 
                   
-                if(posts[i].tag == '면접' ){%>
+                if(posts[i].tag == array ){%>
               <div class="col">
                 <div class="card shadow-sm">
                   <img
@@ -151,7 +151,13 @@
       <li class="list-inline-item"><a href="#">Support</a></li>
     </ul>
   </footer>
+      <script>
+        $('#category').change((e)=>{
+          console.log(e)
+        })
 
+       
+      </script>
       <script
         src="/docs/5.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3"
