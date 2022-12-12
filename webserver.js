@@ -88,10 +88,41 @@ app.use(function (req, res, next) {
 //암호화 bcrypt
 const bcrypt = require("bcrypt");
 
+//nodemailer
+const nodemailer = require('nodemailer');
+
 //routes
 app.get("/changeprivacy", (req, res) => {
   return res.render("changeprivacy.ejs");
 });
+
+//이메일 인증
+// app.post('/mail', async(req, res) => {
+//   const authNum = Math.random().toString().substr(2,6);
+//   let emailTemplate;
+//   ejs.renderFile(appDir + '/views/authMail.ejs', {authCode : authNum}, (err, data)=>{
+//     emailTemplete = data;
+//   });
+
+//   const transporter = nodemailer.createTransport({
+//     service: 'gmail',
+//     auth: {
+//       user: process.env.NODEMAILER_USER,
+//       pass: process.env.NODEMAILER_PASS,
+//     }
+//   });
+  
+//   const mailOptions = await transporter.sendMail({
+//     from: '공부밭',
+//     to: req.body.mail,
+//     subject: '회원가입을 위한 인증번호를 입력해주세요.',
+//     html: emailTemplate
+//   });
+
+//   transporter.sendMail(mailOptions, (err, info)=>{
+
+//   })
+// });
 
 //회원가입
 app.get("/signup", (req, res) => {
