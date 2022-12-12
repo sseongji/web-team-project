@@ -10,6 +10,7 @@
     <style>
         body{
             display: flex;
+            min-height: 120vh;
         }
     main{
       width: 1130px; justify-content: center;
@@ -79,17 +80,17 @@
 
             <div class="col-12" >
               <label for="Name" class="form-label">지역</label>
-              <input type="text" class="form-control" id="member" placeholder="멤버" name="member" required>
+              <input type="text" class="form-control" id="member" placeholder="지역" name="local" required>
               <div class="invalid-feedback">
                 Valid name is required.
               </div>
             </div>
 
             <div class="col-12">
-              <label for="Notice" class="form-label">공지</label>
+              <label for="Notice" class="form-label">자기 소개</label>
               <div class="input-group has-validation">
                 
-                <input type="text" class="form-control" id="Notice" placeholder="공지" value="" name="Notice">
+                <textarea class="form-control" id="floatingTextarea2" style="height: 100px" name="introduce"></textarea>
               <div class="invalid-feedback">
                   Your username is required.
                 </div>
@@ -97,8 +98,8 @@
             </div>
 
             <div class="form-floating">
-              <span>소개 </span>
-              <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea2" style="height: 100px" name="Description"></textarea>
+              <span>모임에 바라는 점 </span>
+              <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea2" style="height: 100px" name="Hope"></textarea>
               <div class="invalid-feedback">
                 Please enter a valid email address for shipping updates.
               </div>
@@ -130,22 +131,6 @@
               })
             </script>
 
-          <div class="btn-group" role="group" aria-label="Basic radio toggle button group" >
-            <input type="radio" class="btn-check" name="tag" id="btnradio1" autocomplete="off" value="면접">
-            <label class="btn btn-outline-primary" for="btnradio1">면접</label>
-
-            <input type="radio" class="btn-check" name="tag" id="btnradio2" autocomplete="off" value="인적성">
-            <label class="btn btn-outline-primary" for="btnradio2">인적성</label>
-
-            <input type="radio" class="btn-check" name="tag" id="btnradio3" autocomplete="off" value="언어">
-            <label class="btn btn-outline-primary" for="btnradio3">언어</label>
-
-            <input type="radio" class="btn-check" name="tag" id="btnradio4" autocomplete="off" value="자소서">
-            <label class="btn btn-outline-primary" for="btnradio4">자소서</label>
-
-            <input type="radio" class="btn-check" name="tag" id="btnradio5" autocomplete="off" value="자격증">
-            <label class="btn btn-outline-primary" for="btnradio5">자격증</label>
-          </div>
 
          
 
@@ -159,14 +144,7 @@
     </div>
   </main>
 
-  <footer class="my-5 pt-5 text-muted text-center text-small" id="footer">
-    <p class="mb-1">&copy; 2017–2022 Company Name</p>
-    <ul class="list-inline">
-      <li class="list-inline-item"><a href="#">Privacy</a></li>
-      <li class="list-inline-item"><a href="#">Terms</a></li>
-      <li class="list-inline-item"><a href="#">Support</a></li>
-    </ul>
-  </footer>
+
 </div>
 
 

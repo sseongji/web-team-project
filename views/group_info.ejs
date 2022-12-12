@@ -16,15 +16,31 @@
       crossorigin="anonymous"
     />
     <style>
+      body {
+        min-height: 150vh;
+      }
+
       .group-info {
-        margin-top: 25px;
-        text-align: center;
+        margin-top: 50px;
+        text-align: left;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .group-info h3 {
+        margin-top: 20px;
+        margin-left: 22%;
       }
 
       .members {
+        margin-top: 20px;
         display: flex;
         align-items: center;
         justify-content: center;
+      }
+
+      .members .card {
+        margin-left: 20px;
       }
     </style>
   </head>
@@ -46,6 +62,7 @@
         <div class="col-md-8">
           <div class="card-body" style="margin-left: 25px">
             <h5 class="card-title"><%=posts.name %></h5>
+
             <p class="card-text" style="margin-top: 25px">
               각오 : <%=posts.intro %>
             </p>
@@ -53,7 +70,9 @@
               <small class="text-muted">#<%=posts.tag %></small>
               <small class="text-muted">#<%=posts.member.length %>명</small>
             </p>
-            <p><a class="btn btn-primary" href="/group/<%=myId%>/register">그룹 가입하기</a></p>
+            <a class="btn btn-primary" href=" /group/<%=posts._id %>/register"
+              >그룹 가입</a
+            >
           </div>
         </div>
       </div>
@@ -91,7 +110,32 @@
 
     <div class="group-info">
       <h3>참여인원</h3>
-      <div class="members"></div>
+      <div class="members row-cols-3">
+        <% for(let i = 0; i < posts.member.length; i++){ %>
+        <div class="card" style="width: 18rem">
+          <img src="..." class="card-img-top" alt="..." />
+          <div class="card-body">
+            <p class="card-text">
+              Some quick example text to build on the card title and make up the
+              bulk of the card's content.
+            </p>
+          </div>
+        </div>
+        <% } %>
+      </div>
+    </div>
+
+    <div class="group-info">
+      <h3>소개 / 공지사항</h3>
+      <textarea
+        name=""
+        id=""
+        rows="10"
+        style="max-width: 1120px; margin-left: 21%; margin-top: 25px"
+      >
+      <%=posts.notice%>
+        </textarea
+      >
     </div>
   </body>
 </html>

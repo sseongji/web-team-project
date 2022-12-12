@@ -446,6 +446,10 @@ app.get("/group/:id/register", (req, res) => {
   res.render("group_register");
 });
 
+app.post("/group/:id/register", (req, res) => {
+  res.redirect("/group/:id");
+});
+
 //현재 날짜(nnnn년 n월 n일) 가져오기
 //연, 월
 const nowdate = new Date();
@@ -462,9 +466,9 @@ const gid = 200;
 
 app.get("/group/:id/homework", (req, res) => {
   //해당 모임의 해당 월 숙제 데이터 find
-  // const gid = group_id
+  // const gid = req.params.id;
 
-  console.log(req.params.id);
+  console.log(gid);
 
   db.collection("homework")
     .find({ group_id: gid, "date.y": thisYear, "date.m": thisMonth })
@@ -496,6 +500,11 @@ app.get("/group/:id/homework", (req, res) => {
 
 app.put("/group/:id/homework", (req, res) => {
   // const gid = group_id
+
+  // let gid = req.params.id;
+
+  console.log(gid);
+
   console.log(req.body);
   const inputValues = req.body;
 
@@ -522,9 +531,11 @@ app.put("/group/:id/homework", (req, res) => {
 });
 
 app.get("/group/:id/bat", (req, res) => {
-  console.log(req.params.id);
+  // console.log(req.params.id);
   //gid == group_id
-  // const gid = group_id
+
+  // const gid = req.params.id;
+
   //render할 데이터 세팅
   const setReturn = (result) => {
     //모임원
@@ -609,6 +620,12 @@ app.get("/group/:id/bat", (req, res) => {
 });
 
 app.put("/group/:id/bat", (req, res) => {
+  //gid == group_id
+
+  // const gid = req.params.id;
+
+  // console.log(gid);
+
   console.log(req.body);
   const inputValues = req.body;
   const setKeyString = "success." + inputValues.id;
@@ -616,12 +633,13 @@ app.put("/group/:id/bat", (req, res) => {
 
   db.collection("homework").updateOne(
     {
-      group_id: gid,
       "date.y": thisYear,
       "date.m": thisMonth,
       "date.d": nowdate.getDate(),
     },
-    { $set: { [setKeyString]: JSON.parse(inputValues.success) } },
+    {
+      $set: { [setKeyString]: JSON.parse(inputValues.success) },
+    },
     (err, result) => {
       if (err) console.log(err);
       console.log(result);
