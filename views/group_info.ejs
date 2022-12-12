@@ -15,24 +15,36 @@
       integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi"
       crossorigin="anonymous"
     />
+    <style>
+      .group-info {
+        margin-top: 25px;
+        text-align: center;
+      }
+
+      .members {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    </style>
   </head>
   <body>
     <%- include('nav.html') %>
 
     <div
       class="card mb-3 container"
-      style="max-width: 1000px; margin-top: 30px; height: 300px"
+      style="max-width: 1000px; margin-top: 30px; height: 250px; border: none"
     >
       <div class="row g-0">
         <div class="col-md-4">
           <img
             src="/public/image/<%= posts.img %>"
-            class="img-fluid rounded-start"
+            class="img-fluid rounded"
             alt="..."
           />
         </div>
         <div class="col-md-8">
-          <div class="card-body">
+          <div class="card-body" style="margin-left: 25px">
             <h5 class="card-title"><%=posts.name %></h5>
             <p class="card-text" style="margin-top: 25px">
               각오 : <%=posts.intro %>
@@ -44,6 +56,41 @@
           </div>
         </div>
       </div>
+    </div>
+
+    <center style="margin-top: 70px">
+      <hr id="line" class="my-1" style="width: 1130px" />
+      <nav class="navbar navbar-expand" id="navibar" style="width: 1130px">
+        <div class="container-fluid" style="margin-left: 60px">
+          <div
+            class="collapse navbar-collapse justify-content-start"
+            id="navbarNav"
+          >
+            <ul class="navbar-nav">
+              <li class="item nav-item">
+                <a class="nav-link" href="/group/<%=posts._id %>">정보</a>
+              </li>
+              <li class="item nav-item">
+                <a class="nav-link" href="#">스터디</a>
+              </li>
+              <li class="item nav-item">
+                <a class="nav-link" href="#">게시판</a>
+              </li>
+              <li class="item nav-item">
+                <a class="nav-link" href="/group/<%=posts._id%>/bat "
+                  >밭가꾸기</a
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+      <hr id="line" class="my-1" style="width: 1130px" />
+    </center>
+
+    <div class="group-info">
+      <h3>참여인원</h3>
+      <div class="members"></div>
     </div>
   </body>
 </html>
