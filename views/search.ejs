@@ -58,7 +58,7 @@
           </div>
         
             <input type="text" class="form-control" aria-label="Text input with dropdown button">
-            <button class="btn btn-primary" type="submit">버튼</button>
+            <button class="btn btn-primary" type="submit"> 버튼</button>
             
           </form>
         </div>
@@ -92,7 +92,7 @@
                     <text x="50%" y="50%" fill="#eceeef" dy=".3em" style="margin-left: 10px; ">
                       <%=posts[i].name%>
                     </text>
-                  </svg>
+              
 
                   <div class="card-body">
                     <p class="card-text">
@@ -102,14 +102,15 @@
                       class="d-flex justify-content-between align-items-center"
                     >
                       <div class="btn-group">
-                        <button
+                        
+                        <a href="/group/<%= posts[i]._id %>"><button
                           type="button"
                           class="btn btn-sm btn-outline-secondary"
-                        >
-                          <a href="/group/<%=posts[i]._id %>" style="text-decoration-line: none;">참여하기</a>
+                        >참여하기 
                         </button>
-                      </div>
-                      <small class="text-muted">참여인원 :<%=posts[i].member.length%></small>
+                        </a> 
+                  </div>
+                      <small class="text-muted">참여인원 : <%= posts[i].member.length %>명</small>
                     </div>
                   </div>
                 </div>

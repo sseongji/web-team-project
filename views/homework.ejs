@@ -85,7 +85,7 @@
 
             $.ajax({
                 method: 'PUT',
-                url : '/homework',
+                url : '/group/<%=params%>/homework',
                 data : inputValues
             }).done((result)=>{
                 //update 성공
@@ -98,7 +98,7 @@
 
         //밭으로 이동
         $('#btn-back').click(()=>{
-            location.href='/bat'
+            location.href='/group/<%=params%>/bat'
         })
         //숙제 일괄 등록???
         // $('input').each((index, item)=>{ //(1일~마지막날)

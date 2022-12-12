@@ -1,186 +1,214 @@
 <!DOCTYPE html>
 <html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>밭</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css">
-</head>
-    <style>
-        /* body{
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css"
+    />
+  </head>
+  <style>
+    /* body{
             width: 1130px;
             margin: 0 auto;
         } */
-    </style>
-<body>
+  </style>
+  <body>
     <!-- nav bar -->
     <%- include('nav.html') %>
 
     <!-- jquery -->
     <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
 
-    <h3 class="text-center mt-4 mb-4 d-flex justify-content-center" id="viewTitle">밭</h3>
+    <h3
+      class="text-center mt-4 mb-4 d-flex justify-content-center"
+      id="viewTitle"
+    >
+      밭
+    </h3>
     <div class="container">
-        <div class="row col-md-12 col-lg-10 mx-auto">
-            <div class="flex-row">
-                <div class="d-grid d-flex justify-content-end">
-                    <button class="btn btn-primary btn-sm" type="button" id="btn-homework-setting">숙제 관리</button>
-                </div>
-            </div>
-            <p class="text-center"><%=todayHomework%></p>
-            <% members.forEach(mem=>{ %>
-                <div class="d-grid gap-2 d-md-flex">
-                    <h6 class="me-auto"><%=mem%></h6>
-                    <!-- <h6>( <%=score[mem].success%> / <%=score[mem].attend%> ), </h6> -->
-                    <!-- 버튼 클릭 시 업데이트 처리하기 위해 나눔 -->
-                    <h6>( </h6>
-                    <h6 class="score" id="<%=mem%>-score-num"><%=score[mem].success%></h6>
-                    <h6> / </h6>
-                    <h6 class="score" id="<%=mem%>-attend-num"><%=score[mem].attend%></h6>
-                    <h6> ), </h6>
-                    <h6 class="score" id="<%=mem%>-score-per"><%=score[mem].percentage%></h6>
-                    <h6>(%)</h6>
-                </div>
-                <div class="mb-4 border border-1 rounded-3 pt-2">
-                    <div class="d-flex flex-row memids" id="<%=mem%>">
-                        <% homeworks.forEach(hw=>{ %>
-                            <div class="d-flex flex-column mx-auto text-center">
-                                <div class="show-date-<%=hw.date.d%>"><%=hw.date.d%></div>
-                                <!-- <div id="<%=mem%>-<%=hw.date.d%>"></div> -->
-                                <div class="<%=hw.date.d%>" id="<%=mem%>-<%=hw.date.d%>">
-                                <%if(mem in hw.success === true){%>
-                                    <% if(hw.success[mem] === true) { %>
-                                        <i class="bi bi-check-square-fill"></i>
-                                    <%} else {%>
-                                        <i class="bi bi-square"></i>
-                                    <%}%>     
-                                <%}%>  
-                                    <!-- <i class="bi bi-check-lg"></i> -->
-                                </div>
-                            </div>
-                        <% }) %>
-                    </div>
-                </div> 
-            <% }) %>
+      <div class="row col-md-12 col-lg-10 mx-auto">
+        <div class="flex-row">
+          <div class="d-grid d-flex justify-content-end">
+            <a
+              id="btn-homework-setting"
+              href="/group/<%=params%>/homework"
+              class="btn btn-primary"
+              style="border: none"
+              >숙제 관리</a
+            >
+          </div>
         </div>
+        <p class="text-center"><%=todayHomework%></p>
+        <% members.forEach(mem=>{ %>
+        <div class="d-grid gap-2 d-md-flex">
+          <h6 class="me-auto"><%=mem%></h6>
+          <!-- <h6>( <%=score[mem].success%> / <%=score[mem].attend%> ), </h6> -->
+          <!-- 버튼 클릭 시 업데이트 처리하기 위해 나눔 -->
+          <h6>(</h6>
+          <h6 class="score" id="<%=mem%>-score-num"><%=score[mem].success%></h6>
+          <h6>/</h6>
+          <h6 class="score" id="<%=mem%>-attend-num"><%=score[mem].attend%></h6>
+          <h6>),</h6>
+          <h6 class="score" id="<%=mem%>-score-per">
+            <%=score[mem].percentage%>
+          </h6>
+          <h6>(%)</h6>
+        </div>
+        <div class="mb-4 border border-1 rounded-3 pt-2">
+          <div class="d-flex flex-row memids" id="<%=mem%>">
+            <% homeworks.forEach(hw=>{ %>
+            <div class="d-flex flex-column mx-auto text-center">
+              <div class="show-date-<%=hw.date.d%>"><%=hw.date.d%></div>
+              <!-- <div id="<%=mem%>-<%=hw.date.d%>"></div> -->
+              <div class="<%=hw.date.d%>" id="<%=mem%>-<%=hw.date.d%>">
+                <%if(mem in hw.success === true){%> <% if(hw.success[mem] ===
+                true) { %>
+                <i class="bi bi-check-square-fill"></i>
+                <%} else {%>
+                <i class="bi bi-square"></i>
+                <%}%> <%}%>
+                <!-- <i class="bi bi-check-lg"></i> -->
+              </div>
+            </div>
+            <% }) %>
+          </div>
+        </div>
+        <% }) %>
+      </div>
     </div>
 
     <script>
-        //현재 날짜(nnnn년 n월 n일) 가져오기
-        //연, 월
-        const nowdate = new Date()
-        const thisYear = nowdate.getFullYear()
-        const thisMonth = nowdate.getMonth()+1
-        // console.log(thisYear, thisMonth)
-        //일
-        const prevLast = new Date(thisYear, thisMonth-1, 0) //저번 달 마지막 날
-        const lastDate = new Date(thisYear, thisMonth, 0).getDate() //이번 달 마지막 날
-        const thisDates = [...Array(lastDate+1).keys()].splice(1)
-        console.log(thisDates)
-        //요일
-        const thisFirstDay = (prevLast.getDay()+1)%7 //이번 달 1일 요일
-        console.log(thisFirstDay)
+      //현재 날짜(nnnn년 n월 n일) 가져오기
+      //연, 월
+      const nowdate = new Date();
+      const thisYear = nowdate.getFullYear();
+      const thisMonth = nowdate.getMonth() + 1;
+      // console.log(thisYear, thisMonth)
+      //일
+      const prevLast = new Date(thisYear, thisMonth - 1, 0); //저번 달 마지막 날
+      const lastDate = new Date(thisYear, thisMonth, 0).getDate(); //이번 달 마지막 날
+      const thisDates = [...Array(lastDate + 1).keys()].splice(1);
+      console.log(thisDates);
+      //요일
+      const thisFirstDay = (prevLast.getDay() + 1) % 7; //이번 달 1일 요일
+      console.log(thisFirstDay);
 
-        //오늘 날짜
-        const today = nowdate.getDate()
-        // console.log(today)
+      //오늘 날짜
+      const today = nowdate.getDate();
+      // console.log(today)
 
-        //오늘 날짜 강조
-        $('.show-date-'+today).css('background-color','#F16A6E')
-        $('.show-date-'+today).css('color','white')
-        $('.show-date-'+today).css('border-radius','6px')
+      //오늘 날짜 강조
+      $(".show-date-" + today).css("background-color", "#F16A6E");
+      $(".show-date-" + today).css("color", "white");
+      $(".show-date-" + today).css("border-radius", "6px");
 
-        //오늘의 숙제가 없을 때 뷰어에 안내메시지
-        console.log($('p').text())
-        if ($('p').text()===''){
-            $('p').text('설정된 오늘의 숙제가 없습니다. 숙제관리에서 설정해주세요.')
-            $('p').css('color', '#F16A6E')
-        }
+      //오늘의 숙제가 없을 때 뷰어에 안내메시지
+      console.log($("p").text());
+      if ($("p").text() === "") {
+        $("p").text(
+          "설정된 오늘의 숙제가 없습니다. 숙제관리에서 설정해주세요."
+        );
+        $("p").css("color", "#F16A6E");
+      }
 
-        //숙제관리 페이지로 이동
-        $('#btn-homework-setting').click(()=>{
-            location.href='/homework'
-        })
+      //숙제관리 페이지로 이동
+      $("#btn-homework-setting").click(() => {
+        location.href = "/homework";
+      });
 
-        //1일에서 오늘날짜까지만 아이콘 보여주기, 나머지는 hidden
-        const hiddenDivIcons = [...thisDates].splice(today)
-        // console.log(hiddenIcons)
-        console.log($('.memids'))
+      //1일에서 오늘날짜까지만 아이콘 보여주기, 나머지는 hidden
+      const hiddenDivIcons = [...thisDates].splice(today);
+      // console.log(hiddenIcons)
+      console.log($(".memids"));
 
-        $('.memids').each((index, mem)=>{
-            hiddenDivIcons.forEach(d=>{
-            $('#'+mem.id+'-'+d).css('visibility', 'hidden')
+      $(".memids").each((index, mem) => {
+        hiddenDivIcons.forEach((d) => {
+          $("#" + mem.id + "-" + d).css("visibility", "hidden");
+        });
+      });
+
+      //점수 뷰어 강조
+      $(".score").css("color", "#F16A6E");
+
+      //update
+      //클릭 가능한 아이콘 id: 'member_id-date' (예) firstID-31)
+      $("." + today)
+        .css("cursor", "pointer")
+        .click((e) => {
+          console.log(e.target.parentElement.id);
+          const changedTarget = e.target.parentElement.id;
+          const checkedIcon = ["bi bi-square", "bi bi-check-square-fill"]; //0: 숙제 안함, 1: 숙제 함
+          let success = true;
+
+          if ($("#" + changedTarget + ">i").attr("class") === checkedIcon[0]) {
+            console.log("0->1");
+            $("#" + changedTarget + ">i").attr("class", checkedIcon[1]);
+          } else if (
+            $("#" + changedTarget + ">i").attr("class") === checkedIcon[1]
+          ) {
+            console.log("1->0");
+            $("#" + changedTarget + ">i").attr("class", checkedIcon[0]);
+            success = false;
+          }
+
+          //update 보낼 데이터
+          const id = changedTarget.split("-")[0];
+          console.log(id);
+          inputValues = { id: id, success: success };
+
+          $.ajax({
+            method: "PUT",
+            url: "/group/<%=params%>/bat",
+            data: inputValues,
+          })
+            .done((result) => {
+              //update 성공
+              console.log(result);
+
+              //update 후, 점수(값, 백분율) 변경 처리
+              const showScoreNumT = $("#" + id + "-score-num");
+              const showScorePerT = $("#" + id + "-score-per");
+              const attendNum = Number($("#" + id + "-attend-num").html());
+              let showScore = Number(showScoreNumT.html());
+              console.log(showScore);
+
+              //숙제 점수
+              if (success) {
+                //0->1(false->true), +1
+                // console.log(showScoreNumT + 1)
+                showScore += 1;
+                showScoreNumT.html(`${showScore}`);
+              } else {
+                //1->0(true->false), -1
+                // console.log(showScoreNumT- 1)
+                showScore -= 1;
+                showScoreNumT.html(`${showScore}`);
+              }
+              //숙제 백분율
+              const showPer = ((showScore / attendNum) * 100).toFixed(2);
+              console.log(showPer);
+              showScorePerT.html(`${showPer}`);
             })
-        })
-
-        //점수 뷰어 강조
-        $('.score').css('color','#F16A6E')
-
-        //update
-        //클릭 가능한 아이콘 id: 'member_id-date' (예) firstID-31)
-        $('.'+today).css('cursor','pointer').click((e)=>{
-            console.log(e.target.parentElement.id)
-            const changedTarget = e.target.parentElement.id
-            const checkedIcon = [
-                'bi bi-square',
-                'bi bi-check-square-fill'
-            ]//0: 숙제 안함, 1: 숙제 함
-            let success = true
-
-            if($('#'+changedTarget+'>i').attr('class') === checkedIcon[0]){
-                console.log('0->1')
-                $('#'+changedTarget+'>i').attr('class',checkedIcon[1])
-            }else if($('#'+changedTarget+'>i').attr('class') === checkedIcon[1]){
-                console.log('1->0')
-                $('#'+changedTarget+'>i').attr('class',checkedIcon[0])
-                success = false
-            }
-
-            //update 보낼 데이터
-            const id = changedTarget.split('-')[0]
-            console.log(id)
-            inputValues = {'id': id, 'success' : success}
-
-            $.ajax({
-                method: 'PUT',
-                url : '/bat',
-                data : inputValues
-            }).done((result)=>{
-                //update 성공
-                console.log(result)
-
-                //update 후, 점수(값, 백분율) 변경 처리
-                const showScoreNumT = $('#'+id+'-score-num')
-                const showScorePerT = $('#'+id+'-score-per')
-                const attendNum = Number($('#'+id+'-attend-num').html())
-                let showScore = Number(showScoreNumT.html())
-                console.log(showScore)
-
-                //숙제 점수
-                if(success){
-                    //0->1(false->true), +1
-                    // console.log(showScoreNumT + 1)
-                    showScore += 1
-                    showScoreNumT.html(`${showScore}`)
-                }else{
-                    //1->0(true->false), -1
-                    // console.log(showScoreNumT- 1)
-                    showScore -= 1
-                    showScoreNumT.html(`${showScore}`)
-                }
-                //숙제 백분율
-                const showPer = ((showScore / attendNum) * 100).toFixed(2)
-                console.log(showPer)
-                showScorePerT.html(`${showPer}`)
-
-            }).fail((xhr, textStatus, errorThrown)=>{
-                //update 실패
-                console.log('group collection update failed...', xhr, textStatus, errorThrown)
-            })
-
-        })
+            .fail((xhr, textStatus, errorThrown) => {
+              //update 실패
+              console.log(
+                "group collection update failed...",
+                xhr,
+                textStatus,
+                errorThrown
+              );
+            });
+        });
     </script>
-</body>
+  </body>
 </html>

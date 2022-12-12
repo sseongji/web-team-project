@@ -53,16 +53,18 @@ mongoClient.connect(process.env.DB_URL, function (err, client) {
 let ObjectId = require("mongodb").ObjectId;
 
 //session
-const session = require('express-session');
-app.use(session({
-    secret: '1111',
+const session = require("express-session");
+app.use(
+  session({
+    secret: "1111",
     resave: false,
     saveUninitialized: true,
-}));
+  })
+);
 
 //passport
-const passport = require('passport');
-const LocalStrategy = require('passport-local').Strategy;
+const passport = require("passport");
+const LocalStrategy = require("passport-local").Strategy;
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -72,11 +74,11 @@ const { brotliDecompress } = require('zlib');
 app.use(methodOverride('_method'));
 
 //flash message
-const flash = require('connect-flash');
+const flash = require("connect-flash");
 app.use(flash());
 
 //템플릿용 변수 설정
-app.use(function(req,res,next){
+app.use(function (req, res, next) {
   res.locals.currentUser = req.user;
   res.locals.errors = req.flash("error");
   res.locals.infos = req.flash("info");
@@ -84,7 +86,7 @@ app.use(function(req,res,next){
 });
 
 //암호화 bcrypt
-const bcrypt = require('bcrypt');
+const bcrypt = require("bcrypt");
 
 //routes
 app.get("/changeprivacy", (req, res) => {
@@ -96,39 +98,41 @@ app.get("/signup", (req, res) => {
   return res.render("signup.ejs");
 });
 
-app.post('/signup',(req, res, next) => {
+app.post("/signup", (req, res, next) => {
   const userphone = req.body.phone;
   const password = req.body.pw;
   const saltRounds = 10;
 
   bcrypt.hash(password, saltRounds, (err, hash) => {
-    db.collection('user').findOne({ phone : userphone }, (err, user) => {
+    db.collection("user").findOne({ phone: userphone }, (err, user) => {
       if (user) {
         req.flash("error", "중복된 아이디입니다.");
         return res.redirect("/signup");
-      }
-      else {
-        db.collection('user').insertOne({
-          phone : userphone, 
-          name : req.body.name,
-          pw : hash,
-          birth : req.body.birth,
-          region : req.body.region,
-          tag : req.body.tag,
-          regidate : getCurrentDate()
-        }, function(err, result){
-            console.log('저장완료');
-            
+      } else {
+        db.collection("user").insertOne(
+          {
+            phone: userphone,
+            name: req.body.name,
+            pw: hash,
+            birth: req.body.birth,
+            region: req.body.region,
+            tag: req.body.tag,
+            regidate: getCurrentDate(),
+          },
+          function (err, result) {
+            console.log("저장완료");
+
             //index 카운트
             // db.collection('counter').updateOne({name : 'usercnt'}, { $inc : {cnt : 1}}, function(err, result){
             //   //usercnt 1만큼 증가
             //   if(err) return console.log(err);
             //   })
-        })
-        res.redirect('/login');
+          }
+        );
+        res.redirect("/login");
       }
-    })
-  })
+    });
+  });
 });
 
 //로그인
@@ -137,43 +141,52 @@ app.get("/login", (req, res, next) => {
 });
 
 //passport를 이용한 인증 방식
-app.post('/login', passport.authenticate('local', {
-            failureRedirect : '/login',
-            failureFlash: true
-        }),(req, res) => {
-        res.redirect('/');
-});
+app.post(
+  "/login",
+  passport.authenticate("local", {
+    failureRedirect: "/login",
+    failureFlash: true,
+  }),
+  (req, res) => {
+    res.redirect("/");
+  }
+);
 
-passport.use(new LocalStrategy({
-    usernameField : 'phone',
-    passwordField : 'pw',
-    session : true,
-    passReqToCallback : false,
-    
-    }, function(inputid, inputpw, done){ 
-    db.collection('user').findOne({phone : inputid}, function(err, user){
-        if(err) return done(err);
-        if(!user) {
-            return done(null, false, {message : "존재하지 않는 아이디입니다."})
+passport.use(
+  new LocalStrategy(
+    {
+      usernameField: "phone",
+      passwordField: "pw",
+      session: true,
+      passReqToCallback: false,
+    },
+    function (inputid, inputpw, done) {
+      db.collection("user").findOne({ phone: inputid }, function (err, user) {
+        if (err) return done(err);
+        if (!user) {
+          return done(null, false, { message: "존재하지 않는 아이디입니다." });
         }
-        bcrypt.compare(inputpw, user.pw, function(err, result){
-          if(result) {
+        bcrypt.compare(inputpw, user.pw, function (err, result) {
+          if (result) {
             return done(null, user);
+          } else {
+            return done(null, false, {
+              message: "비밀번호가 일치하지 않습니다.",
+            });
           }
-          else {
-            return done(null, false, {message : "비밀번호가 일치하지 않습니다."})
-          }
-        })
-    })
-}));
-passport.serializeUser((user, done)=>{
-    done(null, user.phone); 
+        });
+      });
+    }
+  )
+);
+passport.serializeUser((user, done) => {
+  done(null, user.phone);
 });
-passport.deserializeUser((userid, done)=>{  
-    db.collection('user').findOne({phone : userid}, function(err, result){
-        done(null, result);
-        console.log(result);
-    })
+passport.deserializeUser((userid, done) => {
+  db.collection("user").findOne({ phone: userid }, function (err, result) {
+    done(null, result);
+    console.log(result);
+  });
 });
 
 // db의 post collection을 post.ejs에 result로 전달 (게시물)
@@ -209,7 +222,7 @@ app.post("/add", (req, res) => {
         content: req.body.contents,
         createdate: getCurrentDate(),
         writer: req.body.writer,
-        count_id: totalcount + 1
+        count_id: totalcount + 1,
       },
       (err, result) => {
         console.log("저장완료");
@@ -221,7 +234,8 @@ app.post("/add", (req, res) => {
             if (err) return console.log(err);
           }
         );
-      });
+      }
+    );
   });
   res.redirect("/post");
 });
@@ -240,70 +254,72 @@ app.put('/edit', (req, res) => {
   )
 })
 
-app.get('/edit/:id', (req, res) => {
+app.get("/edit/:id", (req, res) => {
   console.log(req.params.id);
 
-  db.collection('post').findOne({_id : parseInt(req.params.id)}, function(err, result){
+  db.collection("post").findOne(
+    { _id: parseInt(req.params.id) },
+    function (err, result) {
       if (err) return console.log(err);
       console.log(result);
-      res.render('edit.ejs', {post : result});
-  })
-})
+      res.render("edit.ejs", { post: result });
+    }
+  );
+});
 
 // 게시물 삭제
-app.delete('/delete', (req, res) => {
-  console.log(`게시물 id : ${req.body._id}`)
+app.delete("/delete", (req, res) => {
+  console.log(`게시물 id : ${req.body._id}`);
   req.body._id = parseInt(req.body._id);
-                   // post에 저장된 _id, 로그인한 유저의 _id
-  var deleteData = {_id : req.body._id, _id : req.body._id}
+  // post에 저장된 _id, 로그인한 유저의 _id
+  var deleteData = { _id: req.body._id, _id: req.body._id };
   console.log(deleteData);
 
   // post에 저장된 _id, 로그인한 유저의 _id의 값이 동일하면 db에서 삭제 요청
-  db.collection('post').deleteOne(deleteData, (err, result) => {
-      if (err) return console.log(err);
-      // 성공하면 200이라는 코드를 보내줌
-      console.log('result.deletedCount = ' + result.deletedCount)
-      if (result.deletedCount == 1){
-          console.log('삭제 성공');
-          res.status(200).send({message : '성공'});
-      }
-      // 실패하면 400이라는 코드를 보내줌
-      else if (result.deletedCount == 0){
-          console.log('삭제 실패');
-          res.status(400).send({message : '실패'});
-      }
-      // 아이디까지 똑같을떄만 삭제했다는 메시지를 보낼거임
-      // 그래야 진짜 삭제했을때만 list.ejs에서 삭제 처리를 할거임
+  db.collection("post").deleteOne(deleteData, (err, result) => {
+    if (err) return console.log(err);
+    // 성공하면 200이라는 코드를 보내줌
+    console.log("result.deletedCount = " + result.deletedCount);
+    if (result.deletedCount == 1) {
+      console.log("삭제 성공");
+      res.status(200).send({ message: "성공" });
+    }
+    // 실패하면 400이라는 코드를 보내줌
+    else if (result.deletedCount == 0) {
+      console.log("삭제 실패");
+      res.status(400).send({ message: "실패" });
+    }
+    // 아이디까지 똑같을떄만 삭제했다는 메시지를 보낼거임
+    // 그래야 진짜 삭제했을때만 list.ejs에서 삭제 처리를 할거임
   });
-  res.redirect("/post");
 })
 
 // 댓글 삭제
-app.delete('/deleteComment', (req, res) => {
-  console.log(`댓글 id : ${req.body._id}`)
+app.delete("/deleteComment", (req, res) => {
+  console.log(`댓글 id : ${req.body._id}`);
   req.body._id = parseInt(req.body._id);
-                   // post에 저장된 _id, 로그인한 유저의 _id
-  var deleteData = {_id : req.body._id, _id : req.body._id}
+  // post에 저장된 _id, 로그인한 유저의 _id
+  var deleteData = { _id: req.body._id, _id: req.body._id };
   console.log(deleteData);
 
   // post에 저장된 _id, 로그인한 유저의 _id의 값이 동일하면 db에서 삭제 요청
-  db.collection('comment').deleteOne(deleteData, (err, result) =>{
-      if (err) return console.log(err);
-      // 성공하면 200이라는 코드를 보내줌
-      console.log('result.deletedCount = ' + result.deletedCount)
-      if (result.deletedCount == 1){
-          console.log('삭제 성공');
-          res.status(200).send({message : '성공'});
-      }
-      // 실패하면 400이라는 코드를 보내줌
-      else if (result.deletedCount == 0){
-          console.log('삭제 실패');
-          res.status(400).send({message : '실패'});
-      }
-      // 아이디까지 똑같을떄만 삭제했다는 메시지를 보낼거임
-      // 그래야 진짜 삭제했을때만 list.ejs에서 삭제 처리를 할거임
+  db.collection("comment").deleteOne(deleteData, (err, result) => {
+    if (err) return console.log(err);
+    // 성공하면 200이라는 코드를 보내줌
+    console.log("result.deletedCount = " + result.deletedCount);
+    if (result.deletedCount == 1) {
+      console.log("삭제 성공");
+      res.status(200).send({ message: "성공" });
+    }
+    // 실패하면 400이라는 코드를 보내줌
+    else if (result.deletedCount == 0) {
+      console.log("삭제 실패");
+      res.status(400).send({ message: "실패" });
+    }
+    // 아이디까지 똑같을떄만 삭제했다는 메시지를 보낼거임
+    // 그래야 진짜 삭제했을때만 list.ejs에서 삭제 처리를 할거임
   });
-})
+});
 
 // 댓글 달기
 app.post("/addComment", (req, res) => {
@@ -320,7 +336,7 @@ app.post("/addComment", (req, res) => {
         content: req.body.comment,
         createdate: getCurrentDate(),
         writer: req.body.writer,
-        post_id: req.body.post_id
+        post_id: req.body.post_id,
       },
       (err, result) => {
         console.log("저장완료");
@@ -332,7 +348,8 @@ app.post("/addComment", (req, res) => {
             if (err) return console.log(err);
           }
         );
-      });
+      }
+    );
   });
   res.redirect("/post");
 });
@@ -342,7 +359,9 @@ app.get("/write", function (req, res) {
   res.render("write.ejs");
 });
 
-//각각의 카테고리 페이지를 아래의 함수 반복으로 처리할 예정
+
+
+
 app.get("/", (req, res) => {
   db.collection("group")
     .find()
@@ -351,10 +370,44 @@ app.get("/", (req, res) => {
     });
 });
 
+// app.get("/aptitute", (req, res) => {
+//   db.collection("group")
+//     .find()
+//     .toArray(function (err, result) {
+//       res.render("search.ejs", { posts: result, array: array });
+//     });
+// });
+
+// app.get("/language", (req, res) => {
+//   db.collection("group")
+//     .find()
+//     .toArray(function (err, result) {
+//       res.render("search.ejs", { posts: result, array: array });
+//     });
+// });
+
+// app.get("/resume", (req, res) => {
+//   db.collection("group")
+//     .find()
+//     .toArray(function (err, result) {
+//       res.render("search.ejs", { posts: result, array: array });
+//     });
+// });
+
+// app.get("/license", (req, res) => {
+//   db.collection("group")
+//     .find()
+//     .toArray(function (err, result) {
+//       res.render("search.ejs", { posts: result });
+//     });
+// });
+
+//그룹 생성 페이지
 app.get("/group_add", (req, res) => {
   return res.render("group_sign.ejs");
 });
 
+//그룹 생성 과정
 app.post("/group_upload", upload.single("Img"), (req, res) => {
   let members = req.body.member.split(",");
 
@@ -391,141 +444,191 @@ app.get("/group/:id", (req, res) => {
 
 //현재 날짜(nnnn년 n월 n일) 가져오기
 //연, 월
-const nowdate = new Date()
-const thisYear = nowdate.getFullYear()
-const thisMonth = nowdate.getMonth()+1
+const nowdate = new Date();
+const thisYear = nowdate.getFullYear();
+const thisMonth = nowdate.getMonth() + 1;
 // console.log(thisYear, thisMonth)
 //일
 // const prevLast = new date(thisYear, thisMonth, 0)
-const lastDate = new Date(thisYear, thisMonth, 0).getDate()
-const thisDates = [...Array(lastDate+1).keys()].splice(1)
+const lastDate = new Date(thisYear, thisMonth, 0).getDate();
+const thisDates = [...Array(lastDate + 1).keys()].splice(1);
 // console.log(thisDates)
 
-const gid = 200
+const gid = 200;
 
-app.get("/homework", (req, res) => {
+app.get("/group/:id/homework", (req, res) => {
   //해당 모임의 해당 월 숙제 데이터 find
   // const gid = group_id
 
-  db.collection('homework').find({ group_id : gid, 'date.y' : thisYear, 'date.m' : thisMonth}).toArray((err, result)=>{
-    if(err) console.log(err)
-    // console.log(result)
-    console.log(result.length)
-    if(result.length===0){
-      //데이터 없으면, insert
-      insertHomeworkData(gid)
-      //다시 조회
-      db.collection('homework').find({ group_id : gid, 'date.y' : thisYear, 'date.m' : thisMonth}).toArray((err, result)=>{
-        if(err) console.log(err)
-        console.log(result)
-        return res.render("homework.ejs", {homeworks: result});
-       })
-    }
-    //데이터가 있으면, 바로 render
-    else{
-      return res.render("homework.ejs", {homeworks: result});
-    }
-  })
+  console.log(req.params.id);
+
+  db.collection("homework")
+    .find({ group_id: gid, "date.y": thisYear, "date.m": thisMonth })
+    .toArray((err, result) => {
+      if (err) console.log(err);
+      // console.log(result)
+      console.log(result.length);
+      if (result.length === 0) {
+        //데이터 없으면, insert
+        insertHomeworkData(gid);
+        //다시 조회
+        db.collection("homework")
+          .find({ group_id: gid, "date.y": thisYear, "date.m": thisMonth })
+          .toArray((err, result) => {
+            if (err) console.log(err);
+            console.log(result);
+            return res.render("homework.ejs", { homeworks: result });
+          });
+      }
+      //데이터가 있으면, 바로 render
+      else {
+        return res.render("homework.ejs", {
+          homeworks: result,
+          params: req.params.id,
+        });
+      }
+    });
 });
 
-app.put('/homework', (req, res)=>{
+app.put("/group/:id/homework", (req, res) => {
   // const gid = group_id
-  console.log(req.body)
-  const inputValues = req.body
-  
+  console.log(req.body);
+  const inputValues = req.body;
+
   //날짜별로 update, (오늘부터 마지막날)
-  for(const key in inputValues){
+  for (const key in inputValues) {
     // console.log(parseInt(key))
-    db.collection('homework').updateOne(
-      { group_id : gid, 'date.y' : thisYear, 'date.m' : thisMonth, 'date.d' : parseInt(key)}, 
-      { $set: { content : inputValues[key] }},
-      (err, result)=>{
+    db.collection("homework").updateOne(
+      {
+        group_id: gid,
+        "date.y": thisYear,
+        "date.m": thisMonth,
+        "date.d": parseInt(key),
+      },
+      { $set: { content: inputValues[key] } },
+      (err, result) => {
         if (err) return console.log(err);
         // console.log('group_id: '+ gid + ', ' + parseInt(key)+'일 숙제수정완료');
-    })
+      }
+    );
   }
-  res.status(200).send({message : 'put요청으로 데이터 전달, 해당 그룹의 숙제 수정 완료'})
-})
+  res
+    .status(200)
+    .send({ message: "put요청으로 데이터 전달, 해당 그룹의 숙제 수정 완료" });
+});
 
-app.get("/bat", (req, res) => {
+app.get("/group/:id/bat", (req, res) => {
+  console.log(req.params.id);
   //gid == group_id
   // const gid = group_id
   //render할 데이터 세팅
-  const setReturn = (result) =>{
+  const setReturn = (result) => {
     //모임원
-    const mems = result[result.length-1].success
-    const memIds = Object.keys(mems)
-    console.log(Object.keys(mems))
+    const mems = result[result.length - 1].success;
+    const memIds = Object.keys(mems);
+    console.log(Object.keys(mems));
     //오늘의 숙제
     // console.log(nowdate.getDate())
-    const idx = result.length + nowdate.getDate() - lastDate - 1 //(길이 + 오늘(일) - 이번달마지막(일) - 1)
-    const todayHomework = result[idx].content
-    console.log(todayHomework)
+    const idx = result.length + nowdate.getDate() - lastDate - 1; //(길이 + 오늘(일) - 이번달마지막(일) - 1)
+    const todayHomework = result[idx].content;
+    console.log(todayHomework);
 
     //이번 달, 참여한 숙제 수
     // [...thisDates].splice(today)
-    let score = []
-    let percentageScore = 0
-    memIds.forEach(memId=>{
-      let attendCnt = 0
-      let trueCnt = 0
+    let score = [];
+    let percentageScore = 0;
+    memIds.forEach((memId) => {
+      let attendCnt = 0;
+      let trueCnt = 0;
       // (hw.success[mem] === true)
       // console.log(result.slice(0, nowdate.getDate()))
-      result.slice(0, nowdate.getDate()).forEach(r=>{
+      result.slice(0, nowdate.getDate()).forEach((r) => {
         // console.log(r.success)
-        if(memId in r.success){
-          attendCnt += 1
-          if(r.success[memId] === true){
-            trueCnt += 1
+        if (memId in r.success) {
+          attendCnt += 1;
+          if (r.success[memId] === true) {
+            trueCnt += 1;
           }
         }
-      })
-      percentageScore = (trueCnt/attendCnt) * 100 
-      console.log(memId+', '+trueCnt+' / '+attendCnt+', '+Number(percentageScore.toFixed(2))+'(%)') //소수점둘째자리까지
+      });
+      percentageScore = (trueCnt / attendCnt) * 100;
+      console.log(
+        memId +
+          ", " +
+          trueCnt +
+          " / " +
+          attendCnt +
+          ", " +
+          Number(percentageScore.toFixed(2)) +
+          "(%)"
+      ); //소수점둘째자리까지
       //attend(할당된 숙제 개수), success(할당된 숙제 완료한 개수)
-      score[memId] = {'attend' : attendCnt, 'success': trueCnt, 'percentage': Number(percentageScore.toFixed(2))}
-    })
-    console.log(score)
-    return res.render("bat.ejs", {homeworks: result, members: memIds, todayHomework : todayHomework, score: score});
-  }
+      score[memId] = {
+        attend: attendCnt,
+        success: trueCnt,
+        percentage: Number(percentageScore.toFixed(2)),
+      };
+    });
+    console.log(score);
+    return res.render("bat.ejs", {
+      homeworks: result,
+      members: memIds,
+      todayHomework: todayHomework,
+      score: score,
+      params: req.params.id,
+    });
+  };
 
-  db.collection('homework').find({ group_id : gid, 'date.y' : thisYear, 'date.m' : thisMonth}).toArray((err, result)=>{
-    if(err) console.log(err)
-    console.log(result)
-    console.log(result.length)
-    if(result.length===0){
-      //해당 그룹의 해당 월 숙제 데이터가 없는 상태.
-      //#### 방장이면, 숙제 처리로 이동? 나머지 인원은 모달창 띄워줌? #### 어떻게 할 것???
+  db.collection("homework")
+    .find({ group_id: gid, "date.y": thisYear, "date.m": thisMonth })
+    .toArray((err, result) => {
+      if (err) console.log(err);
+      console.log(result);
+      console.log(result.length);
+      if (result.length === 0) {
+        //해당 그룹의 해당 월 숙제 데이터가 없는 상태.
+        //#### 방장이면, 숙제 처리로 이동? 나머지 인원은 모달창 띄워줌? #### 어떻게 할 것???
 
-      //데이터 없으면, insert
-      insertHomeworkData(gid)
-      db.collection('homework').find({ group_id : gid, 'date.y' : thisYear, 'date.m' : thisMonth}).toArray((err, result)=>{
-        if(err) console.log(err)
-        console.log(result)
-        setReturn(result)
-      })
-    }else{
-      setReturn(result)
+        //데이터 없으면, insert
+        insertHomeworkData(gid);
+        db.collection("homework")
+          .find({ group_id: gid, "date.y": thisYear, "date.m": thisMonth })
+          .toArray((err, result) => {
+            if (err) console.log(err);
+            console.log(result);
+            setReturn(result);
+          });
+      } else {
+        setReturn(result);
+      }
+    });
+});
+
+app.put("/group/:id/bat", (req, res) => {
+  console.log(req.body);
+  const inputValues = req.body;
+  const setKeyString = "success." + inputValues.id;
+  console.log(setKeyString);
+
+  db.collection("homework").updateOne(
+    {
+      group_id: gid,
+      "date.y": thisYear,
+      "date.m": thisMonth,
+      "date.d": nowdate.getDate(),
+    },
+    { $set: { [setKeyString]: JSON.parse(inputValues.success) } },
+    (err, result) => {
+      if (err) console.log(err);
+      console.log(result);
     }
-  })
-})
+  );
 
-app.put("/bat", (req, res) => {
-  console.log(req.body)
-  const inputValues = req.body
-  const setKeyString = 'success.'+inputValues.id
-  console.log(setKeyString)
-
-  db.collection('homework').updateOne(
-    { group_id : gid, 'date.y' : thisYear, 'date.m' : thisMonth, 'date.d' : nowdate.getDate()},
-    { $set: { [setKeyString] : JSON.parse(inputValues.success) }},
-    (err, result)=>{
-    if(err) console.log(err)
-    console.log(result)
-  })
-
-  res.status(200).send({message : 'put요청으로 데이터 전달, 선택한 모임원 점수와 이행 여부 업데이트 완료'})
-})
+  res.status(200).send({
+    message:
+      "put요청으로 데이터 전달, 선택한 모임원 점수와 이행 여부 업데이트 완료",
+  });
+});
 
 //테스트 homework 데이터 삭제 쿼리
 // app.get("/test", (req, res) => {
@@ -534,44 +637,44 @@ app.put("/bat", (req, res) => {
 // })
 
 // 데이터가 없으면, 해당 월의 오늘 포함 이후 날짜만큼 숙제 데이터 insert하고, homework로 render하는 함수
-const insertHomeworkData = (gid) =>{
+const insertHomeworkData = (gid) => {
   //해당 모임의 모임원 id 가져오고, 숙제 이행 여부(success)를 defalut값(false)으로 적용
-  db.collection('group').findOne({ _id : gid},(err, result)=>{
-    if(err) console.log(err)
-    console.log(result)
+  db.collection("group").findOne({ _id: gid }, (err, result) => {
+    if (err) console.log(err);
+    console.log(result);
 
-    let hw = []
-    let memSuccess = {}
-    const members = result.member
+    let hw = [];
+    let memSuccess = {};
+    const members = result.member;
 
-    members.forEach(member=>{
-      memSuccess[member] = false
-    })  
-    // console.log('내부',memSuccess) 
+    members.forEach((member) => {
+      memSuccess[member] = false;
+    });
+    // console.log('내부',memSuccess)
 
     //insert할 데이터 리스트 (오늘 ~ 마지막 날)
-    const inputIds = [...thisDates].splice(nowdate.getDate()-1)
+    const inputIds = [...thisDates].splice(nowdate.getDate() - 1);
 
-    inputIds.forEach(d=>{
+    inputIds.forEach((d) => {
       hw.push({
-        content: '',
-        date:{
+        content: "",
+        date: {
           y: thisYear,
           m: thisMonth,
-          d: d
+          d: d,
         },
-        group_id : gid,
-        success : memSuccess
-      })
-    })
+        group_id: gid,
+        success: memSuccess,
+      });
+    });
     // console.log('내부', hw)
     //insert
-    db.collection('homework').insertMany(hw, (err, result)=>{
-      if(err) console.log(err)
+    db.collection("homework").insertMany(hw, (err, result) => {
+      if (err) console.log(err);
       // console.log(result)
-    })
-  })
-}
+    });
+  });
+};
 
 //get korea local time
 const getCurrentDate = () => {
@@ -588,7 +691,8 @@ const getCurrentDate = () => {
   );
 };
 
-// // 페이지를 찾을 수 없을때 표시
-// app.all('*', (req, res) => {//등록되지 않은 패스에 대해 페이지 오류 응답
-//   res.status(404).send('<h1>ERROR - 페이지를 찾을 수 없습니다.</h1>');
-// })
+// 페이지를 찾을 수 없을때 표시
+app.all("*", (req, res) => {
+  //등록되지 않은 패스에 대해 페이지 오류 응답
+  res.status(404).send("<h1>ERROR - 페이지를 찾을 수 없습니다.</h1>");
+});
