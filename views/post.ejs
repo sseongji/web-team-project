@@ -113,7 +113,7 @@
                 <%= comments[j].writer %> : <%= comments[j].content %>
                 <div style="float: right;">
                   날짜 : <%= comments[j].createdate %>
-                  <button class="btn btn-danger deleteComment" data-id="<%= comments[j]._id %>">삭제</button>
+                  <button id="deleteComment" class="btn btn-danger" data-id="<%= comments[j]._id %>">삭제</button>
                 </div>
               </h6>
               <% } %>
@@ -155,7 +155,7 @@
       })
 
       /* 댓글 삭제 */ 
-      $('.deleteComment').click((e) =>{
+      $('#deleteComment').click((e) =>{
         var num = e.target.dataset.id;
         console.log(num);
         var btnClick = $(this)

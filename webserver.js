@@ -66,6 +66,11 @@ const LocalStrategy = require('passport-local').Strategy;
 app.use(passport.initialize());
 app.use(passport.session());
 
+// method-override 사용
+const methodOverride = require('method-override');   // 미들웨어
+const { brotliDecompress } = require('zlib');
+app.use(methodOverride('_method'));
+
 //flash message
 const flash = require('connect-flash');
 app.use(flash());
@@ -223,7 +228,6 @@ app.post("/add", (req, res) => {
 
 app.put('/edit', (req, res) => {
   console.log(req.body)
-  console.log("진입은 하니?")
   db.collection('post').updateOne(
       { _id : parseInt(req.body.id) },
       { $set : { content : req.body.contents } },
@@ -231,9 +235,9 @@ app.put('/edit', (req, res) => {
           if (err) return console.log(err);
           console.log(result);
           console.log('수정 완료')
-          res.redirect("/post");
       }
   )
+  res.redirect("/post");
 })
 
 app.get('/edit/:id', (req, res) => {
@@ -586,7 +590,7 @@ const getCurrentDate = () => {
   );
 };
 
-// 페이지를 찾을 수 없을때 표시
-app.all('*', (req, res) => {//등록되지 않은 패스에 대해 페이지 오류 응답
-  res.status(404).send('<h1>ERROR - 페이지를 찾을 수 없습니다.</h1>');
-})
+// // 페이지를 찾을 수 없을때 표시
+// app.all('*', (req, res) => {//등록되지 않은 패스에 대해 페이지 오류 응답
+//   res.status(404).send('<h1>ERROR - 페이지를 찾을 수 없습니다.</h1>');
+// })
