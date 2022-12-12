@@ -17,8 +17,8 @@
 
     <style>
       *{
-            font-family: 'Gowun Batang', serif;
-            font-size: 20px;
+        font-family: 'Gowun Batang', serif;
+        font-size: 20px;
       }
       #createBtn{
         width: 10%;
@@ -83,12 +83,17 @@
           글 번호 : <%= posts[i]._id %>
           <div style="float: right;">날짜 : <%= posts[i].createdate %></div>
           <p></p>
-          <h4><%= posts[i].writer %> : <%= posts[i].content %>
-            <div style="float: right;">
-              <button class="btn btn-danger delete" data-id="<%= posts[i]._id %>">삭제</button>
-              <a class="btn btn-danger" href="/edit/<%= posts[i]._id %>">수정</a>
-            </div>
-          </h4>
+          <form id="editContents" action="/edit?_method=PUT" method="POST" style="display: none;">
+            <textarea name="id" type="text" style="display: none;"><%= posts[i]._id %></textarea>
+            <textarea name="writer" style="display: none;"><%= posts[i].writer %></textarea>
+            <textarea name="editContent" class="form-control" style="resize: vertical;"><%= posts[i].content %></textarea>
+            <button id="updateBtn" type="submit" class="btn btn-primary" style="width: 80px;">수정</button>
+          </form>
+          <h4 id="postContent"><%= posts[i].writer %> : <%= posts[i].content %></h4>
+          <div id="postOption" style="float: right; margin-top: -50px;">
+            <button class="btn btn-danger delete" data-id="<%= posts[i]._id %>" style="float: right;">삭제</button>
+            <button id="editBtn" class="btn btn-danger" style="float: right; margin-right: 3px;">수정</button>
+          </div>
           <p></p>
           <hr id="line" class="my-1" style="width: 100%">
           <!-- 댓글 작성 -->
@@ -106,16 +111,17 @@
           <div>
             <% for(let j = 0; j < comments.length; j++){ %>
               <% if(comments[j].post_id == posts[i]._id){ %>
-                <svg xmlns="http://www.w3.org/2000/svg" style="margin-left:10px; margin-right:10px; float:left; transform: rotate( 180deg );" width="16" height="16" fill="currentColor" class="bi bi-arrow-90deg-left" viewBox="0 0 16 16">
-                  <path fill-rule="evenodd" d="M1.146 4.854a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 4H12.5A2.5 2.5 0 0 1 15 6.5v8a.5.5 0 0 1-1 0v-8A1.5 1.5 0 0 0 12.5 5H2.707l3.147 3.146a.5.5 0 1 1-.708.708l-4-4z"/>
-                </svg>
-              <h6>
-                <%= comments[j].writer %> : <%= comments[j].content %>
-                <div style="float: right;">
-                  날짜 : <%= comments[j].createdate %>
-                  <button id="deleteComment" class="btn btn-danger" data-id="<%= comments[j]._id %>">삭제</button>
+                <div style="margin: 1px; border: 1px;">
+                  <svg xmlns="http://www.w3.org/2000/svg" style="margin-left:10px; margin-right:10px; float:left; transform: rotate( 180deg );" width="16" height="16" fill="currentColor" class="bi bi-arrow-90deg-left" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M1.146 4.854a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 4H12.5A2.5 2.5 0 0 1 15 6.5v8a.5.5 0 0 1-1 0v-8A1.5 1.5 0 0 0 12.5 5H2.707l3.147 3.146a.5.5 0 1 1-.708.708l-4-4z"/>
+                  </svg>
+                  <%= comments[j].writer %> : <%= comments[j].content %>
+                  <div style="float: right;">
+                    날짜 : <%= comments[j].createdate %>
+                    <button class="btn btn-danger deleteComment" data-id="<%= comments[j]._id %>">삭제</button>
+                  </div>
                 </div>
-              </h6>
+                <p></p>
               <% } %>
             <% } %>
             </li>
@@ -129,11 +135,26 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
     
     <script>
+      /* 게시물 수정 화면으로 변경 */
+      $('#editBtn').click((e) => {
+        document.getElementById('postContent').style.display='none'
+        document.getElementById('postOption').style.display='none'
+        document.getElementById('editContents').style.display='flex'
+      })
+
+      /* 게시물 수정 완료 */
+      $('#updateBtn').click((e) => {
+        document.getElementById('editContents').style.display='none'
+        document.getElementById('postContent').style.display='flex'
+        document.getElementById('postOption').style.display='flex'
+      })
+
       /* 게시물 삭제 */
       $('.delete').click((e) => {
         var num = e.target.dataset.id;
-        console.log(num);
+        console.log(`num : ${num}`);
         var btnClick = $(this)
+        console.log(`btnClick : ${btnClick}`)
 
         $.ajax({
           method : 'DELETE',
@@ -144,7 +165,7 @@
           console.log("성공했어요");
           
           // 삭제 대상을 안보이게 처리하는 루틴
-          btnClick.parents('li').fadeOut();
+          btnClickd.parents('li').fadeOut();
           setTimeout(() => console.log("after"), 1000);
           // 새로고침
           //location.reload();
@@ -155,10 +176,11 @@
       })
 
       /* 댓글 삭제 */ 
-      $('#deleteComment').click((e) =>{
+      $('.deleteComment').click((e) =>{
         var num = e.target.dataset.id;
-        console.log(num);
+        console.log(`num : ${num}`);
         var btnClick = $(this)
+        console.log(`btnClick : ${btnClick}`)
 
         $.ajax({
           method : 'DELETE',

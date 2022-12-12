@@ -230,14 +230,14 @@ app.put('/edit', (req, res) => {
   console.log(req.body)
   db.collection('post').updateOne(
       { _id : parseInt(req.body.id) },
-      { $set : { content : req.body.contents } },
+      { $set : { content : req.body.editContent } },
       (err, result) => {
           if (err) return console.log(err);
           console.log(result);
           console.log('수정 완료')
+          res.redirect("/post");
       }
   )
-  res.redirect("/post");
 })
 
 app.get('/edit/:id', (req, res) => {
@@ -275,6 +275,7 @@ app.delete('/delete', (req, res) => {
       // 아이디까지 똑같을떄만 삭제했다는 메시지를 보낼거임
       // 그래야 진짜 삭제했을때만 list.ejs에서 삭제 처리를 할거임
   });
+  res.redirect("/post");
 })
 
 // 댓글 삭제
@@ -340,9 +341,6 @@ app.post("/addComment", (req, res) => {
 app.get("/write", function (req, res) {
   res.render("write.ejs");
 });
-
-
-
 
 //각각의 카테고리 페이지를 아래의 함수 반복으로 처리할 예정
 app.get("/", (req, res) => {
