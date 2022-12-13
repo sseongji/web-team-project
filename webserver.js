@@ -62,6 +62,10 @@ app.use(
   })
 );
 
+//cookie
+const cookieParser = require('cookie-parser')
+app.use(cookieParser())
+
 //passport
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
@@ -79,9 +83,8 @@ app.use(flash());
 
 //템플릿용 변수 설정
 app.use(function (req, res, next) {
-  res.locals.currentUser = req.user;
-  res.locals.errors = req.flash("error");
-  res.locals.infos = req.flash("info");
+  // res.locals.currentUser = req.user;
+  res.locals.error = req.flash("error");
   next();
 });
 
@@ -91,58 +94,102 @@ const bcrypt = require("bcrypt");
 //nodemailer
 const nodemailer = require('nodemailer');
 
+const ejs = require('ejs');
+const { off } = require("process");
+const appDir = path.dirname(require.main.filename);
+
+
 //routes
 app.get("/changeprivacy", (req, res) => {
   return res.render("changeprivacy.ejs");
 });
 
 //이메일 인증
-// app.post('/mail', async(req, res) => {
-//   const authNum = Math.random().toString().substr(2,6);
-//   let emailTemplate;
-//   ejs.renderFile(appDir + '/views/authMail.ejs', {authCode : authNum}, (err, data)=>{
-//     emailTemplete = data;
-//   });
+app.post('/emailAuth', async(req, res) => {
+  const emailaddress = req.body.email
+  const existemail = await db.collection("user").findOne({ email: emailaddress });
+  try{
+    //이메일 중복 시
+    if (existemail) {
+      req.flash("error", "중복된 아이디입니다.");
+      // return res.redirect("/signup");
+    } else {
+      const authNum = Math.random().toString().substr(2,6);
+      const hashAuth = await bcrypt.hash(authNum, 12);
+      res.cookie('hashAuth', hashAuth, { maxAge : 300000 });
+      
+      let emailTemplate;
+        ejs.renderFile(appDir + '/views/authMail.ejs', {authCode: authNum}, (err, data)=>{
+          emailTemplate = data;
+        });
+      
+        const transporter = nodemailer.createTransport({
+          service: 'gmail',
+          auth: {
+            user: process.env.NODEMAILER_USER,
+            pass: process.env.NODEMAILER_PASS,
+          }
+        });
 
-//   const transporter = nodemailer.createTransport({
-//     service: 'gmail',
-//     auth: {
-//       user: process.env.NODEMAILER_USER,
-//       pass: process.env.NODEMAILER_PASS,
-//     }
-//   });
-  
-//   const mailOptions = await transporter.sendMail({
-//     from: '공부밭',
-//     to: req.body.mail,
-//     subject: '회원가입을 위한 인증번호를 입력해주세요.',
-//     html: emailTemplate
-//   });
+      const mailOptions = {
+          from: '공부밭',
+          to: emailaddress,
+          subject: '회원가입을 위한 인증번호를 입력해주세요.',
+          html: emailTemplate
+      };
+      await transporter.sendMail(mailOptions, (err, res)=>{
+        if(err) console.log(err);
+        else {
+          console.log('이메일 전송');
+        }
+        transporter.close();
+      })
+    }
+  } catch (err) {
+    res.send({ result: 'fail'});
+    console.log(err);
+  }
+});
 
-//   transporter.sendMail(mailOptions, (err, info)=>{
+//이메일 인증
+app.post('/cert', async(req, res)=>{
+  const code = req.body.code;
+  const hashAuth = req.cookies.hashAuth;
+  console.log(code);
 
-//   })
-// });
+  try {
+    if(bcrypt.compareSync(code, hashAuth)){
+      res.send({ result : 'success' });
+    } else {
+    res.send({ result : 'fail' });
+    }
+  } catch(err) {
+      res.send({ result : 'fail' });
+      console.error(err);
+    }
+});
+
+
 
 //회원가입
 app.get("/signup", (req, res) => {
-  return res.render("signup.ejs");
+    return res.render("signup.ejs");
 });
 
-app.post("/signup", (req, res, next) => {
-  const userphone = req.body.phone;
+app.post("/signup", (req, res) => {
+  const usermail = req.body.email;
   const password = req.body.pw;
   const saltRounds = 10;
 
   bcrypt.hash(password, saltRounds, (err, hash) => {
-    db.collection("user").findOne({ phone: userphone }, (err, user) => {
+    db.collection("user").findOne({ email : usermail }, ( err, user) => {
       if (user) {
         req.flash("error", "중복된 아이디입니다.");
         return res.redirect("/signup");
       } else {
         db.collection("user").insertOne(
           {
-            phone: userphone,
+            email: usermail,
             name: req.body.name,
             pw: hash,
             birth: req.body.birth,
@@ -167,14 +214,12 @@ app.post("/signup", (req, res, next) => {
 });
 
 //로그인
-app.get("/login", (req, res, next) => {
+app.get("/login", (req, res) => {
   return res.render("login.ejs");
 });
 
 //passport를 이용한 인증 방식
-app.post(
-  "/login",
-  passport.authenticate("local", {
+app.post("/login", passport.authenticate("local", {
     failureRedirect: "/login",
     failureFlash: true,
   }),
@@ -186,24 +231,23 @@ app.post(
 passport.use(
   new LocalStrategy(
     {
-      usernameField: "phone",
+      usernameField: "email",
       passwordField: "pw",
       session: true,
-      passReqToCallback: false,
+      passReqToCallback: true,
     },
-    function (inputid, inputpw, done) {
-      db.collection("user").findOne({ phone: inputid }, function (err, user) {
+    function (req, inputmail, inputpw, done) {
+
+      db.collection("user").findOne({ email: inputmail }, function (err, user) {
         if (err) return done(err);
         if (!user) {
-          return done(null, false, { message: "존재하지 않는 아이디입니다." });
+          return done(null, false, req.flash("error", '아이디가 존재하지 않습니다.'));
         }
         bcrypt.compare(inputpw, user.pw, function (err, result) {
           if (result) {
             return done(null, user);
           } else {
-            return done(null, false, {
-              message: "비밀번호가 일치하지 않습니다.",
-            });
+            return done(null, false, req.flash("error", "비밀번호가 일치하지 않습니다."));
           }
         });
       });
@@ -211,10 +255,10 @@ passport.use(
   )
 );
 passport.serializeUser((user, done) => {
-  done(null, user.phone);
+  done(null, user.email);
 });
 passport.deserializeUser((userid, done) => {
-  db.collection("user").findOne({ phone: userid }, function (err, result) {
+  db.collection("user").findOne({ email: userid }, function (err, result) {
     done(null, result);
     console.log(result);
   });

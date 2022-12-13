@@ -47,7 +47,9 @@
   <body>
     
     <%- include('nav.html') %>
-        
+
+    <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
+    
     <h2>공부밭</h2>
     
     <div class="formbody">
@@ -58,24 +60,25 @@
             <label>아이디</label>
             <div class="row">
                 <div class="col">
-                    <input type="text" class="form-control" name="phone" placeholder="전화번호를 입력하세요">
+                    <input type="text" class="form-control" name="email" placeholder="이메일을 입력하세요">
                 </div>
                 <div class="col">
-                    <button type="submit" class="btn btn-danger" style="background-color: #F16A6E; border-color: #F16A6E;">인증번호 전송</button>
+                    <button type="button" class="btn btn-danger sendCode" style="background-color: #F16A6E; border-color: #F16A6E;">인증번호 전송</button>
                 </div>
             </div>
             
-            <div class="dup"> <h6> <%= errors %> </h6> </div>
+            <div class="dup"> <h6> <%= error %> </h6> </div>
 
         
             <div class="row total">
                 <div class="col">
-                    <input type="text" class="form-control">
+                    <input type="text" class="form-control" name="codenum">
                 </div>
                 <div class="col">
-                    <button type="submit" class="btn btn-primary" style="background-color: #4AB186; border-color: #4AB186;">인증 확인</button>
+                    <button type="button" class="btn btn-primary confirmCode" style="background-color: #4AB186; border-color: #4AB186;">인증 확인</button>
                 </div>
             </div>
+            <div class="dup"> <h6> <%= error %> </h6> </div>
 
             <p></p>
 
@@ -164,6 +167,33 @@
         </form>
     </div>
 
+    <script>
+        $(".sendCode").click((e)=>{
+            var emailadress = $('input[name=email]').val();
+            console.log(emailadress);
+
+            $.ajax({
+                method: 'POST',
+                url: '/emailAuth',
+                data: { mail : emailadress }
+            }).done((result)=>{
+                console.log(result)
+            })
+        })
+
+        $(".confirmCode").click((e)=>{
+            var code = $('input[name=codenum]').val();
+            console.log(code);
+
+            $.ajax({
+                method: 'POST',
+                url: '/cert',
+                data: { code : code }
+            }).done((result)=>{
+                console.log(result)
+            })
+        })
+    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
   </body>
