@@ -220,10 +220,11 @@ passport.deserializeUser((userid, done) => {
   });
 });
 
-// db의 post collection을 post.ejs에 result로 전달 (게시물)
+// db의 post collection을 post.ejs에 result로 전달 (게시물) -> 게시판이라서 역순으로 출력
 app.get("/post", (req, res) => {
   db.collection("post")
     .find()
+    .sort({"_id": -1})
     .toArray((err, postResult) => {
       // post 게시물 id를 기준으로 그 게시물의 댓글들만 가져옴
       db.collection("comment")
@@ -267,10 +268,44 @@ app.post("/add", (req, res) => {
         );
       }
     );
+    res.redirect("/post");
   });
-  res.redirect("/post");
 });
 
+// 댓글 작성
+app.post("/addComment", (req, res) => {
+  console.log(`댓글 내용 : ${req.body.comment}`);
+
+  db.collection("index").findOne({ name: "commentcnt" }, (err, result) => {
+    console.log(`result.cnt : ${result.cnt}`);
+
+    var totalcount = result.cnt;
+
+    db.collection("comment").insertOne(
+      {
+        _id: totalcount + 1,
+        content: req.body.comment,
+        createdate: getCurrentDate(),
+        writer: req.body.writer,
+        post_id: req.body.post_id,
+      },
+      (err, result) => {
+        console.log("저장완료");
+        //counter라는 컬렉션에 있는 totalPost 1증가시켜주어야 함.
+        db.collection("index").updateOne(
+          { name: "commentcnt" },
+          { $inc: { cnt: 1 } },
+          () => {
+            if (err) return console.log(err);
+          }
+        );
+      }
+    );
+    res.redirect("/post");
+  });
+});
+
+// 게시물 수정
 app.put("/edit", (req, res) => {
   console.log(req.body);
   db.collection("post").updateOne(
@@ -285,18 +320,19 @@ app.put("/edit", (req, res) => {
   );
 });
 
-app.get("/edit/:id", (req, res) => {
-  console.log(req.params.id);
+// // 게시물 수정 url 진입(별도 url 진입을 안하게 수정해서 사용 안할 예정)
+// app.get("/edit/:id", (req, res) => {
+//   console.log(req.params.id);
 
-  db.collection("post").findOne(
-    { _id: parseInt(req.params.id) },
-    function (err, result) {
-      if (err) return console.log(err);
-      console.log(result);
-      res.render("edit.ejs", { post: result });
-    }
-  );
-});
+//   db.collection("post").findOne(
+//     { _id: parseInt(req.params.id) },
+//     function (err, result) {
+//       if (err) return console.log(err);
+//       console.log(result);
+//       res.render("edit.ejs", { post: result });
+//     }
+//   );
+// });
 
 // 게시물 삭제
 app.delete("/delete", (req, res) => {
@@ -350,39 +386,6 @@ app.delete("/deleteComment", (req, res) => {
     // 아이디까지 똑같을떄만 삭제했다는 메시지를 보낼거임
     // 그래야 진짜 삭제했을때만 list.ejs에서 삭제 처리를 할거임
   });
-});
-
-// 댓글 달기
-app.post("/addComment", (req, res) => {
-  console.log(`댓글 내용 : ${req.body.comment}`);
-
-  db.collection("index").findOne({ name: "commentcnt" }, (err, result) => {
-    console.log(`result.cnt : ${result.cnt}`);
-
-    var totalcount = result.cnt;
-
-    db.collection("comment").insertOne(
-      {
-        _id: totalcount + 1,
-        content: req.body.comment,
-        createdate: getCurrentDate(),
-        writer: req.body.writer,
-        post_id: req.body.post_id,
-      },
-      (err, result) => {
-        console.log("저장완료");
-        //counter라는 컬렉션에 있는 totalPost 1증가시켜주어야 함.
-        db.collection("index").updateOne(
-          { name: "commentcnt" },
-          { $inc: { cnt: 1 } },
-          () => {
-            if (err) return console.log(err);
-          }
-        );
-      }
-    );
-  });
-  res.redirect("/post");
 });
 
 // 글쓰기 버튼 누르면 진입
