@@ -16,10 +16,6 @@
       crossorigin="anonymous"
     />
     <style>
-      body {
-        min-height: 150vh;
-      }
-
       .group-info {
         margin-top: 50px;
         text-align: left;
@@ -29,18 +25,20 @@
 
       .group-info h3 {
         margin-top: 20px;
-        margin-left: 22%;
+        margin-left: 23%;
       }
 
       .members {
         margin-top: 20px;
+        margin-left: 20%;
+        margin-right: 20%;
         display: flex;
-        align-items: center;
-        justify-content: center;
+        flex-wrap: wrap;
       }
 
       .members .card {
-        margin-left: 20px;
+        margin-top: 20px;
+        margin-left: 50px;
       }
     </style>
   </head>
@@ -108,17 +106,14 @@
       <hr id="line" class="my-1" style="width: 1130px" />
     </center>
 
-    <div class="group-info">
+    <div class="group-info card-group">
       <h3>참여인원</h3>
-      <div class="members row-cols-3">
+      <div class="members">
         <% for(let i = 0; i < posts.member.length; i++){ %>
-        <div class="card" style="width: 18rem">
-          <img src="..." class="card-img-top" alt="..." />
+        <div class="card card h-100" style="width: 16rem">
+          <img class="card-img-top" />
           <div class="card-body">
-            <p class="card-text">
-              Some quick example text to build on the card title and make up the
-              bulk of the card's content.
-            </p>
+            <p class="card-text"><%=posts.member[i].name%></p>
           </div>
         </div>
         <% } %>
@@ -131,7 +126,12 @@
         name=""
         id=""
         rows="10"
-        style="max-width: 1120px; margin-left: 21%; margin-top: 25px"
+        style="
+          max-width: 1120px;
+          margin-left: 24%;
+          margin-top: 25px;
+          height: 200px;
+        "
       >
       <%=posts.notice%>
         </textarea
