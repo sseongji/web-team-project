@@ -89,7 +89,7 @@ app.use(function (req, res, next) {
 const bcrypt = require("bcrypt");
 
 //nodemailer
-const nodemailer = require('nodemailer');
+const nodemailer = require("nodemailer");
 
 //routes
 app.get("/changeprivacy", (req, res) => {
@@ -111,7 +111,7 @@ app.get("/changeprivacy", (req, res) => {
 //       pass: process.env.NODEMAILER_PASS,
 //     }
 //   });
-  
+
 //   const mailOptions = await transporter.sendMail({
 //     from: '공부밭',
 //     to: req.body.mail,
@@ -390,6 +390,7 @@ app.get("/write", function (req, res) {
   res.render("write.ejs");
 });
 
+// 각 카테고리 페이지 렌더링
 let array = ["면접", "인적성", "언어", "자소서", "자격증"];
 
 app.get("/", (req, res) => {
@@ -474,11 +475,31 @@ app.get("/group/:id", (req, res) => {
 
 //유저 그룹 가입 기능
 app.get("/group/:id/register", (req, res) => {
-  res.render("group_register");
+  let params = req.params.id;
+  res.render("group_register.ejs", { params: params });
 });
 
 app.post("/group/:id/register", (req, res) => {
-  res.redirect("/group/:id");
+  let myId = req.params.id;
+  db.collection("group").updateOne(
+    {
+      _id: ObjectId(req.params.id),
+    },
+    {
+      $push: {
+        member: {
+          name: req.body.Name,
+          local: req.body.local,
+          intro: req.body.introduce,
+          hope: req.body.Hope,
+        },
+      },
+    },
+    function (err, result) {
+      if (err) return console.log(err);
+      res.redirect("/group/:id/register");
+    }
+  );
 });
 
 //현재 날짜(nnnn년 n월 n일) 가져오기
