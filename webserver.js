@@ -83,7 +83,6 @@ app.use(flash());
 
 //템플릿용 변수 설정
 app.use(function (req, res, next) {
-  // res.locals.currentUser = req.user;
   res.locals.error = req.flash("error");
   next();
 });
@@ -99,6 +98,28 @@ const { off } = require("process");
 const appDir = path.dirname(require.main.filename);
 
 //routes
+
+
+
+app.get("/mypage", loginCheck, (req, res) => {
+  res.render("mypage.ejs", { userSession : req.user });
+});
+
+function loginCheck(req, res, next){
+  if (req.user) {
+    next()
+  } else {
+    res.render("login.ejs");
+  }
+}
+
+
+app.post('/uploadProfile', upload.single('myImage'), (req, res) => {
+  // res.render('mypage', {
+  //   file : './public/image/${req.file.filename}'
+  // })
+});
+
 app.get("/changeprivacy", (req, res) => {
   return res.render("changeprivacy.ejs");
 });
@@ -283,7 +304,6 @@ passport.serializeUser((user, done) => {
 passport.deserializeUser((userid, done) => {
   db.collection("user").findOne({ email: userid }, function (err, result) {
     done(null, result);
-    console.log(result);
   });
 });
 
