@@ -104,16 +104,30 @@ app.get("/changeprivacy", (req, res) => {
   return res.render("changeprivacy.ejs");
 });
 
+//닉네임 중복확인
+app.post('/nameCheck', async(req, res)=>{
+  const nickname = req.body.nickname;
+  const existname = await db.collection("user").findOne({ nickname: nickname });
+  console.log(existname);
+  try{
+      if (!existname) {
+        res.send('Y'); 
+    }
+    else if (existname) {
+      res.send('N')
+    }
+  } catch (err) {
+    console.log(err);
+  }
+})
+
 //이메일 인증
 app.post('/emailAuth', async(req, res) => {
   const emailaddress = req.body.email
   const existemail = await db.collection("user").findOne({ email: emailaddress });
   try{
-    //이메일 중복 시
-    if (existemail) {
-      req.flash("error", "중복된 아이디입니다.");
-      // return res.redirect("/signup");
-    } else {
+    //이메일 중복 아닐 시
+    if (!existemail) {
       const authNum = Math.random().toString().substr(2,6);
       const hashAuth = await bcrypt.hash(authNum, 12);
       res.cookie('hashAuth', hashAuth, { maxAge : 300000 });
@@ -137,16 +151,18 @@ app.post('/emailAuth', async(req, res) => {
           subject: '회원가입을 위한 인증번호를 입력해주세요.',
           html: emailTemplate
       };
-      await transporter.sendMail(mailOptions, (err, res)=>{
-        if(err) console.log(err);
-        else {
-          console.log('이메일 전송');
+      await transporter.sendMail(mailOptions, (req, res, err)=>{
+        if(err) {
+          console.log('실패');
         }
-        transporter.close();
+        else {
+          console.log('성공');
+        }
       })
+    } else {
+        res.send('중복');
     }
   } catch (err) {
-    res.send({ result: 'fail'});
     console.log(err);
   }
 });
@@ -182,15 +198,12 @@ app.post("/signup", (req, res) => {
   const saltRounds = 10;
 
   bcrypt.hash(password, saltRounds, (err, hash) => {
-    db.collection("user").findOne({ email : usermail }, ( err, user) => {
-      if (user) {
-        req.flash("error", "중복된 아이디입니다.");
-        return res.redirect("/signup");
-      } else {
+    db.collection("user").findOne({ email : usermail }, (err, user) => {
+      if (!user) {
         db.collection("user").insertOne(
           {
             email: usermail,
-            name: req.body.name,
+            nickname: req.body.nickname,
             pw: hash,
             birth: req.body.birth,
             region: req.body.region,
