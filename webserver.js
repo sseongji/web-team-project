@@ -63,8 +63,8 @@ app.use(
 );
 
 //cookie
-const cookieParser = require('cookie-parser')
-app.use(cookieParser())
+const cookieParser = require("cookie-parser");
+app.use(cookieParser());
 
 //passport
 const passport = require("passport");
@@ -94,10 +94,9 @@ const bcrypt = require("bcrypt");
 //nodemailer
 const nodemailer = require("nodemailer");
 
-const ejs = require('ejs');
+const ejs = require("ejs");
 const { off } = require("process");
 const appDir = path.dirname(require.main.filename);
-
 
 //routes
 app.get("/changeprivacy", (req, res) => {
@@ -130,28 +129,32 @@ app.post('/emailAuth', async(req, res) => {
     if (!existemail) {
       const authNum = Math.random().toString().substr(2,6);
       const hashAuth = await bcrypt.hash(authNum, 12);
-      res.cookie('hashAuth', hashAuth, { maxAge : 300000 });
-      
+      res.cookie("hashAuth", hashAuth, { maxAge: 300000 });
+
       let emailTemplate;
-        ejs.renderFile(appDir + '/views/authMail.ejs', {authCode: authNum}, (err, data)=>{
+      ejs.renderFile(
+        appDir + "/views/authMail.ejs",
+        { authCode: authNum },
+        (err, data) => {
           emailTemplate = data;
-        });
-      
-        const transporter = nodemailer.createTransport({
-          service: 'gmail',
-          auth: {
-            user: process.env.NODEMAILER_USER,
-            pass: process.env.NODEMAILER_PASS,
-          }
-        });
+        }
+      );
+
+      const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          user: process.env.NODEMAILER_USER,
+          pass: process.env.NODEMAILER_PASS,
+        },
+      });
 
       const mailOptions = {
-          from: '공부밭',
-          to: emailaddress,
-          subject: '회원가입을 위한 인증번호를 입력해주세요.',
-          html: emailTemplate
+        from: "공부밭",
+        to: emailaddress,
+        subject: "회원가입을 위한 인증번호를 입력해주세요.",
+        html: emailTemplate,
       };
-      await transporter.sendMail(mailOptions, (req, res, err)=>{
+      await transporter.sendMail(mailOptions, (err, res)=>{
         if(err) {
           console.log('실패');
         }
@@ -168,28 +171,26 @@ app.post('/emailAuth', async(req, res) => {
 });
 
 //이메일 인증
-app.post('/cert', async(req, res)=>{
+app.post("/cert", async (req, res) => {
   const code = req.body.code;
   const hashAuth = req.cookies.hashAuth;
   console.log(code);
 
   try {
-    if(bcrypt.compareSync(code, hashAuth)){
-      res.send({ result : 'success' });
+    if (bcrypt.compareSync(code, hashAuth)) {
+      res.send({ result: "success" });
     } else {
-    res.send({ result : 'fail' });
+      res.send({ result: "fail" });
     }
-  } catch(err) {
-      res.send({ result : 'fail' });
-      console.error(err);
-    }
+  } catch (err) {
+    res.send({ result: "fail" });
+    console.error(err);
+  }
 });
-
-
 
 //회원가입
 app.get("/signup", (req, res) => {
-    return res.render("signup.ejs");
+  return res.render("signup.ejs");
 });
 
 app.post("/signup", (req, res) => {
@@ -232,7 +233,9 @@ app.get("/login", (req, res) => {
 });
 
 //passport를 이용한 인증 방식
-app.post("/login", passport.authenticate("local", {
+app.post(
+  "/login",
+  passport.authenticate("local", {
     failureRedirect: "/login",
     failureFlash: true,
   }),
@@ -250,17 +253,24 @@ passport.use(
       passReqToCallback: true,
     },
     function (req, inputmail, inputpw, done) {
-
       db.collection("user").findOne({ email: inputmail }, function (err, user) {
         if (err) return done(err);
         if (!user) {
-          return done(null, false, req.flash("error", '아이디가 존재하지 않습니다.'));
+          return done(
+            null,
+            false,
+            req.flash("error", "아이디가 존재하지 않습니다.")
+          );
         }
         bcrypt.compare(inputpw, user.pw, function (err, result) {
           if (result) {
             return done(null, user);
           } else {
-            return done(null, false, req.flash("error", "비밀번호가 일치하지 않습니다."));
+            return done(
+              null,
+              false,
+              req.flash("error", "비밀번호가 일치하지 않습니다.")
+            );
           }
         });
       });
@@ -281,7 +291,7 @@ passport.deserializeUser((userid, done) => {
 app.get("/post", (req, res) => {
   db.collection("post")
     .find()
-    .sort({"_id": -1})
+    .sort({ _id: -1 })
     .toArray((err, postResult) => {
       // post 게시물 id를 기준으로 그 게시물의 댓글들만 가져옴
       db.collection("comment")
@@ -500,6 +510,7 @@ app.get("/group_add", (req, res) => {
 
 //그룹 생성 과정
 app.post("/group_upload", upload.single("Img"), (req, res) => {
+  console.log(req.body);
   let members = req.body.member.split(",");
 
   db.collection("group").insertOne(
@@ -527,7 +538,7 @@ app.get("/group/:id", (req, res) => {
     { _id: ObjectId(myId) },
     function (err, result) {
       if (err) return console.log(err);
-
+      console.log(result);
       res.render("group_info.ejs", { posts: result, myId });
     }
   );
@@ -541,23 +552,43 @@ app.get("/group/:id/register", (req, res) => {
 
 app.post("/group/:id/register", (req, res) => {
   let myId = req.params.id;
-  db.collection("group").updateOne(
+  console.log(req.body);
+  console.log(myId);
+
+  db.collection("user").findOne(
     {
-      _id: ObjectId(req.params.id),
-    },
-    {
-      $push: {
-        member: {
-          name: req.body.Name,
-          local: req.body.local,
-          intro: req.body.introduce,
-          hope: req.body.Hope,
-        },
-      },
+      email: req.body.email,
     },
     function (err, result) {
       if (err) return console.log(err);
-      res.redirect("/group/:id/register");
+
+      db.collection("group").updateOne(
+        {
+          _id: ObjectId(req.params.id),
+        },
+        {
+          $push: {
+            member: {
+              name: req.body.name,
+              local: req.body.local,
+              intro: req.body.introduce,
+              hope: req.body.Hope,
+              email: req.body.email,
+            },
+          },
+        },
+        function (err, result) {
+          if (err) return console.log(err);
+          db.collection("group").findOne(
+            { _id: ObjectId(myId) },
+            function (err, result) {
+              if (err) return console.log(err);
+              console.log(result);
+              res.render("group_info.ejs", { posts: result, myId });
+            }
+          );
+        }
+      );
     }
   );
 });
@@ -591,6 +622,7 @@ app.get("/group/:id/homework", (req, res) => {
       if (result.length === 0) {
         //데이터 없으면, insert
         insertHomeworkData(gid);
+
         //다시 조회
         db.collection("homework")
           .find({ group_id: gid, "date.y": thisYear, "date.m": thisMonth })
@@ -615,7 +647,7 @@ app.put("/group/:id/homework", (req, res) => {
 
   // let gid = req.params.id;
 
-  console.log(gid);
+  // console.log(gid);
 
   console.log(req.body);
   const inputValues = req.body;
@@ -643,10 +675,11 @@ app.put("/group/:id/homework", (req, res) => {
 });
 
 app.get("/group/:id/bat", (req, res) => {
-  // console.log(req.params.id);
   //gid == group_id
 
   // const gid = req.params.id;
+
+  // console.log(req.params.id);
 
   //render할 데이터 세팅
   const setReturn = (result) => {
@@ -717,7 +750,9 @@ app.get("/group/:id/bat", (req, res) => {
         //#### 방장이면, 숙제 처리로 이동? 나머지 인원은 모달창 띄워줌? #### 어떻게 할 것???
 
         //데이터 없으면, insert
+
         insertHomeworkData(gid);
+
         db.collection("homework")
           .find({ group_id: gid, "date.y": thisYear, "date.m": thisMonth })
           .toArray((err, result) => {
@@ -770,7 +805,7 @@ app.put("/group/:id/bat", (req, res) => {
 //   res.send('테스트 데이터 삭제완료.')
 // })
 
-// 데이터가 없으면, 해당 월의 오늘 포함 이후 날짜만큼 숙제 데이터 insert하고, homework로 render하는 함수
+//데이터가 없으면, 해당 월의 오늘 포함 이후 날짜만큼 숙제 데이터 insert하고, homework로 render하는 함수
 const insertHomeworkData = (gid) => {
   //해당 모임의 모임원 id 가져오고, 숙제 이행 여부(success)를 defalut값(false)으로 적용
   db.collection("group").findOne({ _id: gid }, (err, result) => {

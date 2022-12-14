@@ -64,13 +64,7 @@
       <%- include('nav.html') %>
       <main>
         <div class="py-5 text-center" id="header">
-          <img
-            class="d-block mx-auto mb-4"
-            src="/docs/5.2/assets/brand/bootstrap-logo.svg"
-            alt=""
-            width="72"
-            height="57"
-          />
+          <img class="d-block mx-auto mb-4" alt="" width="72" height="57" />
         </div>
 
         <div class="row g-5" id="form">
@@ -79,7 +73,6 @@
               class="needs-validation"
               method="post"
               action="/group/<%=params%>/register"
-              enctype="multipart/form-data"
             >
               <div class="row g-3">
                 <div class="col-12">
@@ -87,9 +80,22 @@
                   <input
                     type="text"
                     class="form-control"
-                    id="Name"
+                    id="name"
                     placeholder="이름"
                     name="Name"
+                    required
+                  />
+                  <div class="invalid-feedback">Valid name is required.</div>
+                </div>
+
+                <div class="col-12">
+                  <label for="Name" class="form-label">이메일</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="Name"
+                    placeholder="이메일"
+                    name="email"
                     required
                   />
                   <div class="invalid-feedback">Valid name is required.</div>
@@ -116,12 +122,13 @@
                 <div class="col-12">
                   <label for="Notice" class="form-label">자기 소개</label>
                   <div class="input-group has-validation">
-                    <textarea
+                    <input
+                      type="text"
                       class="form-control"
-                      id="floatingTextarea2"
-                      style="height: 100px"
+                      id="Name"
+                      placeholder="자기소개"
                       name="introduce"
-                    ></textarea>
+                    />
                     <div class="invalid-feedback">
                       Your username is required.
                     </div>
@@ -141,35 +148,6 @@
                   </div>
                 </div>
 
-                <div class="col-12">
-                  <label for="Img" class="form-label">사진</label>
-                  <input
-                    type="file"
-                    class="form-control"
-                    id="Img"
-                    placeholder="사진"
-                    accept="image/*"
-                    name="Img"
-                  />
-                  <img id="preview" />
-                </div>
-
-                <script>
-                  $("#Img").change((e) => {
-                    console.log(e);
-                    $("#filename").text(e.target.files[0].name);
-
-                    var file = event.target.files[0];
-
-                    var reader = new FileReader();
-                    reader.onload = function (e) {
-                      $("#preview").attr("src", e.target.result);
-                    };
-
-                    reader.readAsDataURL(file);
-                  });
-                </script>
-
                 <div class="d-grid gap-2" id="button">
                   <button class="btn btn-primary" type="submit">버튼</button>
                 </div>
@@ -179,13 +157,5 @@
         </div>
       </main>
     </div>
-
-    <script
-      src="/docs/5.2/dist/js/bootstrap.bundle.min.js"
-      integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3"
-      crossorigin="anonymous"
-    ></script>
-
-    <script src="form-validation.js"></script>
   </body>
 </html>
