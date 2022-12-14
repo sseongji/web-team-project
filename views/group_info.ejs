@@ -16,6 +16,11 @@
       crossorigin="anonymous"
     />
     <style>
+      body {
+        height: auto;
+        height: 180vh;
+      }
+
       .group-info {
         margin-top: 50px;
         text-align: left;
@@ -113,7 +118,7 @@
         <div class="card card h-100" style="width: 16rem">
           <img class="card-img-top" />
           <div class="card-body">
-            <p class="card-text"><%=posts.member[i].name%></p>
+            <p class="card-text"><%=posts.member[i].name%> : <%=posts.member[i].hope%></p>
           </div>
         </div>
         <% } %>
@@ -127,10 +132,11 @@
         id=""
         rows="10"
         style="
-          max-width: 1120px;
-          margin-left: 24%;
+          max-width: 1000px;
+          margin-left: 23%;
           margin-top: 25px;
           height: 200px;
+          border-radius: 5px;
         "
       >
       <%=posts.notice%>
