@@ -75,7 +75,7 @@
     <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
 
       <div class="container" style="display: flex;">
-        <h2 class="ml-2 my-3" style="margin: auto;">게시판</h2>
+        <h2 class="ml-2 my-3" style="margin: auto;"><%= searchTxt %></h2>
       </div>
       <div class="container" style="display: flex;">
         <a id="createToggle" class="btn btn-primary" href="#">글쓰기</a>
@@ -141,7 +141,7 @@
             <!-- 댓글 작성 -->
             <form class="formbody" action="/addComment" method="POST">
               <!-- 글쓴이 임시 값임 => posts[i].writer로 바꿔야함 -->
-              <input class="noneDisplay" name="writer" value="글쓴이2">
+              <input class="noneDisplay" name="writer" value="글쓴이">
               <input class="noneDisplay" name="post_id" value="<%= posts[i]._id %>">
               <input id="inputComment" class="form-control" name="comment"/>
               <button id="addComment" class="btn btn-success addBtn" type="submit" class="btn btn-primary">댓글 등록</button>

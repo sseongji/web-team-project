@@ -264,8 +264,10 @@ passport.deserializeUser((userid, done) => {
   });
 });
 
-// db의 post collection을 post.ejs에 result로 전달 (게시물) -> 게시판이라서 역순으로 출력
+// post 게시판
 app.get("/post", (req, res) => {
+  let userId = req.session.userid
+
   db.collection("post")
     .find()
     .sort({"_id": -1})
@@ -281,6 +283,53 @@ app.get("/post", (req, res) => {
           });
         });
     });
+});
+
+// 게시물 검색
+app.get('/post_search', (req, res) => {
+  console.log(`검색창에 입력한 value 값 : ${req.query.value}`)
+  console.log(`선택한 오브젝트 : ${req.query.obj}`)
+  let obj = req.query.obj
+  let searchResult = `'${req.query.value}'에 대한 검색 결과`
+  if(req.query.value == '')
+    searchResult = "게시판"
+
+  // 바이너리 검색
+  if(obj == "content"){
+    db.collection("post")
+    .find({ content: new RegExp(req.query.value)})
+    .sort({"_id": -1})
+    .toArray((err, postResult) => {
+      console.log(postResult)
+      db.collection("comment")
+        .find()
+        .toArray((err, commentResult) => {
+          // 게시물, 댓글을 post.ejs로 전달
+          res.render("post_search.ejs", {
+            posts: postResult,
+            comments: commentResult,
+            searchTxt: searchResult
+          });
+        });
+    });
+  }else if(obj == "writer"){
+    db.collection("post")
+    .find({ writer: new RegExp(req.query.value)})
+    .sort({"_id": -1})
+    .toArray((err, postResult) => {
+      console.log(postResult)
+      db.collection("comment")
+        .find()
+        .toArray((err, commentResult) => {
+          // 게시물, 댓글을 post.ejs로 전달
+          res.render("post_search.ejs", {
+            posts: postResult,
+            comments: commentResult,
+            searchTxt: searchResult
+          });
+        });
+    });
+  }
 });
 
 // 게시물 작성
@@ -354,7 +403,7 @@ app.put("/edit", (req, res) => {
   console.log(req.body);
   db.collection("post").updateOne(
     { _id: parseInt(req.body.id) },
-    { $set: { content: req.body.editContent } },
+    { $set: { content: req.body.contents } },
     (err, result) => {
       if (err) return console.log(err);
       console.log(result);
@@ -364,19 +413,19 @@ app.put("/edit", (req, res) => {
   );
 });
 
-// // 게시물 수정 url 진입(별도 url 진입을 안하게 수정해서 사용 안할 예정)
-// app.get("/edit/:id", (req, res) => {
-//   console.log(req.params.id);
+// 게시물 수정 url 진입
+app.get("/edit/:id", (req, res) => {
+  console.log(req.params.id);
 
-//   db.collection("post").findOne(
-//     { _id: parseInt(req.params.id) },
-//     function (err, result) {
-//       if (err) return console.log(err);
-//       console.log(result);
-//       res.render("edit.ejs", { post: result });
-//     }
-//   );
-// });
+  db.collection("post").findOne(
+    { _id: parseInt(req.params.id) },
+    function (err, result) {
+      if (err) return console.log(err);
+      console.log(result);
+      res.render("edit.ejs", { post: result });
+    }
+  );
+});
 
 // 게시물 삭제
 app.delete("/delete", (req, res) => {

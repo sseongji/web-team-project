@@ -48,7 +48,7 @@
         <form action="/edit?_method=PUT" method="POST">
             <div class = "form-group">
                 <input type="text" name="id" style="display: none;" value=<%= post._id %>>
-                <textarea name="contents" class="form-control" aria-placeholder="글 내용" style="resize: vertical;"><%= post.content %></textarea>
+                <textarea name="contents" class="form-control" style="resize: vertical;"><%= post.content %></textarea>
                 <input name="writer" type="hidden" value="글쓴이">
             </div>
             <button id="updateBtn" type="submit" class="btn btn-primary">수정</button>
