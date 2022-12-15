@@ -25,6 +25,9 @@ const handleListening = () => {
 let multer = require("multer");
 const path = require("path");
 
+// moment 설정(현재 날짜 설정하는 라이브러리)
+const moment = require('moment');
+
 //const { Server } = require("http");
 let storage = multer.diskStorage({
   destination: function (req, res, cb) {
@@ -331,8 +334,8 @@ app.get("/post", (req, res) => {
 
 // 게시물 검색
 app.get('/post_search', (req, res) => {
-  console.log(`검색창에 입력한 value 값 : ${req.query.value}`)
   console.log(`선택한 오브젝트 : ${req.query.obj}`)
+  console.log(`검색창에 입력한 value 값 : ${req.query.value}`)
   let obj = req.query.obj
   let searchResult = `'${req.query.value}'에 대한 검색 결과`
   if(req.query.value == '')
@@ -352,7 +355,7 @@ app.get('/post_search', (req, res) => {
           res.render("post_search.ejs", {
             posts: postResult,
             comments: commentResult,
-            searchTxt: searchResult
+            searchtxt: searchResult
           });
         });
     });
@@ -369,7 +372,24 @@ app.get('/post_search', (req, res) => {
           res.render("post_search.ejs", {
             posts: postResult,
             comments: commentResult,
-            searchTxt: searchResult
+            searchtxt: searchResult
+          });
+        });
+    });
+  }else if(obj == "createdate"){
+    db.collection("post")
+    .find({ createdate: new RegExp(req.query.value)})
+    .sort({"_id": -1})
+    .toArray((err, postResult) => {
+      console.log(postResult)
+      db.collection("comment")
+        .find()
+        .toArray((err, commentResult) => {
+          // 게시물, 댓글을 post.ejs로 전달
+          res.render("post_search.ejs", {
+            posts: postResult,
+            comments: commentResult,
+            searchtxt: searchResult
           });
         });
     });
@@ -389,7 +409,9 @@ app.post("/add", (req, res) => {
       {
         _id: totalcount + 1,
         content: req.body.contents,
-        createdate: getCurrentDate(),
+        // createdate: getCurrentDate(),
+        createdate: moment().format("YYYY-MM-DD"),
+        createtime: moment().format("hh:mm:ss"),
         writer: req.body.writer,
         count_id: totalcount + 1,
       },
@@ -422,7 +444,9 @@ app.post("/addComment", (req, res) => {
       {
         _id: totalcount + 1,
         content: req.body.comment,
-        createdate: getCurrentDate(),
+        // createdate: getCurrentDate(),
+        createdate: moment().format("YYYY-MM-DD"),
+        createtime: moment().format("hh:mm:ss"),
         writer: req.body.writer,
         post_id: req.body.post_id,
       },
