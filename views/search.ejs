@@ -35,35 +35,40 @@
             <h1 style="color: #4AB186;">모임에 참여해보세요!</h1>
       
           <p style="display: flex; justify-content:flex-end;"><a href="./group_add">원하는 모임이 없으신가요?</a> </p>
-          <form class="input-group mb-3" style="padding: 2rem; background-color: rgba(255, 255, 255, 0.5); border: 1px solid #adb5bd;; border-radius: 5px;">
+          <form class="input-group mb-3" method="post" action="/search" style="padding: 2rem; background-color: rgba(255, 255, 255, 0.5); border: 1px solid #adb5bd;; border-radius: 5px;">
   
           <div style="display: flex;" >
-            <select class="form-select" aria-label="Default select example" id="category">
+            <select class="form-select" aria-label="Default select example" id="category"  name="category">
               <option >면접</option>
               <option >인적성</option>
               <option >언어</option>
               <option >자소서</option>
               <option >자격증</option>
             </select>
-            <select class="form-select" aria-label="Default select example">
-              <option value="1">서울</option>
-              <option value="2">경기</option>
-              <option value="3">인천</option>
-              <option value="4">강원</option>
-              <option value="5">충청</option>
-              <option value="6">전라</option>
-              <option value="7">경상</option>
-              <option value="8">부산</option>
+            <select class="form-select" aria-label="Default select example"  name="local">
+              <option value="서울">서울</option>
+              <option value="경기">경기</option>
+              <option value="인천">인천</option>
+              <option value="강원">강원</option>
+              <option value="충청">충청</option>
+              <option value="전라">전라</option>
+              <option value="경상">경상</option>
+              <option value="부산">부산</option>
             </select>
           </div>
         
-            <input type="text" class="form-control" aria-label="Text input with dropdown button">
+            <input type="text" class="form-control" aria-label="Text input with dropdown button" name="search">
             <button class="btn btn-primary" type="submit"> 버튼</button>
             
           </form>
         </div>
 
-        
+        <script>
+          $("#search").click(function () {
+           
+            window.location.replace("/search");
+          });
+        </script>
 
           
         </section>
