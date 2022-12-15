@@ -11,22 +11,46 @@
             width: 1130px; 
             margin: 0 auto;
         }
-        h1{
-            text-align: center;
+        .pcontainer {
+          display: flex;
+          max-width: 700px;
+          margin: 0 auto;
         }
-        .formbody{
-            padding: 40px;
-            
-            
+        .profileinfos  {
+          margin: auto;
+          padding: 40px 0 20px 0;
         }
-        .personal{
-            padding: 40px 0 80px 0;
-            width: 700px;
-            margin: 0 auto;
+        .personalinfo  {
+          padding: 10px;
         }
-        a{
-            text-decoration: none;
-            color: grey;
+        .personalhead {
+          padding-bottom: 20px;
+        }
+        .headinfo {
+          display: inline-block;
+        }
+        .space {
+          width: 50px;
+          display: inline-block;
+        }
+
+        .pbar {
+          list-style: none;
+          display: flex;
+          justify-content: space-evenly;
+        }
+        #plink {
+          text-decoration: none;
+          color: gray;
+        }
+        
+        #plink:hover {
+          color: #4AB186;
+          font-weight: bold;
+        }
+        #plink:active {
+          color: #4AB186;
+          font-weight: bold;
         }
         
         
@@ -39,36 +63,49 @@
 
     <div class="formbody">
 
-        <div class="personal">
-            <div class="row">
-                <div class="col">
+        <div class="pcontainer">
+          
+                <div class="profileinfos">
                     <img src="/public/image/default_user.png" class="img-fluid rounded-start">
-                        
                 </div>
-                <div class="col">
+
+                <div class="profileinfos">
                     <div class="card-body">
-                        <h1> <%= userSession.nickname %> </h1>
-                        <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-                    
+
+                      <div class="personalhead">
+                        <h1 class="headinfo"> <%= userSession.nickname %> </h1>
+                        <div class="space"></div>
+                        <a href="/changeprivacy">
+                          <button type="button" class="btn btn-primary headinfo" style="font-size: small; background-color: #F16A6E; border-color:#F16A6E;">개인정보수정</button>
+                        </a>
+                      </div>
+
+                      <ul>
+                        <li class="card-text personalinfo">아이디: <%= userSession.email %></li>
+                        <li class="card-text personalinfo">생년월일: <%= userSession.birth %></li>
+                        <li class="card-text personalinfo">지역: <%= userSession.region %></li>
+                        <li class="card-text personalinfo">태그: #<%= userSession.tag %></li>
+                      </ul>
                     </div>
                 </div>
             </div>
         </div>
         
             <hr id="line" class="my-1"/>
-            <div style="padding: 5px 0 5px 0;">
-                <ul class="nav nav-pills nav-fill">
-                    <li class="nav-item">
-                      <a class="nav-link" aria-current="page" href="#">모임</a>
+
+            <div class="pbar">
+                    <li>
+                      <a id="plink" href="#">모임</a>
                     </li>
-                    <li class="nav-item">
-                      <a class="nav-link" href="#">게시글</a>
+                    <li>
+                      <a id="plink" href="#">게시글</a>
                     </li>
-                    <li class="nav-item">
-                      <a class="nav-link" href="#">댓글</a>
+                    <li>
+                      <a id="plink" href="#">댓글</a>
                     </li>
                   </ul>
             </div>    
+
             <hr id="line" class="my-1"/>
         
         

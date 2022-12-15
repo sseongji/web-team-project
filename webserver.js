@@ -100,19 +100,14 @@ const appDir = path.dirname(require.main.filename);
 
 //routes
 
-
-
-app.get("/mypage", loginCheck, (req, res) => {
-  res.render("mypage.ejs", { userSession : req.user });
-});
-
-function loginCheck(req, res, next){
-  if (req.user) {
-    next()
+//마이페이지
+app.get("/mypage", (req, res) => {
+  if (req.isAuthenticated()) {
+    res.render("mypage.ejs", { userSession : req.user });
   } else {
-    res.render("login.ejs");
+    res.redirect('/login');
   }
-}
+});
 
 
 app.post('/uploadProfile', upload.single('myImage'), (req, res) => {
@@ -121,9 +116,38 @@ app.post('/uploadProfile', upload.single('myImage'), (req, res) => {
   // })
 });
 
+//개인정보수정 페이지
 app.get("/changeprivacy", (req, res) => {
-  return res.render("changeprivacy.ejs");
+  if (req.isAuthenticated()) {
+    res.render("changeprivacy.ejs", { userSession : req.user });
+  } else {
+    res.redirect('/login');
+  }
 });
+
+app.post("/changeprivacy", (req, res) => {
+  const userId = req.user.email
+  const password = req.body.pw;
+  const saltRounds = 10;
+
+  bcrypt.hash(password, saltRounds, (err, hash) => {
+    db.collection("user").findOne({ email: userId }, (err, user) => {
+      db.collection("user").updateOne({ email : userId }, 
+        { 
+          $set: { 
+                  pw : password, 
+                  nickname : req.body.nickname,
+                  region: req.body.region,
+                  tag: req.body.tag,
+                }},
+          function (err, result) {
+            if(err) return console.log(err)
+          }
+        );
+      res.redirect("/mypage");
+    });
+  });
+})
 
 //닉네임 중복확인
 app.post("/nameCheck", async (req, res) => {
@@ -301,6 +325,7 @@ passport.use(
 );
 passport.serializeUser((user, done) => {
   done(null, user.email);
+  console.log(user);
 });
 passport.deserializeUser((userid, done) => {
   db.collection("user").findOne({ email: userid }, function (err, result) {
