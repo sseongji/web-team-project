@@ -15,6 +15,7 @@ app.use("/public", express.static("public"));
 //bodyParser(req.body 사용용도)
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json());
 
 //(app == http) express Server
 const handleListening = () => {
@@ -688,6 +689,7 @@ app.post("/group/:id/register", (req, res) => {
           _id: ObjectId(req.params.id),
         },
         {
+          //$push: 새로운 값을 밀어넣는 것
           $push: {
             member: {
               name: req.body.name,
@@ -726,12 +728,41 @@ app.get("/group/:id/group_update", (req, res) => {
     },
     function (err, result) {
       if (err) return console.log(err);
-      console.log(result);
+
       for (let index in result.member) {
         names.push(result.member[index].name);
       }
 
-      res.render("group_update.ejs", { posts: result, members: names });
+      res.render("group_update.ejs", {
+        posts: result,
+        members: names,
+        param: myId,
+      });
+    }
+  );
+});
+
+app.post("/group/:id/group_update", upload.single("Img"), (req, res) => {
+  let members = req.body.member.split(",");
+
+  db.collection("group").updateOne(
+    {
+      _id: ObjectId(req.params.id),
+    },
+    {
+      //$set은 값을 대체시켜주는 것
+      $set: {
+        name: req.body.name,
+        member: members,
+        notice: req.body.Notice,
+        intro: req.body.Description,
+        img: req.file.filename,
+        tag: req.body.tag,
+      },
+    },
+    function (err, result) {
+      if (err) return console.log(err);
+      console.log(result);
     }
   );
 });

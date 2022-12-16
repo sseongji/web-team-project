@@ -76,8 +76,8 @@
           <div class="col-md-7 col-lg-8 border rounded" id="border">
             <form
               class="needs-validation"
-              method="post"
-              action="/group_upload"
+              action="/group/<%=param%>/group_update"
+              method="POST"
               enctype="multipart/form-data"
             >
               <div class="row g-3">
@@ -235,13 +235,44 @@
                 </div>
 
                 <div class="d-grid gap-2" id="button">
-                  <button class="btn btn-primary" type="submit">버튼</button>
+                  <button
+                    class="btn btn-primary"
+                    type="submit"
+                    id="search_button"
+                  >
+                    버튼
+                  </button>
                 </div>
               </div>
             </form>
           </div>
         </div>
       </main>
+
+      <script>
+        $("#search_button").click(() => {
+          const imageInput = $("#Img")[0];
+          // 파일을 여러개 선택할 수 있으므로 files 라는 객체에 담긴다.
+          console.log("imageInput: ", imageInput.files);
+
+          if (imageInput.files.length === 0) {
+            alert("파일은 선택해주세요");
+            return;
+          }
+
+          const formData = new FormData();
+          formData.append("image", imageInput.files[0]);
+
+          $.ajax({
+            method: "PUT",
+            url: "/group/<%=param%>/group_upload",
+            data: formData,
+          }).done((result) => {
+            //update 성공
+            console.log(result);
+          });
+        });
+      </script>
 
       <footer class="my-5 pt-5 text-muted text-center text-small" id="footer">
         <p class="mb-1">&copy; 2017–2022 Company Name</p>
