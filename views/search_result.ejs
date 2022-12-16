@@ -35,15 +35,15 @@
             <h1 style="color: #4AB186;">모임에 참여해보세요!</h1>
       
           <p style="display: flex; justify-content:flex-end;"><a href="./group_add">원하는 모임이 없으신가요?</a> </p>
-        <div class="input-group mb-3"  style="padding: 2rem; background-color: rgba(255, 255, 255, 0.5); border: 1px solid #adb5bd;; border-radius: 5px;">
+          <div class="input-group mb-3"  style="padding: 2rem; background-color: rgba(255, 255, 255, 0.5); border: 1px solid #adb5bd;; border-radius: 5px;">
   
-          <div class="input-group mb-3">
-            <input type="text" id="search-input" class="form-control" placeholder="그룹 검색" aria-label="Recipient's username" aria-describedby="button-addon2">
-            <button class="btn btn-primary btn-lg " type="button" id="search">검색</button>
-          </div>
+            <div class="input-group mb-3">
+              <input type="text" id="search-input" class="form-control" placeholder="그룹 검색" aria-label="Recipient's username" aria-describedby="button-addon2">
+              <button class="btn btn-primary btn-lg " type="button" id="search">검색</button>
+            </div>
             
           </div>
-        </div>
+        
 
         <script>
           $("#search").click(function () {
@@ -58,9 +58,7 @@
         <div class="album py-5 bg-light" id="album">
           <div class="container">
             <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
-              <% for(var i = 0; i < posts.length; i++){ 
-                  
-                if(posts[i].tag == array ){%>
+              <% for(var i = 0; i < posts.length; i++){ {%>
               <div class="col">
                 <div class="card shadow-sm">
                   <img

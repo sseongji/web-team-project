@@ -607,11 +607,12 @@ app.get("/license", (req, res) => {
       res.render("search.ejs", { posts: result, array: array[4] });
     });
 });
-//그룹 검색 기능
-app.post("/search", (req, res) => {
-  console.log(req.body);
 
-  let keyword = req.body;
+//그룹 검색 기능
+app.get("/search", (req, res) => {
+  console.log(req.query.value);
+
+  let keyword = req.query.value;
 
   db.collection("group")
     .find({
@@ -619,9 +620,7 @@ app.post("/search", (req, res) => {
     })
     .toArray(function (err, result) {
       if (err) return console.log(err);
-      res.render("search.ejs", {
-        posts: result,
-      });
+      res.render("search_result.ejs", { posts: result });
     });
 });
 
@@ -714,6 +713,13 @@ app.post("/group/:id/register", (req, res) => {
     }
   );
 });
+
+// 그룹 정보 수정
+
+app.get('/')
+
+
+
 
 //현재 날짜(nnnn년 n월 n일) 가져오기
 //연, 월
