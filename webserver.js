@@ -716,10 +716,25 @@ app.post("/group/:id/register", (req, res) => {
 
 // 그룹 정보 수정
 
-app.get('/')
+app.get("/group/:id/group_update", (req, res) => {
+  let names = [];
 
+  let myId = req.params.id;
+  db.collection("group").findOne(
+    {
+      _id: ObjectId(myId),
+    },
+    function (err, result) {
+      if (err) return console.log(err);
+      console.log(result);
+      for (let index in result.member) {
+        names.push(result.member[index].name);
+      }
 
-
+      res.render("group_update.ejs", { posts: result, members: names });
+    }
+  );
+});
 
 //현재 날짜(nnnn년 n월 n일) 가져오기
 //연, 월
