@@ -45,7 +45,7 @@
   </head>
   <body>
     
-    <%- include('nav.html') %>
+    <%- include('nav.ejs') %>
 
     <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
     
@@ -183,7 +183,7 @@
             var valPass = $('.pw').val();
             var valCPass = $('.cpw').val();
             var valName = $('input[name=nickname]').val();
-            var valReg = $("select[name=region]").val();
+            var valReg = $('select[name=region]').val();
             var nameck = $('.nameDup').attr('nameck');
 
 
@@ -191,12 +191,9 @@
             if(valPass.length < 8) { $('.checkpw').text('비밀번호 8자 이상을 입력해주세요.'); $('.pw').focus(); return false;}
             if(valCPass == null || valCPass == undefined || valCPass == ""){ $('.checkpw').text('비밀번호 확인을 입력해주세요.'); $('.cpw').focus(); return false;}
             
-            if(valName == null || valName == undefined || valName == ""){ $('.nameDup').text('닉네임을 입력해주세요.'); $('input[name=nickname]').focus(); return false;} 
-            if(nameck == null || nameck == 'N'){$('.nameDup').text('닉네임 중복확인을 해주세요'); $('input[name=nickname]').focus(); return false;}
+            // if(valName == null || valName == undefined || valName == ""){ $('.nameDup').text('닉네임을 입력해주세요.'); $('input[name=nickname]').focus(); return false;} 
+            // if(nameck == null || nameck == 'N'){$('.nameDup').text('닉네임 중복확인을 해주세요'); $('input[name=nickname]').focus(); return false;}
             
-            
-
-            if(valBirth == null || valBirth == undefined || valBirth == ""){ $('.birthcheck').text('생년월일을 입력해주세요.'); $('input[name=birth]').focus(); return false;} 
             if(valReg == 'none'){ $('.regcheck').text('지역을 입력해주세요.'); $('input[name=region]').focus(); return false;} 
             
             if(valPass != valCPass){ $('.checkpw').text('비밀번호와 비밀번호 확인이 같지 않습니다.'); $('.cpw').focus(); return false;}

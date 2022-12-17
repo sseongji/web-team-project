@@ -85,6 +85,7 @@ app.use(flash());
 //템플릿용 변수 설정
 app.use(function (req, res, next) {
   res.locals.error = req.flash("error");
+  res.locals.isAuthenticated = req.isAuthenticated();
   next();
 });
 
@@ -100,6 +101,14 @@ const { stringify } = require("querystring");
 const appDir = path.dirname(require.main.filename);
 
 //routes
+
+//로그아웃
+app.get('/logout', (req, res, next)=>{
+  req.logout((err)=>{
+    if(err) return next(err);
+  });
+  res.redirect('/');
+})
 
 //마이페이지
 app.get("/mypage", (req, res) => {
