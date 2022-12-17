@@ -105,26 +105,11 @@ const appDir = path.dirname(require.main.filename);
 app.get("/mypage", (req, res) => {
   if (req.isAuthenticated()) {
     res.render("mypage.ejs", { userSession: req.user });
-
-    app.get("/mypage", loginCheck, (req, res) => {
-      res.render("mypage.ejs", { userSession: req.user });
-    });
-
-    function loginCheck(req, res, next) {
-      if (req.user) {
-        next();
-      } else {
-        res.redirect("/login");
-      }
-    }
+  } else {
+    res.redirect("/login");
   }
 });
 
-app.post("/uploadProfile", upload.single("myImage"), (req, res) => {
-  // res.render('mypage', {
-  //   file : './public/image/${req.file.filename}'
-  // })
-});
 
 //개인정보수정 페이지
 app.get("/changeprivacy", (req, res) => {
@@ -141,24 +126,22 @@ app.post("/changeprivacy", (req, res) => {
   const saltRounds = 10;
 
   bcrypt.hash(password, saltRounds, (err, hash) => {
-    db.collection("user").findOne({ email: userId }, (err, user) => {
-      db.collection("user").updateOne(
-        { email: userId },
-        {
-          $set: {
-            pw: password,
-            nickname: req.body.nickname,
-            region: req.body.region,
-            tag: req.body.tag,
-          },
+    db.collection("user").updateOne(
+      { email: userId },
+      {
+        $set: {
+          pw: hash,
+          nickname: req.body.nickname,
+          region: req.body.region,
+          tag: req.body.tag,
         },
-        function (err, result) {
-          if (err) return console.log(err);
-        }
-      );
-      res.redirect("/mypage");
+      },
+      function (err, result) {
+        if (err) return console.log(err);
+      }
+    );
+    res.redirect("/mypage");
     });
-  });
 });
 
 //닉네임 중복확인
