@@ -6,6 +6,8 @@
     <title>공부밭</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.1/font/bootstrap-icons.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/material_green.css">
     
     <style>
         body{
@@ -46,9 +48,17 @@
     
     <%- include('nav.ejs') %>
 
+    
     <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/flatpickr.min.js"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/ko.js"></script>
+ 
     
     <h2>공부밭</h2>
+
+
     
     <div class="formbody">
         
@@ -63,9 +73,10 @@
                 <div class="col">
                     <button type="button" class="btn btn-danger sendCode" style="background-color: #F16A6E; border-color: #F16A6E;">인증번호 전송</button>
                 </div>
+                <div class="emailcheck" style="color: red;"> <h6>  </h6> </div>
             </div>
             
-            <div class="dup" style="color: red;"> <h6>  </h6> </div>
+            
 
         
             <div class="row total">
@@ -75,6 +86,7 @@
                 <div class="col">
                     <button type="button" class="btn btn-primary confirmCode" style="background-color: #4AB186; border-color: #4AB186;">인증 확인</button>
                 </div>
+                <div class="codecheck" style="color: red;"> <h6>  </h6> </div>
             </div>
 
             <p></p>
@@ -112,9 +124,8 @@
             <label>생년월일</label>
             <div class="row total">
                 <div class="col">
-                    <input type="text" class="form-control" name="birth" placeholder="[필수]생년월일">
+                    <input class="dateSelector" name="birth" placeholder=" [필수]">
                 </div>
-                <div class="form-text">1990-01-01</div>
                 <div class="birthcheck" style="color: red;"> <h6> </h6> </div>
             </div>
 
@@ -170,13 +181,22 @@
     </div>
 
     <script>
+
+        //날짜 선택기
+        var dateSelector = flatpickr(document.getElementsByClassName('dateSelector'), {
+            local : "ko",
+            maxDate : "today"
+        });
+
+        
+
         //인증번호 전송
         $(".sendCode").click((e)=>{
             var emailadress = $('input[name=email]').val();
             console.log(emailadress);
 
             if(emailadress == null || emailadress == undefined || emailadress == ""){
-                $(".dup").text("올바른 주소를 입력하세요.")
+                $(".emailcheck").text("올바른 주소를 입력하세요.")
             } else {
                 $.ajax({
                 method: 'POST',
@@ -184,7 +204,9 @@
                 data: { email : emailadress },
                 success: function(data) {
                     if(data=='중복'){
-                        $('.dup').text('이미 존재하는 아이디입니다.')
+                        $('.emailcheck').text('이미 존재하는 아이디입니다.')
+                    } else if (data=='전송'){
+                        $('.emailcheck').text('인증번호가 전송되었습니다.')
                     }
                 }
             })
@@ -199,9 +221,14 @@
             $.ajax({
                 method: 'POST',
                 url: '/cert',
-                data: { code : code }
-            }).done((result)=>{
-                console.log(result)
+                data: { code : code },
+                success: function(data) {
+                    if(data=='성공'){
+                        $('.codecheck').text('인증되었습니다.').attr('codecheck','Y')
+                    } else {
+                        $('.codecheck').text('인증 실패했습니다.').attr('codecheck','N')
+                    }
+                }
             })
         })
 
@@ -224,17 +251,19 @@
             }); 
         })
 
-        // $('.finalck').click((e)=>{
             function validate() {
                 var valEmail = $('input[name=email]').val();
                 var valPass = $('.pw').val();
                 var valCPass = $('.cpw').val();
                 var valName = $('input[name=nickname]').val();
-                var valBirth = $('input[name=birth]').val();
+                var dateSelector = $('.dateSelector').val();
                 var valReg = $("select[name=region]").val();
                 var nameck = $('.nameDup').attr('nameck');
+                var codeck = $('.codecheck').attr('codecheck');
 
-                if(valEmail == null || valEmail == undefined || valEmail == ""){ $('.dup').text('아이디를 입력하세요.') ; $('input[name=email]').focus(); return false;}
+                if(valEmail == null || valEmail == undefined || valEmail == ""){ $('.emailcheck').text('아이디를 입력하세요.') ; $('input[name=email]').focus(); return false;}
+                if(codeck == null || codeck == undefined || codeck == "N"){ $('.codecheck').text('이메일을 인증하세요.') ; $('input[name=email]').focus(); return false;}
+                
                 if(valPass == null || valPass == undefined || valPass == ""){ $('.checkpw').text('비밀번호를 입력하세요.'); $('.pw').focus(); return false;} 
                 if(valPass.length < 8) { $('.checkpw').text('비밀번호 8자 이상을 입력해주세요.'); $('.pw').focus(); return false;}
                 if(valCPass == null || valCPass == undefined || valCPass == ""){ $('.checkpw').text('비밀번호 확인을 입력해주세요.'); $('.cpw').focus(); return false;}
@@ -242,16 +271,15 @@
                 if(valName == null || valName == undefined || valName == ""){ $('.nameDup').text('닉네임을 입력해주세요.'); $('input[name=nickname]').focus(); return false;} 
                 if(nameck == null || nameck == 'N'){$('.nameDup').text('닉네임 중복확인을 해주세요'); $('input[name=nickname]').focus(); return false;}
 
-                if(valBirth == null || valBirth == undefined || valBirth == ""){ $('.birthcheck').text('생년월일을 입력해주세요.'); $('input[name=birth]').focus(); return false;} 
+                if(dateSelector == null || dateSelector == undefined || dateSelector == ""){ $('.birthcheck').text('생년월일을 입력해주세요.'); $('.dateSelector').focus(); return false;} 
                 if(valReg == 'none'){ $('.regcheck').text('지역을 입력해주세요.'); $('input[name=region]').focus(); return false;} 
                 
                 if(valPass != valCPass){ $('.checkpw').text('비밀번호와 비밀번호 확인이 같지 않습니다.'); $('.cpw').focus(); return false;}
             }
             
-        //     }
-		// );
     </script>
 
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
   </body>
 </html>

@@ -100,6 +100,9 @@ const { off } = require("process");
 const { stringify } = require("querystring");
 const appDir = path.dirname(require.main.filename);
 
+
+
+
 //routes
 
 //로그아웃
@@ -172,15 +175,16 @@ app.post("/nameCheck", async (req, res) => {
 //이메일 인증
 app.post("/emailAuth", async (req, res) => {
   const emailaddress = req.body.email;
-  const existemail = await db
-    .collection("user")
-    .findOne({ email: emailaddress });
+  const existemail = await db.collection("user").findOne({ email: emailaddress });
+  
   try {
-    //이메일 중복 아닐 시
     if (!existemail) {
       const authNum = Math.random().toString().substr(2, 6);
       const hashAuth = await bcrypt.hash(authNum, 12);
-      res.cookie("hashAuth", hashAuth, { maxAge: 300000 });
+      console.log(hashAuth);
+
+      res.cookie('hashAuth', hashAuth, { maxAge: 300000 });
+      res.send('전송')
 
       let emailTemplate;
       ejs.renderFile(
@@ -205,6 +209,7 @@ app.post("/emailAuth", async (req, res) => {
         subject: "회원가입을 위한 인증번호를 입력해주세요.",
         html: emailTemplate,
       };
+
       await transporter.sendMail(mailOptions, (err, res) => {
         if (err) {
           console.log("실패");
@@ -220,21 +225,18 @@ app.post("/emailAuth", async (req, res) => {
   }
 });
 
-//이메일 인증
-app.post("/cert", async (req, res) => {
-  const code = req.body.code;
-  const hashAuth = req.cookies.hashAuth;
-  console.log(code);
 
-  try {
-    if (bcrypt.compareSync(code, hashAuth)) {
-      res.send({ result: "success" });
-    } else {
-      res.send({ result: "fail" });
-    }
-  } catch (err) {
-    res.send({ result: "fail" });
-    console.error(err);
+//이메일 인증
+app.post("/cert", (req, res) => {
+  const code = req.body.code;
+  const hashAuth = req.cookies.hashAuth
+  console.log(code);
+  console.log(hashAuth);
+
+  if (bcrypt.compare(code, hashAuth)) {
+    res.send("성공")
+  } else {
+    res.send("실패")
   }
 });
 
