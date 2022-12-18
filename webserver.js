@@ -103,12 +103,12 @@ const appDir = path.dirname(require.main.filename);
 //routes
 
 //로그아웃
-app.get('/logout', (req, res, next)=>{
-  req.logout((err)=>{
-    if(err) return next(err);
+app.get("/logout", (req, res, next) => {
+  req.logout((err) => {
+    if (err) return next(err);
   });
-  res.redirect('/');
-})
+  res.redirect("/");
+});
 
 //마이페이지
 app.get("/mypage", (req, res) => {
@@ -118,7 +118,6 @@ app.get("/mypage", (req, res) => {
     res.redirect("/login");
   }
 });
-
 
 //개인정보수정 페이지
 app.get("/changeprivacy", (req, res) => {
@@ -150,7 +149,7 @@ app.post("/changeprivacy", (req, res) => {
       }
     );
     res.redirect("/mypage");
-    });
+  });
 });
 
 //닉네임 중복확인
@@ -624,15 +623,12 @@ app.get("/group_add", (req, res) => {
 
 //그룹 생성 과정
 app.post("/group_upload", upload.single("Img"), (req, res) => {
-  console.log(req.body);
-  let members = req.body.member.split(",");
-
   db.collection("group").insertOne(
     {
       name: req.body.Name,
-      member: members,
       notice: req.body.Notice,
-      intro: req.body.Description,
+      leader: req.body.leader,
+      member: [req.body.leader],
       img: req.file.filename,
       tag: req.body.tag,
       createdate: getCurrentDate(),
@@ -734,8 +730,11 @@ app.get("/group/:id/group_update", (req, res) => {
   );
 });
 
+//처음 가입할 때 방장의 정보만 입력가능하도록 수정! (멤버 정보 객체형태로 저장해야함)
 app.post("/group/:id/group_update", upload.single("Img"), (req, res) => {
+  let myId = req.params.id;
   let members = req.body.member.split(",");
+  console.log(members);
 
   db.collection("group").updateOne(
     {
@@ -755,6 +754,12 @@ app.post("/group/:id/group_update", upload.single("Img"), (req, res) => {
     function (err, result) {
       if (err) return console.log(err);
       console.log(result);
+
+      res.render("group_update.ejs", {
+        posts: result,
+        members: members,
+        param: myId,
+      });
     }
   );
 });
@@ -793,7 +798,10 @@ app.get("/group/:id/homework", (req, res) => {
           .toArray((err, result) => {
             if (err) console.log(err);
             console.log(result);
-            return res.render("homework.ejs", { homeworks: result });
+            return res.render("homework.ejs", {
+              homeworks: result,
+              params: req.params.id,
+            });
           });
       }
       //데이터가 있으면, 바로 render

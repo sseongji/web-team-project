@@ -60,6 +60,7 @@
             src="/public/image/<%= posts.img %>"
             class="img-fluid rounded"
             alt="..."
+            style="height: 232px; width: 323px"
           />
         </div>
         <div class="col-md-8">
@@ -123,9 +124,7 @@
         <div class="card card h-100" style="width: 16rem">
           <img class="card-img-top" />
           <div class="card-body">
-            <p class="card-text">
-              <%=posts.member[i].name%> : <%=posts.member[i].hope%>
-            </p>
+            <p class="card-text"><%=posts.member[i].name%> %></p>
           </div>
         </div>
         <% } %>
