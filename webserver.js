@@ -100,9 +100,6 @@ const { off } = require("process");
 const { stringify } = require("querystring");
 const appDir = path.dirname(require.main.filename);
 
-
-
-
 //routes
 
 //비밀번호 찾기
@@ -244,8 +241,10 @@ app.post("/nameCheck", async (req, res) => {
 //이메일 인증
 app.post("/emailAuth", async (req, res) => {
   const emailaddress = req.body.email;
-  const existemail = await db.collection("user").findOne({ email: emailaddress });
-  
+  const existemail = await db
+    .collection("user")
+    .findOne({ email: emailaddress });
+
   try {
     if (!existemail) {
       const authNum = Math.random().toString().substr(2, 6);
@@ -253,7 +252,6 @@ app.post("/emailAuth", async (req, res) => {
 
       res.cookie('hashAuth', hashAuth, { maxAge: 300000 });
       
-
       let emailTemplate;
       ejs.renderFile(
         appDir + "/views/authMail.ejs",
@@ -295,7 +293,6 @@ app.post("/emailAuth", async (req, res) => {
   }
 });
 
-
 //이메일 인증
 app.post("/cert", (req, res) => {
   const code = req.body.code;
@@ -306,7 +303,7 @@ app.post("/cert", (req, res) => {
   } else {
     res.send("실패")
   } 
-});
+})
 
 //회원가입
 app.get("/signup", (req, res) => {
@@ -694,20 +691,29 @@ app.get("/group_add", (req, res) => {
 
 //그룹 생성 과정
 app.post("/group_upload", upload.single("Img"), (req, res) => {
-  db.collection("group").insertOne(
+  db.collection("user").findOne(
     {
-      name: req.body.Name,
-      notice: req.body.Notice,
-      leader: req.body.leader,
-      member: [req.body.leader],
-      img: req.file.filename,
-      tag: req.body.tag,
-      createdate: getCurrentDate(),
+      email: req.session.passport.user,
     },
     function (err, result) {
-      if (err) return console.log(err);
-      console.log("수정 완료");
-      res.redirect("/");
+      delete result.pw;
+
+      db.collection("group").insertOne(
+        {
+          name: req.body.Name,
+          notice: req.body.Notice,
+          leader: req.body.leader,
+          member: [result],
+          img: req.file.filename,
+          tag: req.body.tag,
+          createdate: getCurrentDate(),
+        },
+        function (err, result) {
+          if (err) return console.log(err);
+          console.log("수정 완료");
+          res.redirect("/");
+        }
+      );
     }
   );
 });
@@ -781,6 +787,7 @@ app.get("/group/:id/group_update", (req, res) => {
   let names = [];
 
   let myId = req.params.id;
+
   db.collection("group").findOne(
     {
       _id: ObjectId(myId),
@@ -824,7 +831,6 @@ app.post("/group/:id/group_update", upload.single("Img"), (req, res) => {
     },
     function (err, result) {
       if (err) return console.log(err);
-      console.log(result);
 
       res.render("group_update.ejs", {
         posts: result,
@@ -888,12 +894,13 @@ app.get("/group/:id/homework", (req, res) => {
 app.put("/group/:id/homework", (req, res) => {
   // const gid = group_id
 
-  let gid = req.params.id;
+  // let gid = req.params.id;
 
   // console.log(gid);
 
-  console.log(req.body);
   const inputValues = req.body;
+
+  console.log(req.body);
 
   //날짜별로 update, (오늘부터 마지막날)
   for (const key in inputValues) {
@@ -908,6 +915,7 @@ app.put("/group/:id/homework", (req, res) => {
       { $set: { content: inputValues[key] } },
       (err, result) => {
         if (err) return console.log(err);
+        console.log(result);
         // console.log('group_id: '+ gid + ', ' + parseInt(key)+'일 숙제수정완료');
       }
     );
@@ -932,11 +940,11 @@ app.get("/group/:id/bat", (req, res) => {
 
       //render할 데이터 세팅
       const setReturn = (result) => {
-        console.log(g_members);
+        console.log(result);
         //모임원
         const mems = result[result.length - 1].success;
         const memIds = Object.keys(mems);
-        // console.log(memIds);
+        console.log(mems);
         //오늘의 숙제
         // console.log(nowdate.getDate())
         const idx = result.length + nowdate.getDate() - lastDate - 1; //(길이 + 오늘(일) - 이번달마지막(일) - 1)
@@ -979,7 +987,7 @@ app.get("/group/:id/bat", (req, res) => {
             percentage: Number(percentageScore.toFixed(2)),
           };
         });
-        // console.log(score);
+        // console.log(result);
         return res.render("bat.ejs", {
           homeworks: result,
           members: g_members,
@@ -1031,10 +1039,9 @@ app.put("/group/:id/bat", (req, res) => {
 
   // console.log(gid);
 
-  console.log(req.body);
+  // console.log(req.body);
   const inputValues = req.body;
   const setKeyString = "success." + inputValues.id;
-  console.log(setKeyString);
 
   db.collection("homework").updateOne(
     {
