@@ -1,0 +1,128 @@
+<!-- 폰트 사용 -->
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Gowun+Batang"
+/>
+
+<style>
+  * {
+    font-family: "Gowun Batang", serif;
+    font-size: 20px;
+  }
+  #gongbubat {
+    color: #4ab186;
+    font-size: 50px;
+    font-weight: 1000;
+    transition: 1s;
+  }
+  #navibar {
+    background-color: white;
+  }
+  #userBtn {
+    font-size: 42px;
+    float: right;
+    margin-right: 15px;
+  }
+  #logoutBtn,
+  #loginBtn,
+  #signupBtn {
+    border: 0px solid;
+    background-color: #f16a6e;
+    border-radius: 20px 20px 20px 20px;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  /* 마우스 오버 (마우스 올렸을 때) */
+  .item:hover {
+    font-weight: 1000;
+  }
+  #loginBtn:hover {
+    font-weight: 1000;
+  }
+  #signupBtn:hover {
+    font-weight: 1000;
+  }
+  /* 마우스 클릭하고 있을 때 */
+  .item:active {
+    /* background-color: #ffc8c8; */
+    transform: translate(1px, 1px);
+  }
+</style>
+
+<center>
+  <nav class="navbar navbar-expand" id="navibar" style="width: 1130px">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="/" id="gongbubat">공부밭</a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#navbarNav"
+        aria-controls="navbarNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div
+        class="collapse navbar-collapse justify-content-start"
+        id="navbarNav"
+      >
+        <ul class="navbar-nav">
+          <li class="item nav-item">
+            <a class="nav-link" href="/">면접</a>
+          </li>
+          <li class="item nav-item">
+            <a class="nav-link" href="/aptitute">인적성</a>
+          </li>
+          <li class="item nav-item">
+            <a class="nav-link" href="/language">언어</a>
+          </li>
+          <li class="item nav-item">
+            <a class="nav-link" href="/resume">자소서</a>
+          </li>
+          <li class="item nav-item">
+            <a class="nav-link" href="/license">자격증</a>
+          </li>
+        </ul>
+        <div
+          class="collapse navbar-collapse justify-content-end"
+          id="navbarNav"
+          style="margin: auto"
+        >
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a href="/mypage">
+                <i id="userBtn" class="bi bi-person-circle"></i>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/login">
+                <% if(!isAuthenticated) { %> 
+                  <button id="loginBtn" class="btn">로그인</button>
+                <% } %>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/signup">
+                <% if(!isAuthenticated) { %> 
+                  <button id="signupBtn" class="btn">회원가입</button>
+                <% } %>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/logout">
+                <% if(isAuthenticated) { %> 
+                  <button id="logoutBtn" class="btn">로그아웃</button>
+                <% } %>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </nav>
+  <hr id="line" class="my-1" style="width: 1130px" />
+</center>

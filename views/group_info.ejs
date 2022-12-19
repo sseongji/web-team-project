@@ -48,7 +48,7 @@
     </style>
   </head>
   <body>
-    <%- include('nav.html') %>
+    <%- include('nav.ejs') %>
 
     <div
       class="card mb-3 container"
@@ -60,6 +60,7 @@
             src="/public/image/<%= posts.img %>"
             class="img-fluid rounded"
             alt="..."
+            style="height: 232px; width: 323px"
           />
         </div>
         <div class="col-md-8">
@@ -75,6 +76,11 @@
             </p>
             <a class="btn btn-primary" href=" /group/<%=posts._id %>/register"
               >그룹 가입</a
+            >
+            <a
+              class="btn btn-primary"
+              href=" /group/<%=posts._id %>/group_update"
+              >그룹 수정</a
             >
           </div>
         </div>
@@ -118,7 +124,7 @@
         <div class="card card h-100" style="width: 16rem">
           <img class="card-img-top" />
           <div class="card-body">
-            <p class="card-text"><%=posts.member[i].name%> : <%=posts.member[i].hope%></p>
+            <p class="card-text"><%=posts.member[i].name%> %></p>
           </div>
         </div>
         <% } %>

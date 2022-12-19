@@ -76,57 +76,35 @@
           <div class="col-md-7 col-lg-8 border rounded" id="border">
             <form
               class="needs-validation"
-              method="post"
-              action="/group_upload"
+              action="/group/<%=param%>/group_update"
+              method="POST"
               enctype="multipart/form-data"
             >
               <div class="row g-3">
                 <div class="col-12">
-                  <label for="Name" class="form-label">그룹 이름</label>
+                  <label for="Name" class="form-label">이름</label>
                   <input
                     type="text"
                     class="form-control"
                     id="Name"
-                    placeholder="그룹 이름"
-                    name="Name"
+                    placeholder="<%=posts.name%>"
+                    name="name"
                     required
                   />
                   <div class="invalid-feedback">Valid name is required.</div>
                 </div>
 
-                <div class="col-12" style="margin-top: 25px">
-                  <h6>지역</h6>
-                  <select
-                    class="form-select"
-                    aria-label="Default select example"
-                    name="local"
-                  >
-                    <option name="서울">서울</option>
-                    <option name="경기">경기</option>
-                    <option name="인천">인천</option>
-                    <option name="강원">강원</option>
-                    <option name="충청">충청</option>
-                    <option name="전라">전라</option>
-                    <option name="경상">경상</option>
-                    <option name="부산">부산</option>
-                  </select>
-                </div>
-
                 <div class="col-12">
-                  <label for="Notice" class="form-label">방장</label>
-                  <div class="input-group has-validation">
-                    <input
-                      type="text"
-                      class="form-control"
-                      id="Notice"
-                      placeholder="방장 이름"
-                      value=""
-                      name="leader"
-                    />
-                    <div class="invalid-feedback">
-                      Your username is required.
-                    </div>
-                  </div>
+                  <label for="member" class="form-label">멤버</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="member"
+                    placeholder="<%=members%>"
+                    name="member"
+                    required
+                  />
+                  <div class="invalid-feedback">Valid name is required.</div>
                 </div>
 
                 <div class="col-12">
@@ -136,7 +114,7 @@
                       type="text"
                       class="form-control"
                       id="Notice"
-                      placeholder="공지"
+                      placeholder="<%=posts.notice%>"
                       value=""
                       name="Notice"
                     />
@@ -148,9 +126,10 @@
 
                 <div class="form-floating">
                   <span>소개 </span>
+
                   <textarea
                     class="form-control"
-                    placeholder="Leave a comment here"
+                    placeholder="안녕하세요"
                     id="floatingTextarea2"
                     style="height: 100px"
                     name="Description"
@@ -256,13 +235,44 @@
                 </div>
 
                 <div class="d-grid gap-2" id="button">
-                  <button class="btn btn-primary" type="submit">버튼</button>
+                  <button
+                    class="btn btn-primary"
+                    type="submit"
+                    id="search_button"
+                  >
+                    버튼
+                  </button>
                 </div>
               </div>
             </form>
           </div>
         </div>
       </main>
+
+      <script>
+        $("#search_button").click(() => {
+          const imageInput = $("#Img")[0];
+          // 파일을 여러개 선택할 수 있으므로 files 라는 객체에 담긴다.
+          console.log("imageInput: ", imageInput.files);
+
+          if (imageInput.files.length === 0) {
+            alert("파일은 선택해주세요");
+            return;
+          }
+
+          const formData = new FormData();
+          formData.append("image", imageInput.files[0]);
+
+          $.ajax({
+            method: "PUT",
+            url: "/group/<%=param%>/group_upload",
+            data: formData,
+          }).done((result) => {
+            //update 성공
+            console.log(result);
+          });
+        });
+      </script>
 
       <footer class="my-5 pt-5 text-muted text-center text-small" id="footer">
         <p class="mb-1">&copy; 2017–2022 Company Name</p>
