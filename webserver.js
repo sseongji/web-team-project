@@ -27,7 +27,7 @@ let multer = require("multer");
 const path = require("path");
 
 // moment 설정(현재 날짜 설정하는 라이브러리)
-const moment = require('moment');
+const moment = require("moment");
 
 //const { Server } = require("http");
 let storage = multer.diskStorage({
@@ -112,18 +112,20 @@ app.get("/findpassword", (req, res) => {
 
 app.post("/sendtemppw", (req, res) => {
   const emailaddress = req.body.email;
-  
-  db.collection("user").findOne({ email: emailaddress }, (err, user)=>{
-    if(user) {
 
+  db.collection("user").findOne({ email: emailaddress }, (err, user) => {
+    if (user) {
       //비밀번호 랜덤 함수
       function createRandomPassword(variable, passwordLength) {
         var randomString = "";
-        for (var j = 0; j < passwordLength; j++) 
-          randomString += variable[Math.floor(Math.random()*variable.length)];
-          return randomString
+        for (var j = 0; j < passwordLength; j++)
+          randomString += variable[Math.floor(Math.random() * variable.length)];
+        return randomString;
       }
-      var variable = "0,1,2,3,4,5,6,7,8,9,a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z".split(",");
+      var variable =
+        "0,1,2,3,4,5,6,7,8,9,a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z".split(
+          ","
+        );
       var password = createRandomPassword(variable, 8);
       console.log(password);
 
@@ -162,18 +164,18 @@ app.post("/sendtemppw", (req, res) => {
       bcrypt.hash(password, saltRounds, (err, hash) => {
         db.collection("user").updateOne(
           { email: emailaddress },
-          {$set: { pw: hash }},
+          { $set: { pw: hash } },
           function (err, result) {
             if (err) return console.log(err);
-          })
-      })
-      res.send('성공')
-      } else {
-        res.send('실패')
-      }
-    })
+          }
+        );
+      });
+      res.send("성공");
+    } else {
+      res.send("실패");
+    }
+  });
 });
-     
 
 //로그아웃
 app.get("/logout", (req, res, next) => {
@@ -253,8 +255,8 @@ app.post("/emailAuth", async (req, res) => {
       const authNum = Math.random().toString().substr(2, 6);
       const hashAuth = await bcrypt.hash(authNum, 12);
 
-      res.cookie('hashAuth', hashAuth, { maxAge: 300000 });
-      
+      res.cookie("hashAuth", hashAuth, { maxAge: 300000 });
+
       let emailTemplate;
       ejs.renderFile(
         appDir + "/views/authMail.ejs",
@@ -287,7 +289,7 @@ app.post("/emailAuth", async (req, res) => {
         }
       });
 
-      res.send('전송')
+      res.send("전송");
     } else {
       res.send("중복");
     }
@@ -299,14 +301,14 @@ app.post("/emailAuth", async (req, res) => {
 //이메일 인증
 app.post("/cert", (req, res) => {
   const code = req.body.code;
-  const hashAuth = req.cookies.hashAuth
+  const hashAuth = req.cookies.hashAuth;
 
   if (bcrypt.compareSync(code, hashAuth)) {
-    res.send("성공")
+    res.send("성공");
   } else {
-    res.send("실패")
-  } 
-})
+    res.send("실패");
+  }
+});
 
 //회원가입
 app.get("/signup", (req, res) => {
@@ -410,13 +412,13 @@ passport.deserializeUser((userid, done) => {
 // post 게시판
 app.get("/group/:id/post", (req, res) => {
   let groupId = req.params;
-  console.log(`groupId.id : ${groupId.id}`)
+  console.log(`groupId.id : ${groupId.id}`);
   if (req.isAuthenticated()) {
     db.collection("post")
-      .find( { group_id: new RegExp(groupId.id) })
+      .find({ group_id: new RegExp(groupId.id) })
       .sort({ _id: -1 })
       .toArray((err, postResult) => {
-        console.log({postResult});
+        console.log({ postResult });
         // post 게시물 id를 기준으로 그 게시물의 댓글들만 가져옴
         db.collection("comment")
           .find()
@@ -438,17 +440,20 @@ app.get("/group/:id/post", (req, res) => {
 // 게시물 검색
 app.get("/group/:id/post_search", (req, res) => {
   let groupId = req.params;
-  console.log(`검색 groupId.id : ${groupId.id}`)
+  console.log(`검색 groupId.id : ${groupId.id}`);
   console.log(`검색창에 입력한 value 값 : ${req.query.value}`);
   console.log(`선택한 오브젝트 : ${req.query.obj}`);
   let obj = req.query.obj;
   let searchResult = `'${req.query.value}'에 대한 검색 결과`;
-  if (req.query.value != ""){
+  if (req.query.value != "") {
     if (req.isAuthenticated()) {
       // 바이너리 검색
       if (obj == "content") {
         db.collection("post")
-          .find( { group_id: new RegExp(groupId.id), content: new RegExp(req.query.value) } )
+          .find({
+            group_id: new RegExp(groupId.id),
+            content: new RegExp(req.query.value),
+          })
           .sort({ _id: -1 })
           .toArray((err, postResult) => {
             console.log(postResult);
@@ -467,42 +472,48 @@ app.get("/group/:id/post_search", (req, res) => {
           });
       } else if (obj == "writer") {
         db.collection("post")
-        .find({ group_id: new RegExp(groupId.id), writer: new RegExp(req.query.value)})
-        .sort({_id: -1})
-        .toArray((err, postResult) => {
-          console.log(postResult)
-          db.collection("comment")
-            .find()
-            .toArray((err, commentResult) => {
-              // 게시물, 댓글을 post.ejs로 전달
-              res.render("post_search.ejs", {
-                posts: postResult,
-                comments: commentResult,
-                searchtxt: searchResult,
-                loginUser: req.user,
-                groupid: groupId,
+          .find({
+            group_id: new RegExp(groupId.id),
+            writer: new RegExp(req.query.value),
+          })
+          .sort({ _id: -1 })
+          .toArray((err, postResult) => {
+            console.log(postResult);
+            db.collection("comment")
+              .find()
+              .toArray((err, commentResult) => {
+                // 게시물, 댓글을 post.ejs로 전달
+                res.render("post_search.ejs", {
+                  posts: postResult,
+                  comments: commentResult,
+                  searchtxt: searchResult,
+                  loginUser: req.user,
+                  groupid: groupId,
+                });
               });
-            });
-        });
-      }else if(obj == "createdate"){
+          });
+      } else if (obj == "createdate") {
         db.collection("post")
-        .find({ group_id: new RegExp(groupId.id), createdate: new RegExp(req.query.value)})
-        .sort({_id: -1})
-        .toArray((err, postResult) => {
-          console.log(postResult)
-          db.collection("comment")
-            .find()
-            .toArray((err, commentResult) => {
-              // 게시물, 댓글을 post.ejs로 전달
-              res.render("post_search.ejs", {
-                posts: postResult,
-                comments: commentResult,
-                searchtxt: searchResult,
-                loginUser: req.user,
-                groupid: groupId,
+          .find({
+            group_id: new RegExp(groupId.id),
+            createdate: new RegExp(req.query.value),
+          })
+          .sort({ _id: -1 })
+          .toArray((err, postResult) => {
+            console.log(postResult);
+            db.collection("comment")
+              .find()
+              .toArray((err, commentResult) => {
+                // 게시물, 댓글을 post.ejs로 전달
+                res.render("post_search.ejs", {
+                  posts: postResult,
+                  comments: commentResult,
+                  searchtxt: searchResult,
+                  loginUser: req.user,
+                  groupid: groupId,
+                });
               });
-            });
-        });
+          });
       }
     } else {
       res.redirect("/login");
@@ -544,8 +555,8 @@ app.post("/group/:id/add", (req, res) => {
           );
         }
       );
-      res.redirect("/group/"+groupId.id+"/post");
-    })
+      res.redirect("/group/" + groupId.id + "/post");
+    });
   } else {
     res.redirect("/login");
   }
@@ -745,6 +756,7 @@ app.get("/group_add", (req, res) => {
 });
 
 //그룹 생성 과정
+//처음 가입할 때 방장의 정보만 입력가능하도록 수정! (멤버 정보 객체형태로 저장해야함)
 app.post("/group_upload", upload.single("Img"), (req, res) => {
   db.collection("user").findOne(
     {
@@ -789,7 +801,11 @@ app.get("/group/:id", (req, res) => {
 //유저 그룹 가입 기능
 app.get("/group/:id/register", (req, res) => {
   let params = req.params.id;
-  res.render("group_register.ejs", { params: params });
+  if (req.isAuthenticated()) {
+    res.render("group_register.ejs", { params: params });
+  } else {
+    res.redirect("/login");
+  }
 });
 
 app.post("/group/:id/register", (req, res) => {
@@ -842,32 +858,32 @@ app.get("/group/:id/group_update", (req, res) => {
   let names = [];
 
   let myId = req.params.id;
+  if (req.isAuthenticated()) {
+    db.collection("group").findOne(
+      {
+        _id: ObjectId(myId),
+      },
+      function (err, result) {
+        if (err) return console.log(err);
 
-  db.collection("group").findOne(
-    {
-      _id: ObjectId(myId),
-    },
-    function (err, result) {
-      if (err) return console.log(err);
-
-      for (let index in result.member) {
-        names.push(result.member[index].name);
+        for (let index in result.member) {
+          names.push(result.member[index].name);
+        }
+        console.log(result);
+        res.render("group_update.ejs", {
+          posts: result,
+          members: names,
+          param: myId,
+        });
       }
-
-      res.render("group_update.ejs", {
-        posts: result,
-        members: names,
-        param: myId,
-      });
-    }
-  );
+    );
+  } else {
+    res.redirect("/login");
+  }
 });
 
-//처음 가입할 때 방장의 정보만 입력가능하도록 수정! (멤버 정보 객체형태로 저장해야함)
 app.post("/group/:id/group_update", upload.single("Img"), (req, res) => {
   let myId = req.params.id;
-  let members = req.body.member.split(",");
-  console.log(members);
 
   db.collection("group").updateOne(
     {
@@ -984,7 +1000,7 @@ app.get("/group/:id/bat", (req, res) => {
   let g_members = [];
   let g_id = req.params.id;
 
-  console.log(`g_id : ${g_id}`)
+  console.log(`g_id : ${g_id}`);
   db.collection("group").findOne(
     { _id: ObjectId(g_id) },
     function (err, result) {
