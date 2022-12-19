@@ -198,13 +198,10 @@
         document.getElementById('searchDiv').style.display='flex'
       }) 
 
-      // 게시물 추가
-      $('.addBtn').click((e) => {
-
+      // 게시물, 댓글 작성
+      $('#addBtn').click( () => {
+        location.replace(`/group/<%= groupid.id %>/post`);
       })
-
-      // 댓글 추가
-
 
       // 게시물 삭제
       $('.delete').click((e) => {

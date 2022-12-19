@@ -609,6 +609,7 @@ app.put("/edit", (req, res) => {
 
 // 게시물 수정 url 진입
 app.get("/edit/:id", (req, res) => {
+  let groupId = req.params;
   console.log(req.params.id);
 
   db.collection("post").findOne(
@@ -616,7 +617,10 @@ app.get("/edit/:id", (req, res) => {
     function (err, result) {
       if (err) return console.log(err);
       console.log(result);
-      res.render("edit.ejs", { post: result });
+      res.render("edit.ejs", {
+        post: result, 
+        group_id: groupId.id,
+      });
     }
   );
 });

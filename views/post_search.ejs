@@ -146,7 +146,7 @@
             <p></p>
             <hr id="line" class="my-1" style="width: 100%">
             <!-- 댓글 작성 -->
-            <form class="formbody" action="/addComment" method="POST">
+            <form class="formbody" action="/group/<%= groupid.id %>/addComment" method="POST">
               <input class="noneDisplay" name="post_id" value="<%= posts[i]._id %>">
               <input id="inputComment" class="form-control" name="comment"/>
               <button id="addComment" class="btn btn-success addBtn" type="submit" class="btn btn-primary">댓글 등록</button>
