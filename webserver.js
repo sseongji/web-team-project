@@ -105,6 +105,11 @@ const appDir = path.dirname(require.main.filename);
 
 //routes
 
+//스터디 페이지
+app.get("/study", (req, res) => {
+  return res.render("study.ejs");
+});
+
 //비밀번호 찾기
 app.get("/findpassword", (req, res) => {
   return res.render("findpassword.ejs");
