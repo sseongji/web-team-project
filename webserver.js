@@ -342,157 +342,188 @@ passport.deserializeUser((userid, done) => {
 });
 
 // post 게시판
-app.get("/post", (req, res) => {
-  let userId = req.session.userid;
-
-  db.collection("post")
-    .find()
-    .sort({ _id: -1 })
-    .toArray((err, postResult) => {
-      // post 게시물 id를 기준으로 그 게시물의 댓글들만 가져옴
-      db.collection("comment")
-        .find()
-        .toArray((err, commentResult) => {
-          // 게시물, 댓글을 post.ejs로 전달
-          res.render("post.ejs", {
-            posts: postResult,
-            comments: commentResult,
-          });
-        });
-    });
-});
-
-// 게시물 검색
-app.get("/post_search", (req, res) => {
-  console.log(`검색창에 입력한 value 값 : ${req.query.value}`);
-  console.log(`선택한 오브젝트 : ${req.query.obj}`);
-  let obj = req.query.obj;
-  let searchResult = `'${req.query.value}'에 대한 검색 결과`;
-  if (req.query.value == "") searchResult = "게시판";
-
-  // 바이너리 검색
-  if (obj == "content") {
+app.get("/group/:id/post", (req, res) => {
+  let groupId = req.params;
+  console.log(`groupId.id : ${groupId.id}`)
+  if (req.isAuthenticated()) {
     db.collection("post")
-      .find({ content: new RegExp(req.query.value) })
+      .find( { group_id: new RegExp(groupId.id) })
       .sort({ _id: -1 })
       .toArray((err, postResult) => {
-        console.log(postResult);
+        console.log({postResult});
+        // post 게시물 id를 기준으로 그 게시물의 댓글들만 가져옴
         db.collection("comment")
           .find()
           .toArray((err, commentResult) => {
             // 게시물, 댓글을 post.ejs로 전달
-            res.render("post_search.ejs", {
+            res.render("post.ejs", {
               posts: postResult,
               comments: commentResult,
-              searchTxt: searchResult,
+              loginUser: req.user,
+              groupid: groupId,
             });
           });
       });
-  } else if (obj == "writer") {
-    db.collection("post")
-    .find({ writer: new RegExp(req.query.value)})
-    .sort({_id: -1})
-    .toArray((err, postResult) => {
-      console.log(postResult)
-      db.collection("comment")
-        .find()
-        .toArray((err, commentResult) => {
-          // 게시물, 댓글을 post.ejs로 전달
-          res.render("post_search.ejs", {
-            posts: postResult,
-            comments: commentResult,
-            searchtxt: searchResult
+  } else {
+    res.redirect("/login");
+  }
+});
+
+// 게시물 검색
+app.get("/group/:id/post_search", (req, res) => {
+  let groupId = req.params;
+  console.log(`검색 groupId.id : ${groupId.id}`)
+  console.log(`검색창에 입력한 value 값 : ${req.query.value}`);
+  console.log(`선택한 오브젝트 : ${req.query.obj}`);
+  let obj = req.query.obj;
+  let searchResult = `'${req.query.value}'에 대한 검색 결과`;
+  if (req.query.value != ""){
+    if (req.isAuthenticated()) {
+      // 바이너리 검색
+      if (obj == "content") {
+        db.collection("post")
+          .find( { group_id: new RegExp(groupId.id), content: new RegExp(req.query.value) } )
+          .sort({ _id: -1 })
+          .toArray((err, postResult) => {
+            console.log(postResult);
+            db.collection("comment")
+              .find()
+              .toArray((err, commentResult) => {
+                // 게시물, 댓글을 post.ejs로 전달
+                res.render("post_search.ejs", {
+                  posts: postResult,
+                  comments: commentResult,
+                  searchtxt: searchResult,
+                  loginUser: req.user,
+                  groupid: groupId,
+                });
+              });
           });
+      } else if (obj == "writer") {
+        db.collection("post")
+        .find({ group_id: new RegExp(groupId.id), writer: new RegExp(req.query.value)})
+        .sort({_id: -1})
+        .toArray((err, postResult) => {
+          console.log(postResult)
+          db.collection("comment")
+            .find()
+            .toArray((err, commentResult) => {
+              // 게시물, 댓글을 post.ejs로 전달
+              res.render("post_search.ejs", {
+                posts: postResult,
+                comments: commentResult,
+                searchtxt: searchResult,
+                loginUser: req.user,
+                groupid: groupId,
+              });
+            });
         });
-    });
-  }else if(obj == "createdate"){
-    db.collection("post")
-    .find({ createdate: new RegExp(req.query.value)})
-    .sort({_id: -1})
-    .toArray((err, postResult) => {
-      console.log(postResult)
-      db.collection("comment")
-        .find()
-        .toArray((err, commentResult) => {
-          // 게시물, 댓글을 post.ejs로 전달
-          res.render("post_search.ejs", {
-            posts: postResult,
-            comments: commentResult,
-            searchtxt: searchResult
-          });
+      }else if(obj == "createdate"){
+        db.collection("post")
+        .find({ group_id: new RegExp(groupId.id), createdate: new RegExp(req.query.value)})
+        .sort({_id: -1})
+        .toArray((err, postResult) => {
+          console.log(postResult)
+          db.collection("comment")
+            .find()
+            .toArray((err, commentResult) => {
+              // 게시물, 댓글을 post.ejs로 전달
+              res.render("post_search.ejs", {
+                posts: postResult,
+                comments: commentResult,
+                searchtxt: searchResult,
+                loginUser: req.user,
+                groupid: groupId,
+              });
+            });
         });
-    });
+      }
+    } else {
+      res.redirect("/login");
+    }
   }
 });
 
 // 게시물 작성
-app.post("/add", (req, res) => {
-  console.log(`글 내용 : ${req.body.contents}`);
+app.post("/group/:id/add", (req, res) => {
+  let groupId = req.params;
+  if (req.isAuthenticated()) {
+    console.log(`글 내용 : ${req.body.contents}`);
 
-  db.collection("index").findOne({ name: "postcnt" }, (err, result) => {
-    console.log(`result.cnt : ${result.cnt}`);
+    db.collection("index").findOne({ name: "postcnt" }, (err, result) => {
+      console.log(`result.cnt : ${result.cnt}`);
 
-    var totalcount = result.cnt;
+      var totalcount = result.cnt;
 
-    db.collection("post").insertOne(
-      {
-        _id: totalcount + 1,
-        content: req.body.contents,
-        // createdate: getCurrentDate(),
-        createdate: moment().format("YYYY-MM-DD"),
-        createtime: moment().format("hh:mm:ss"),
-        writer: req.body.writer,
-        count_id: totalcount + 1,
-      },
-      (err, result) => {
-        console.log("저장완료");
-        //counter라는 컬렉션에 있는 totalPost 1증가시켜주어야 함.
-        db.collection("index").updateOne(
-          { name: "postcnt" },
-          { $inc: { cnt: 1 } },
-          () => {
-            if (err) return console.log(err);
-          }
-        );
-      }
-    );
-    res.redirect("/post");
-  });
+      db.collection("post").insertOne(
+        {
+          _id: totalcount + 1,
+          content: req.body.contents,
+          // createdate: getCurrentDate(),
+          createdate: moment().format("YYYY-MM-DD"),
+          createtime: moment().format("hh:mm:ss"),
+          writer: req.user.nickname,
+          count_id: totalcount + 1,
+          group_id: groupId.id,
+        },
+        (err, result) => {
+          console.log("저장완료");
+          //counter라는 컬렉션에 있는 totalPost 1증가시켜주어야 함.
+          db.collection("index").updateOne(
+            { name: "postcnt" },
+            { $inc: { cnt: 1 } },
+            () => {
+              if (err) return console.log(err);
+            }
+          );
+        }
+      );
+      res.redirect("/group/"+groupId.id+"/post");
+    })
+  } else {
+    res.redirect("/login");
+  }
 });
 
 // 댓글 작성
-app.post("/addComment", (req, res) => {
-  console.log(`댓글 내용 : ${req.body.comment}`);
+app.post("/group/:id/addComment", (req, res) => {
+  let groupId = req.params;
+  console.log(groupId.id);
+  if (req.isAuthenticated()) {
+    console.log(`댓글 내용 : ${req.body.comment}`);
 
-  db.collection("index").findOne({ name: "commentcnt" }, (err, result) => {
-    console.log(`result.cnt : ${result.cnt}`);
+    db.collection("index").findOne({ name: "commentcnt" }, (err, result) => {
+      console.log(`result.cnt : ${result.cnt}`);
 
-    var totalcount = result.cnt;
+      var totalcount = result.cnt;
 
-    db.collection("comment").insertOne(
-      {
-        _id: totalcount + 1,
-        content: req.body.comment,
-        // createdate: getCurrentDate(),
-        createdate: moment().format("YYYY-MM-DD"),
-        createtime: moment().format("hh:mm:ss"),
-        writer: req.body.writer,
-        post_id: req.body.post_id,
-      },
-      (err, result) => {
-        console.log("저장완료");
-        //counter라는 컬렉션에 있는 totalPost 1증가시켜주어야 함.
-        db.collection("index").updateOne(
-          { name: "commentcnt" },
-          { $inc: { cnt: 1 } },
-          () => {
-            if (err) return console.log(err);
-          }
-        );
-      }
-    );
-    res.redirect("/post");
-  });
+      db.collection("comment").insertOne(
+        {
+          _id: totalcount + 1,
+          content: req.body.comment,
+          // createdate: getCurrentDate(),
+          createdate: moment().format("YYYY-MM-DD"),
+          createtime: moment().format("hh:mm:ss"),
+          writer: req.user.nickname,
+          post_id: req.body.post_id,
+        },
+        (err, result) => {
+          console.log("저장완료");
+          //counter라는 컬렉션에 있는 totalPost 1증가시켜주어야 함.
+          db.collection("index").updateOne(
+            { name: "commentcnt" },
+            { $inc: { cnt: 1 } },
+            () => {
+              if (err) return console.log(err);
+            }
+          );
+        }
+      );
+      res.redirect(`/group/${groupId.id}/post`);
+    });
+  } else {
+    res.redirect("/login");
+  }
 });
 
 // 게시물 수정
@@ -876,6 +907,7 @@ app.get("/group/:id/bat", (req, res) => {
   let g_members = [];
   let g_id = req.params.id;
 
+  console.log(`g_id : ${g_id}`)
   db.collection("group").findOne(
     { _id: ObjectId(g_id) },
     function (err, result) {
