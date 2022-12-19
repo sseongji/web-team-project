@@ -105,6 +105,76 @@ const appDir = path.dirname(require.main.filename);
 
 //routes
 
+//비밀번호 찾기
+app.get("/findpassword", (req, res) => {
+  return res.render("findpassword.ejs");
+});
+
+app.post("/sendtemppw", (req, res) => {
+  const emailaddress = req.body.email;
+  
+  db.collection("user").findOne({ email: emailaddress }, (err, user)=>{
+    if(user) {
+
+      //비밀번호 랜덤 함수
+      function createRandomPassword(variable, passwordLength) {
+        var randomString = "";
+        for (var j = 0; j < passwordLength; j++) 
+          randomString += variable[Math.floor(Math.random()*variable.length)];
+          return randomString
+      }
+      var variable = "0,1,2,3,4,5,6,7,8,9,a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z".split(",");
+      var password = createRandomPassword(variable, 8);
+      console.log(password);
+
+      let emailTemplate;
+      ejs.renderFile(
+        appDir + "/views/pwMail.ejs",
+        { tempCode: password },
+        (err, data) => {
+          emailTemplate = data;
+        }
+      );
+
+      const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          user: process.env.NODEMAILER_USER,
+          pass: process.env.NODEMAILER_PASS,
+        },
+      });
+
+      const mailOptions = {
+        from: "공부밭",
+        to: emailaddress,
+        subject: "임시 비밀번호가 전송되었습니다.",
+        html: emailTemplate,
+      };
+
+      transporter.sendMail(mailOptions, (err, res) => {
+        if (err) {
+          console.log("실패");
+        } else {
+          console.log("성공");
+        }
+      });
+      const saltRounds = 10;
+      bcrypt.hash(password, saltRounds, (err, hash) => {
+        db.collection("user").updateOne(
+          { email: emailaddress },
+          {$set: { pw: hash }},
+          function (err, result) {
+            if (err) return console.log(err);
+          })
+      })
+      res.send('성공')
+      } else {
+        res.send('실패')
+      }
+    })
+});
+     
+
 //로그아웃
 app.get("/logout", (req, res, next) => {
   req.logout((err) => {
@@ -180,10 +250,9 @@ app.post("/emailAuth", async (req, res) => {
     if (!existemail) {
       const authNum = Math.random().toString().substr(2, 6);
       const hashAuth = await bcrypt.hash(authNum, 12);
-      console.log(hashAuth);
 
       res.cookie('hashAuth', hashAuth, { maxAge: 300000 });
-      res.send('전송')
+      
 
       let emailTemplate;
       ejs.renderFile(
@@ -216,6 +285,8 @@ app.post("/emailAuth", async (req, res) => {
           console.log("성공");
         }
       });
+
+      res.send('전송')
     } else {
       res.send("중복");
     }
@@ -229,14 +300,12 @@ app.post("/emailAuth", async (req, res) => {
 app.post("/cert", (req, res) => {
   const code = req.body.code;
   const hashAuth = req.cookies.hashAuth
-  console.log(code);
-  console.log(hashAuth);
 
-  if (bcrypt.compare(code, hashAuth)) {
+  if (bcrypt.compareSync(code, hashAuth)) {
     res.send("성공")
   } else {
     res.send("실패")
-  }
+  } 
 });
 
 //회원가입
