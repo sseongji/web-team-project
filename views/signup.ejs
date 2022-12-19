@@ -225,7 +225,7 @@
                 success: function(data) {
                     if(data=='성공'){
                         $('.codecheck').text('인증되었습니다.').attr('codecheck','Y')
-                    } else {
+                    } else if (data=='실패') {
                         $('.codecheck').text('인증 실패했습니다.').attr('codecheck','N')
                     }
                 }

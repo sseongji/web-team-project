@@ -54,6 +54,22 @@
       #preview {
         width: 485px;
       }
+
+      .card-text button {
+        border: none;
+      }
+
+      #members {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+      }
+
+      .members {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+      }
     </style>
   </head>
   <body>
@@ -96,15 +112,26 @@
 
                 <div class="col-12">
                   <label for="member" class="form-label">멤버</label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="member"
-                    placeholder="<%=members%>"
-                    name="member"
-                    required
-                  />
-                  <div class="invalid-feedback">Valid name is required.</div>
+                  <div class="members">
+                    <% for(let i = 0; i < posts.member.length; i++){ %>
+                    <div
+                      class="card card h-100"
+                      style="width: 11rem; margin-bottom: 10px"
+                    >
+                      <img class="card-img-top" />
+                      <div class="card-body">
+                        <p class="card-text" id="members">
+                          <h7><%=posts.member[i].name%> %></h7>
+                          <button
+                            type="button"
+                            class="btn-close"
+                            aria-label="Close"
+                          ></button>
+                        </p>
+                      </div>
+                    </div>
+                    <% } %>
+                  </div>
                 </div>
 
                 <div class="col-12">
