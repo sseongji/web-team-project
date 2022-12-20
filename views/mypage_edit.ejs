@@ -42,10 +42,10 @@
   <body>
     <%- include('nav.ejs') %>
 
-    <h2>글 수정</h2>
+    <h2>마이페이지에서 글 수정</h2>
 
     <div class="formbody">
-        <form action="/edit?_method=PUT" method="POST">
+        <form action="/mypage_edit?_method=PUT" method="POST">
             <div class = "form-group">
                 <input type="text" name="id" style="display: none;" value=<%= post._id %>>
                 <input type="text" name="groupid" style="display: none;" value=<%= post.group_id %>>
