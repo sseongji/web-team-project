@@ -62,15 +62,7 @@
     <div class="container">
       <%- include('nav.ejs') %>
       <main>
-        <div class="py-5 text-center" id="header">
-          <img
-            class="d-block mx-auto mb-4"
-            src="/docs/5.2/assets/brand/bootstrap-logo.svg"
-            alt=""
-            width="72"
-            height="57"
-          />
-        </div>
+        <div class="py-5 text-center" id="header"></div>
 
         <div class="row g-5" id="form">
           <div class="col-md-7 col-lg-8 border rounded" id="border">
@@ -82,29 +74,51 @@
             >
               <div class="row g-3">
                 <div class="col-12">
-                  <label for="Name" class="form-label">이름</label>
+                  <label for="Name" class="form-label">그룹 이름</label>
                   <input
                     type="text"
                     class="form-control"
                     id="Name"
-                    placeholder="이름"
+                    placeholder="그룹 이름"
                     name="Name"
                     required
                   />
                   <div class="invalid-feedback">Valid name is required.</div>
                 </div>
 
+                <div class="col-12" style="margin-top: 25px">
+                  <h6>지역</h6>
+                  <select
+                    class="form-select"
+                    aria-label="Default select example"
+                    name="local"
+                  >
+                    <option name="서울">서울</option>
+                    <option name="경기">경기</option>
+                    <option name="인천">인천</option>
+                    <option name="강원">강원</option>
+                    <option name="충청">충청</option>
+                    <option name="전라">전라</option>
+                    <option name="경상">경상</option>
+                    <option name="부산">부산</option>
+                  </select>
+                </div>
+
                 <div class="col-12">
-                  <label for="Name" class="form-label">멤버</label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="member"
-                    placeholder="멤버"
-                    name="member"
-                    required
-                  />
-                  <div class="invalid-feedback">Valid name is required.</div>
+                  <label for="Notice" class="form-label">방장</label>
+                  <div class="input-group has-validation">
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="Notice"
+                      placeholder="방장 이름"
+                      value=""
+                      name="leader"
+                    />
+                    <div class="invalid-feedback">
+                      Your username is required.
+                    </div>
+                  </div>
                 </div>
 
                 <div class="col-12">
@@ -157,6 +171,11 @@
                     $("#filename").text(e.target.files[0].name);
 
                     var file = event.target.files[0];
+
+                    if (file === 0) {
+                      alert("파일은 선택해주세요");
+                      return;
+                    }
 
                     var reader = new FileReader();
                     reader.onload = function (e) {

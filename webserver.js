@@ -26,6 +26,9 @@ const handleListening = () => {
 let multer = require("multer");
 const path = require("path");
 
+// moment 설정(현재 날짜 설정하는 라이브러리)
+const moment = require("moment");
+
 //const { Server } = require("http");
 let storage = multer.diskStorage({
   destination: function (req, res, cb) {
@@ -102,13 +105,90 @@ const appDir = path.dirname(require.main.filename);
 
 //routes
 
-//로그아웃
-app.get('/logout', (req, res, next)=>{
-  req.logout((err)=>{
-    if(err) return next(err);
+//스터디 페이지
+app.get("/study", (req, res) => {
+  return res.render("study.ejs");
+});
+
+//비밀번호 찾기
+app.get("/findpassword", (req, res) => {
+  return res.render("findpassword.ejs");
+});
+
+app.post("/sendtemppw", (req, res) => {
+  const emailaddress = req.body.email;
+
+  db.collection("user").findOne({ email: emailaddress }, (err, user) => {
+    if (user) {
+      //비밀번호 랜덤 함수
+      function createRandomPassword(variable, passwordLength) {
+        var randomString = "";
+        for (var j = 0; j < passwordLength; j++)
+          randomString += variable[Math.floor(Math.random() * variable.length)];
+        return randomString;
+      }
+      var variable =
+        "0,1,2,3,4,5,6,7,8,9,a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z".split(
+          ","
+        );
+      var password = createRandomPassword(variable, 8);
+      console.log(password);
+
+      let emailTemplate;
+      ejs.renderFile(
+        appDir + "/views/pwMail.ejs",
+        { tempCode: password },
+        (err, data) => {
+          emailTemplate = data;
+        }
+      );
+
+      const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          user: process.env.NODEMAILER_USER,
+          pass: process.env.NODEMAILER_PASS,
+        },
+      });
+
+      const mailOptions = {
+        from: "공부밭",
+        to: emailaddress,
+        subject: "임시 비밀번호가 전송되었습니다.",
+        html: emailTemplate,
+      };
+
+      transporter.sendMail(mailOptions, (err, res) => {
+        if (err) {
+          console.log("실패");
+        } else {
+          console.log("성공");
+        }
+      });
+      const saltRounds = 10;
+      bcrypt.hash(password, saltRounds, (err, hash) => {
+        db.collection("user").updateOne(
+          { email: emailaddress },
+          { $set: { pw: hash } },
+          function (err, result) {
+            if (err) return console.log(err);
+          }
+        );
+      });
+      res.send("성공");
+    } else {
+      res.send("실패");
+    }
   });
-  res.redirect('/');
-})
+});
+
+//로그아웃
+app.get("/logout", (req, res, next) => {
+  req.logout((err) => {
+    if (err) return next(err);
+  });
+  res.redirect("/");
+});
 
 //마이페이지
 app.get("/mypage", (req, res) => {
@@ -118,7 +198,6 @@ app.get("/mypage", (req, res) => {
     res.redirect("/login");
   }
 });
-
 
 //개인정보수정 페이지
 app.get("/changeprivacy", (req, res) => {
@@ -150,7 +229,7 @@ app.post("/changeprivacy", (req, res) => {
       }
     );
     res.redirect("/mypage");
-    });
+  });
 });
 
 //닉네임 중복확인
@@ -175,11 +254,12 @@ app.post("/emailAuth", async (req, res) => {
   const existemail = await db
     .collection("user")
     .findOne({ email: emailaddress });
+
   try {
-    //이메일 중복 아닐 시
     if (!existemail) {
       const authNum = Math.random().toString().substr(2, 6);
       const hashAuth = await bcrypt.hash(authNum, 12);
+
       res.cookie("hashAuth", hashAuth, { maxAge: 300000 });
 
       let emailTemplate;
@@ -205,6 +285,7 @@ app.post("/emailAuth", async (req, res) => {
         subject: "회원가입을 위한 인증번호를 입력해주세요.",
         html: emailTemplate,
       };
+
       await transporter.sendMail(mailOptions, (err, res) => {
         if (err) {
           console.log("실패");
@@ -212,6 +293,8 @@ app.post("/emailAuth", async (req, res) => {
           console.log("성공");
         }
       });
+
+      res.send("전송");
     } else {
       res.send("중복");
     }
@@ -221,20 +304,14 @@ app.post("/emailAuth", async (req, res) => {
 });
 
 //이메일 인증
-app.post("/cert", async (req, res) => {
+app.post("/cert", (req, res) => {
   const code = req.body.code;
   const hashAuth = req.cookies.hashAuth;
-  console.log(code);
 
-  try {
-    if (bcrypt.compareSync(code, hashAuth)) {
-      res.send({ result: "success" });
-    } else {
-      res.send({ result: "fail" });
-    }
-  } catch (err) {
-    res.send({ result: "fail" });
-    console.error(err);
+  if (bcrypt.compareSync(code, hashAuth)) {
+    res.send("성공");
+  } else {
+    res.send("실패");
   }
 });
 
@@ -337,156 +414,264 @@ passport.deserializeUser((userid, done) => {
   });
 });
 
-// post 게시판
-app.get("/post", (req, res) => {
-  let userId = req.session.userid;
-
-  db.collection("post")
-    .find()
-    .sort({ _id: -1 })
-    .toArray((err, postResult) => {
-      // post 게시물 id를 기준으로 그 게시물의 댓글들만 가져옴
-      db.collection("comment")
-        .find()
-        .toArray((err, commentResult) => {
-          // 게시물, 댓글을 post.ejs로 전달
-          res.render("post.ejs", {
-            posts: postResult,
-            comments: commentResult,
+// 마이페이지 내가 쓴 글
+app.get("/mypage_post/:id", (req, res) => {
+  console.log(req.user.nickname);
+  if (req.isAuthenticated()) {
+    db.collection("post")
+      .find({writer: new RegExp(req.user.nickname)})
+      .sort({ _id: -1 })
+      .toArray((err, postResult) => {
+        console.log({ postResult });
+        // post 게시물 id를 기준으로 그 게시물의 댓글들만 가져옴
+        db.collection("comment")
+          .find()
+          .toArray((err, commentResult) => {
+            // 게시물, 댓글을 post.ejs로 전달
+            res.render("mypage_postpage.ejs", {
+              posts: postResult,
+              comments: commentResult,
+              loginUser: req.user,
+            });
           });
-        });
-    });
+      });
+  } else {
+    res.redirect("/login");
+  }
+});
+
+// // post 게시판
+// app.get("/group/:id/post", (req, res) => {
+//   let groupId = req.params;
+//   console.log(`groupId.id : ${groupId.id}`);
+//   if (req.isAuthenticated()) {
+//     db.collection("post")
+//       .find({ group_id: new RegExp(groupId.id) })
+//       .sort({ _id: -1 })
+//       .toArray((err, postResult) => {
+//         console.log({ postResult });
+//         // post 게시물 id를 기준으로 그 게시물의 댓글들만 가져옴
+//         db.collection("comment")
+//           .find()
+//           .toArray((err, commentResult) => {
+//             // 게시물, 댓글을 post.ejs로 전달
+//             res.render("post.ejs", {
+//               posts: postResult,
+//               comments: commentResult,
+//               loginUser: req.user,
+//               groupid: groupId,
+//             });
+//           });
+//       });
+//   } else {
+//     res.redirect("/login");
+//   }
+// });
+
+// post 게시판
+app.get("/group/:id/group_postpage", (req, res) => {  
+  console.log(`group.id : ${req.params.id}`);
+  if (req.isAuthenticated()) {
+    db.collection("post")
+      .find({ group_id: new RegExp(req.params.id) })
+      .sort({ _id: -1 })
+      .toArray((err, postResult) => {
+        //console.log({ postResult });
+        // post 게시물 id를 기준으로 그 게시물의 댓글들만 가져옴
+        db.collection("comment")
+          .find()
+          .toArray((err, commentResult) => {
+            db.collection("group")
+              .findOne( { _id: ObjectId(req.params.id) },
+              (err, groupResult) => {
+                if (err) return console.log(err);
+                console.log({ groupResult });
+                // 게시물, 댓글을 post.ejs로 전달
+                res.render("group_postpage.ejs", {
+                  posts: postResult,
+                  comments: commentResult,
+                  loginUser: req.user,
+                  group: groupResult,
+                })
+            });
+          });
+      });
+  } else {
+    res.redirect("/login");
+  }
 });
 
 // 게시물 검색
-app.get("/post_search", (req, res) => {
+app.get("/group/:id/post_search", (req, res) => {
+  let group = req.params;
+  console.log(`검색 group.id : ${group.id}`);
   console.log(`검색창에 입력한 value 값 : ${req.query.value}`);
   console.log(`선택한 오브젝트 : ${req.query.obj}`);
   let obj = req.query.obj;
   let searchResult = `'${req.query.value}'에 대한 검색 결과`;
-  if (req.query.value == "") searchResult = "게시판";
-
-  // 바이너리 검색
-  if (obj == "content") {
-    db.collection("post")
-      .find({ content: new RegExp(req.query.value) })
-      .sort({ _id: -1 })
-      .toArray((err, postResult) => {
-        console.log(postResult);
-        db.collection("comment")
-          .find()
-          .toArray((err, commentResult) => {
-            // 게시물, 댓글을 post.ejs로 전달
-            res.render("post_search.ejs", {
-              posts: postResult,
-              comments: commentResult,
-              searchTxt: searchResult,
-            });
+  if (req.query.value != "") {
+    if (req.isAuthenticated()) {
+      // 바이너리 검색
+      if (obj == "content") {
+        db.collection("post")
+          .find({
+            group_id: new RegExp(group.id),
+            content: new RegExp(req.query.value),
+          })
+          .sort({ _id: -1 })
+          .toArray((err, postResult) => {
+            //console.log(postResult);
+            db.collection("comment")
+              .find()
+              .toArray((err, commentResult) => {
+                // 게시물, 댓글을 post.ejs로 전달
+                res.render("post_search.ejs", {
+                  posts: postResult,
+                  comments: commentResult,
+                  searchtxt: searchResult,
+                  loginUser: req.user,
+                  groupid: group,
+                });
+              });
           });
-      });
-  } else if (obj == "writer") {
-    db.collection("post")
-      .find({ writer: new RegExp(req.query.value) })
-      .sort({ _id: -1 })
-      .toArray((err, postResult) => {
-        console.log(postResult);
-        db.collection("comment")
-          .find()
-          .toArray((err, commentResult) => {
-            // 게시물, 댓글을 post.ejs로 전달
-            res.render("post_search.ejs", {
-              posts: postResult,
-              comments: commentResult,
-              searchTxt: searchResult,
-            });
+      } else if (obj == "writer") {
+        db.collection("post")
+          .find({
+            group_id: new RegExp(group.id),
+            writer: new RegExp(req.query.value),
+          })
+          .sort({ _id: -1 })
+          .toArray((err, postResult) => {
+            console.log(postResult);
+            db.collection("comment")
+              .find()
+              .toArray((err, commentResult) => {
+                // 게시물, 댓글을 post.ejs로 전달
+                res.render("post_search.ejs", {
+                  posts: postResult,
+                  comments: commentResult,
+                  searchtxt: searchResult,
+                  loginUser: req.user,
+                  groupid: group,
+                });
+              });
           });
-      });
+      } else if (obj == "createdate") {
+        db.collection("post")
+          .find({
+            group_id: new RegExp(group.id),
+            createdate: new RegExp(req.query.value),
+          })
+          .sort({ _id: -1 })
+          .toArray((err, postResult) => {
+            console.log(postResult);
+            db.collection("comment")
+              .find()
+              .toArray((err, commentResult) => {
+                // 게시물, 댓글을 post.ejs로 전달
+                res.render("post_search.ejs", {
+                  posts: postResult,
+                  comments: commentResult,
+                  searchtxt: searchResult,
+                  loginUser: req.user,
+                  groupid: group,
+                });
+              });
+          });
+      }
+    } else {
+      res.redirect("/login");
+    }
   }
 });
 
 // 게시물 작성
-app.post("/add", (req, res) => {
-  console.log(`글 내용 : ${req.body.contents}`);
+app.post("/group/:id/add", (req, res) => {
+  let group = req.params;
+  if (req.isAuthenticated()) {
+    console.log(`글 내용 : ${req.body.contents}`);
 
-  db.collection("index").findOne({ name: "postcnt" }, (err, result) => {
-    console.log(`result.cnt : ${result.cnt}`);
+    db.collection("index").findOne({ name: "postcnt" }, (err, result) => {
+      console.log(`result.cnt : ${result.cnt}`);
 
-    var totalcount = result.cnt;
+      var totalcount = result.cnt;
 
-    db.collection("post").insertOne(
-      {
-        _id: totalcount + 1,
-        content: req.body.contents,
-        createdate: getCurrentDate(),
-        writer: req.body.writer,
-        count_id: totalcount + 1,
-      },
-      (err, result) => {
-        console.log("저장완료");
-        //counter라는 컬렉션에 있는 totalPost 1증가시켜주어야 함.
-        db.collection("index").updateOne(
-          { name: "postcnt" },
-          { $inc: { cnt: 1 } },
-          () => {
-            if (err) return console.log(err);
-          }
-        );
-      }
-    );
-    res.redirect("/post");
-  });
+      db.collection("post").insertOne(
+        {
+          _id: totalcount + 1,
+          content: req.body.contents,
+          // createdate: getCurrentDate(),
+          createdate: moment().format("YYYY-MM-DD"),
+          createtime: moment().format("hh:mm:ss"),
+          writer: req.user.nickname,
+          count_id: totalcount + 1,
+          group_id: group.id,
+        },
+        (err, result) => {
+          console.log("저장완료");
+          //counter라는 컬렉션에 있는 totalPost 1증가시켜주어야 함.
+          db.collection("index").updateOne(
+            { name: "postcnt" },
+            { $inc: { cnt: 1 } },
+            () => {
+              if (err) return console.log(err);
+            }
+          );
+        }
+      );
+      res.redirect("/group/" + group.id + "/group_postpage");
+    });
+  } else {
+    res.redirect("/login");
+  }
 });
 
 // 댓글 작성
-app.post("/addComment", (req, res) => {
-  console.log(`댓글 내용 : ${req.body.comment}`);
+app.post("/group/:id/addComment", (req, res) => {
+  let group = req.params;
+  console.log(group.id);
+  if (req.isAuthenticated()) {
+    console.log(`댓글 내용 : ${req.body.comment}`);
 
-  db.collection("index").findOne({ name: "commentcnt" }, (err, result) => {
-    console.log(`result.cnt : ${result.cnt}`);
+    db.collection("index").findOne({ name: "commentcnt" }, (err, result) => {
+      console.log(`result.cnt : ${result.cnt}`);
 
-    var totalcount = result.cnt;
+      var totalcount = result.cnt;
 
-    db.collection("comment").insertOne(
-      {
-        _id: totalcount + 1,
-        content: req.body.comment,
-        createdate: getCurrentDate(),
-        writer: req.body.writer,
-        post_id: req.body.post_id,
-      },
-      (err, result) => {
-        console.log("저장완료");
-        //counter라는 컬렉션에 있는 totalPost 1증가시켜주어야 함.
-        db.collection("index").updateOne(
-          { name: "commentcnt" },
-          { $inc: { cnt: 1 } },
-          () => {
-            if (err) return console.log(err);
-          }
-        );
-      }
-    );
-    res.redirect("/post");
-  });
-});
-
-// 게시물 수정
-app.put("/edit", (req, res) => {
-  console.log(req.body);
-  db.collection("post").updateOne(
-    { _id: parseInt(req.body.id) },
-    { $set: { content: req.body.contents } },
-    (err, result) => {
-      if (err) return console.log(err);
-      console.log(result);
-      console.log("수정 완료");
-      res.redirect("/post");
-    }
-  );
+      db.collection("comment").insertOne(
+        {
+          _id: totalcount + 1,
+          content: req.body.comment,
+          // createdate: getCurrentDate(),
+          createdate: moment().format("YYYY-MM-DD"),
+          createtime: moment().format("hh:mm:ss"),
+          writer: req.user.nickname,
+          post_id: req.body.post_id,
+        },
+        (err, result) => {
+          console.log("저장완료");
+          //counter라는 컬렉션에 있는 totalPost 1증가시켜주어야 함.
+          db.collection("index").updateOne(
+            { name: "commentcnt" },
+            { $inc: { cnt: 1 } },
+            () => {
+              if (err) return console.log(err);
+            }
+          );
+        }
+      );
+      res.redirect(`/group/${group.id}/group_postpage`);
+    });
+  } else {
+    res.redirect("/login");
+  }
 });
 
 // 게시물 수정 url 진입
 app.get("/edit/:id", (req, res) => {
+  console.log("게시물 수정 화면으로 진입")
+  console.log(req.params)
+  let groupinfo = req.params;
   console.log(req.params.id);
 
   db.collection("post").findOne(
@@ -494,7 +679,46 @@ app.get("/edit/:id", (req, res) => {
     function (err, result) {
       if (err) return console.log(err);
       console.log(result);
-      res.render("edit.ejs", { post: result });
+      res.render("edit.ejs", {
+        post: result, 
+        group: groupinfo,
+      });
+    }
+  );
+});
+
+// 게시물 수정
+app.put("/edit", (req, res) => {
+  console.log(req.body);
+  console.log(req.body.groupid);
+  db.collection("post").updateOne(
+    { _id: parseInt(req.body.id) },
+    { $set: { content: req.body.contents } },
+    (err, result) => {
+      if (err) return console.log(err);
+      console.log(result);
+      console.log("수정 완료");
+      res.redirect(`/group/${req.body.groupid}/group_postpage`);
+    }
+  );
+});
+
+// mypage에서 게시물 수정 url 진입
+app.get("/mypage_edit/:id", (req, res) => {
+  console.log("마이페이지 수정 화면으로 진입")
+  console.log(req.params)
+  let groupinfo = req.params;
+  console.log(req.params.id);
+
+  db.collection("post").findOne(
+    { _id: parseInt(req.params.id) },
+    function (err, result) {
+      if (err) return console.log(err);
+      console.log(result);
+      res.render("mypage_edit.ejs", {
+        post: result, 
+        group: groupinfo,
+      });
     }
   );
 });
@@ -623,24 +847,31 @@ app.get("/group_add", (req, res) => {
 });
 
 //그룹 생성 과정
+//처음 가입할 때 방장의 정보만 입력가능하도록 수정! (멤버 정보 객체형태로 저장해야함)
 app.post("/group_upload", upload.single("Img"), (req, res) => {
-  console.log(req.body);
-  let members = req.body.member.split(",");
-
-  db.collection("group").insertOne(
+  db.collection("user").findOne(
     {
-      name: req.body.Name,
-      member: members,
-      notice: req.body.Notice,
-      intro: req.body.Description,
-      img: req.file.filename,
-      tag: req.body.tag,
-      createdate: getCurrentDate(),
+      email: req.session.passport.user,
     },
     function (err, result) {
-      if (err) return console.log(err);
-      console.log("수정 완료");
-      res.redirect("/");
+      delete result.pw;
+
+      db.collection("group").insertOne(
+        {
+          name: req.body.Name,
+          notice: req.body.Notice,
+          leader: req.body.leader,
+          member: [result],
+          img: req.file.filename,
+          tag: req.body.tag,
+          createdate: getCurrentDate(),
+        },
+        function (err, result) {
+          if (err) return console.log(err);
+          console.log("수정 완료");
+          res.redirect("/");
+        }
+      );
     }
   );
 });
@@ -652,7 +883,7 @@ app.get("/group/:id", (req, res) => {
     { _id: ObjectId(myId) },
     function (err, result) {
       if (err) return console.log(err);
-      console.log(result);
+
       res.render("group_info.ejs", { posts: result, myId });
     }
   );
@@ -661,7 +892,11 @@ app.get("/group/:id", (req, res) => {
 //유저 그룹 가입 기능
 app.get("/group/:id/register", (req, res) => {
   let params = req.params.id;
-  res.render("group_register.ejs", { params: params });
+  if (req.isAuthenticated()) {
+    res.render("group_register.ejs", { params: params });
+  } else {
+    res.redirect("/login");
+  }
 });
 
 app.post("/group/:id/register", (req, res) => {
@@ -698,7 +933,7 @@ app.post("/group/:id/register", (req, res) => {
             { _id: ObjectId(myId) },
             function (err, result) {
               if (err) return console.log(err);
-              console.log(result);
+
               res.render("group_info.ejs", { posts: result, myId });
             }
           );
@@ -714,29 +949,32 @@ app.get("/group/:id/group_update", (req, res) => {
   let names = [];
 
   let myId = req.params.id;
-  db.collection("group").findOne(
-    {
-      _id: ObjectId(myId),
-    },
-    function (err, result) {
-      if (err) return console.log(err);
+  if (req.isAuthenticated()) {
+    db.collection("group").findOne(
+      {
+        _id: ObjectId(myId),
+      },
+      function (err, result) {
+        if (err) return console.log(err);
 
-      for (let index in result.member) {
-        names.push(result.member[index].name);
+        for (let index in result.member) {
+          names.push(result.member[index].name);
+        }
+
+        res.render("group_update.ejs", {
+          posts: result,
+          members: names,
+          param: myId,
+        });
       }
-
-      res.render("group_update.ejs", {
-        posts: result,
-        members: names,
-        param: myId,
-      });
-    }
-  );
+    );
+  } else {
+    res.redirect("/login");
+  }
 });
 
 app.post("/group/:id/group_update", upload.single("Img"), (req, res) => {
-  let members = req.body.member.split(",");
-
+  let names = [];
   db.collection("group").updateOne(
     {
       _id: ObjectId(req.params.id),
@@ -745,7 +983,6 @@ app.post("/group/:id/group_update", upload.single("Img"), (req, res) => {
       //$set은 값을 대체시켜주는 것
       $set: {
         name: req.body.name,
-        member: members,
         notice: req.body.Notice,
         intro: req.body.Description,
         img: req.file.filename,
@@ -754,7 +991,42 @@ app.post("/group/:id/group_update", upload.single("Img"), (req, res) => {
     },
     function (err, result) {
       if (err) return console.log(err);
-      console.log(result);
+
+      for (let index in result.member) {
+        names.push(result.member[index].name);
+      }
+      res.redirect("/");
+    }
+  );
+});
+
+app.delete("/group/:id/group_update", (req, res) => {
+  console.log(req.body);
+  db.collection("group").findOne(
+    { _id: ObjectId(req.params.id) },
+    function (err, result) {
+      if (err) return console.log(err);
+      result.member.forEach((item, index) => {
+        if (item.email === req.body.email) {
+          result.member.splice(index, 1);
+        }
+      });
+      console.log(result.member);
+      db.collection("group").updateOne(
+        {
+          _id: ObjectId(req.params.id),
+        },
+        {
+          //$set은 값을 대체시켜주는 것
+          $set: {
+            member: result.member,
+          },
+        },
+        function (err, result) {
+          if (err) return console.log(err);
+          console.log(result);
+        }
+      );
     }
   );
 });
@@ -793,7 +1065,10 @@ app.get("/group/:id/homework", (req, res) => {
           .toArray((err, result) => {
             if (err) console.log(err);
             console.log(result);
-            return res.render("homework.ejs", { homeworks: result });
+            return res.render("homework.ejs", {
+              homeworks: result,
+              params: req.params.id,
+            });
           });
       }
       //데이터가 있으면, 바로 render
@@ -809,12 +1084,13 @@ app.get("/group/:id/homework", (req, res) => {
 app.put("/group/:id/homework", (req, res) => {
   // const gid = group_id
 
-  let gid = req.params.id;
+  // let gid = req.params.id;
 
   // console.log(gid);
 
-  console.log(req.body);
   const inputValues = req.body;
+
+  console.log(req.body);
 
   //날짜별로 update, (오늘부터 마지막날)
   for (const key in inputValues) {
@@ -829,6 +1105,7 @@ app.put("/group/:id/homework", (req, res) => {
       { $set: { content: inputValues[key] } },
       (err, result) => {
         if (err) return console.log(err);
+        console.log(result);
         // console.log('group_id: '+ gid + ', ' + parseInt(key)+'일 숙제수정완료');
       }
     );
@@ -842,6 +1119,7 @@ app.get("/group/:id/bat", (req, res) => {
   let g_members = [];
   let g_id = req.params.id;
 
+  console.log(`g_id : ${g_id}`);
   db.collection("group").findOne(
     { _id: ObjectId(g_id) },
     function (err, result) {
@@ -853,11 +1131,11 @@ app.get("/group/:id/bat", (req, res) => {
 
       //render할 데이터 세팅
       const setReturn = (result) => {
-        console.log(g_members);
+        console.log(result);
         //모임원
         const mems = result[result.length - 1].success;
         const memIds = Object.keys(mems);
-        // console.log(memIds);
+        console.log(mems);
         //오늘의 숙제
         // console.log(nowdate.getDate())
         const idx = result.length + nowdate.getDate() - lastDate - 1; //(길이 + 오늘(일) - 이번달마지막(일) - 1)
@@ -900,7 +1178,7 @@ app.get("/group/:id/bat", (req, res) => {
             percentage: Number(percentageScore.toFixed(2)),
           };
         });
-        // console.log(score);
+        // console.log(result);
         return res.render("bat.ejs", {
           homeworks: result,
           members: g_members,
@@ -952,10 +1230,9 @@ app.put("/group/:id/bat", (req, res) => {
 
   // console.log(gid);
 
-  console.log(req.body);
+  // console.log(req.body);
   const inputValues = req.body;
   const setKeyString = "success." + inputValues.id;
-  console.log(setKeyString);
 
   db.collection("homework").updateOne(
     {

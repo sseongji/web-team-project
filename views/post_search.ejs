@@ -60,9 +60,12 @@
       #addComment{
         margin-left: auto;
       }
+      #deleteOption{
+        margin-left: auto;
+        margin-bottom: 5px;
+      }
       .deleteComment{
-        margin-top: -10px;
-        float: right;
+        margin-left: 5px;
       }
       .noneDisplay{
         display: none;
@@ -75,7 +78,8 @@
     <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
 
       <div class="container" style="display: flex;">
-        <h2 class="ml-2 my-3" style="margin: auto;"><%= searchTxt %></h2>
+        <textarea id="groupId" style="display: none;"><%= groupid.id %></textarea>
+        <h2 class="ml-2 my-3" style="margin: auto;"><%= searchtxt %></h2>
       </div>
       <div class="container" style="display: flex;">
         <a id="createToggle" class="btn btn-primary" href="#">글쓰기</a>
@@ -87,12 +91,14 @@
         <select id="objOption" class="form-select" style="width: 120px; flex: none;">
           <option value="content">글내용</option>
           <option value="writer">작성자</option>
+          <option value="createdate">작성일</option>
         </select>
         <input id="searchInput" type="text" class="form-control" style="flex: 1;">
         <button id="searchBtn" class="btn btn-success addBtn" >검색</button>
       </div>
 
       <script>
+        let group_Id = $('#groupId').val();
         // 검색 버튼 눌렀을 때, jQuery 사용
         $('#searchBtn').click( () => {
           // JQuery로 검색어 입력창 내용 가져옴
@@ -103,15 +109,14 @@
           let inputValue = $('#searchInput').val();
           console.log(inputValue)
 
-          location.replace(`/post_search?value=${inputValue}&obj=${objOption}`);
+          location.replace(`/group/<%= groupid.id %>/post_search?value=${inputValue}&obj=${objOption}`);
         })
       </script>
 
       <!-- 게시물 작성창 -->
-      <form action="/add" method="POST" style="margin-bottom: 10px;">
+      <form action="/group/<%= groupid.id %>/add" method="POST" style="margin-bottom: 10px;">
         <div id="writeDiv" class="container" style="display: none;">
           <form id="writeForm" class="form input-group mb-3">
-            <input id="writerId" name="writer" type="hidden" value="sid">
             <input name="contents" type="text" class="form-control" style="flex: 1;">
             <button class="btn btn-success addBtn" type="submit" >글 등록</button>
           </form>
@@ -125,23 +130,23 @@
           <li class="list-group-item">
             <div style="display: flex; flex-direction: row">
               <div style="text-align: left;">글 번호 : <%= posts[i]._id %></div>
-              <div style="margin-left: auto;">날짜 : <%= posts[i].createdate %></div>
+              <div style="margin-left: auto;">날짜 : <%= posts[i].createdate %> <%= posts[i].createtime %></div>
             </div>
             <p></p>
             <div style="display: flex; flex-direction: row; align-items: center;">
               <h4 id="postContent"><%= posts[i].writer %> : <%= posts[i].content %></h4>
-              <div style="display: flex; flex-direction: row; margin-left: auto;">
-                <a id="editBtn" class="btn btn-danger" href="/edit/<%= posts[i]._id %>">수정</a>
-                <button class="btn btn-danger delete" data-id="<%= posts[i]._id %>" style="margin-left: 10px;">삭제</button>
-              </div>
+              <% if(posts[i].writer == loginUser.nickname){ %>
+                <div style="display: flex; flex-direction: row; margin-left: auto;">
+                  <a id="editBtn" class="btn btn-danger" href="/edit/<%= posts[i]._id %>">수정</a>
+                  <button class="btn btn-danger delete" data-id="<%= posts[i]._id %>" style="margin-left: 10px;">삭제</button>
+                </div>
+              <% } %>
             </div>
             
             <p></p>
             <hr id="line" class="my-1" style="width: 100%">
             <!-- 댓글 작성 -->
-            <form class="formbody" action="/addComment" method="POST">
-              <!-- 글쓴이 임시 값임 => posts[i].writer로 바꿔야함 -->
-              <input class="noneDisplay" name="writer" value="글쓴이">
+            <form class="formbody" action="/group/<%= groupid.id %>/addComment" method="POST">
               <input class="noneDisplay" name="post_id" value="<%= posts[i]._id %>">
               <input id="inputComment" class="form-control" name="comment"/>
               <button id="addComment" class="btn btn-success addBtn" type="submit" class="btn btn-primary">댓글 등록</button>
@@ -151,13 +156,17 @@
             <div>
               <% for(let j = 0; j < comments.length; j++){ %>
                 <% if(comments[j].post_id == posts[i]._id){ %>
-                  <form style="margin: 1px; border: 1px;">
+                  <form style="margin: 1px; border: 1px; display: flex; flex-direction: row; align-items: center;">
                     <svg xmlns="http://www.w3.org/2000/svg" style="margin-left:10px; margin-right:10px; float:left; transform: rotate( 180deg );" width="16" height="16" fill="currentColor" class="bi bi-arrow-90deg-left" viewBox="0 0 16 16">
                       <path fill-rule="evenodd" d="M1.146 4.854a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 4H12.5A2.5 2.5 0 0 1 15 6.5v8a.5.5 0 0 1-1 0v-8A1.5 1.5 0 0 0 12.5 5H2.707l3.147 3.146a.5.5 0 1 1-.708.708l-4-4z"/>
                     </svg>
                     <%= comments[j].writer %> : <%= comments[j].content %>
-                    <button class="btn btn-danger deleteComment" data-id="<%= comments[j]._id %>">삭제</button>
-                    <h6 style="float: right;">날짜 : <%= comments[j].createdate %></h6>
+                    <div id="deleteOption">
+                      날짜 : <%= comments[j].createdate %> <%= comments[j].createtime %>
+                      <% if(comments[j].writer == loginUser.nickname){ %>
+                        <button class="btn btn-danger deleteComment" data-id="<%= comments[j]._id %>">삭제</button>
+                      <% } %>
+                    </div>
                     <p></p>
                   </form>
                 <% } %>

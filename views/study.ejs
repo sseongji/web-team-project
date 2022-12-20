@@ -1,0 +1,41 @@
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+
+    <style>
+        body{
+            width: 700px; 
+            margin: 0 auto;
+        }
+        .postcontainer{
+            display: flex;
+            padding: 40px 0 40px 10px;
+            justify-content: space-between;
+        }
+    </style>
+
+</head>
+
+
+<body>
+
+<script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
+
+
+    <h2>스터디 공지</h2>
+
+    <div class="postcontainer">
+
+        <div class="row">
+            <input class="form-control dateSelector" name="birth" placeholder="날짜 및 시간">
+            <input type="text" class="form-control" name="studycontext" placeholder="내용">
+            <input class="form-control" placeholder="주소">
+        </div>
+        <div class="row">
+            
+            <button type="button" class="btn btn-primary studyPost" style="background-color: #4AB186; border-color: #4AB186;">추가</button>
+        </div>
+
+    </div>
+
+
+</body>

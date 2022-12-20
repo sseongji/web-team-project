@@ -73,12 +73,11 @@
     </style>
   </head>
   <body>
-    <%- include('nav.ejs') %>
     
     <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
 
       <div class="container" style="display: flex;">
-        <textarea id="groupId" style="display: none;"><%= groupid.id %></textarea>
+        <textarea id="groupId" style="display: none;"><%= group._id %></textarea>
         <h2 class="ml-2 my-3" style="margin: auto;">게시판</h2>
       </div>
       <div class="container" style="display: flex;">
@@ -109,12 +108,12 @@
           let inputValue = $('#searchInput').val();
           console.log(inputValue)
 
-          location.replace(`/group/<%= groupid.id %>/post_search?value=${inputValue}&obj=${objOption}`);
+          location.replace(`/group/<%= group._id %>/post_search?value=${inputValue}&obj=${objOption}`);
         })
       </script>
 
       <!-- 게시물 작성창 -->
-      <form action="/group/<%= groupid.id %>/add" method="POST" style="margin-bottom: 10px;">
+      <form action="/group/<%= group._id %>/add" method="POST" style="margin-bottom: 10px;">
         <div id="writeDiv" class="container" style="display: none;">
           <form id="writeForm" class="form input-group mb-3">
             <input name="contents" type="text" class="form-control" style="flex: 1;">
@@ -137,7 +136,7 @@
               <h4 id="postContent"><%= posts[i].writer %> : <%= posts[i].content %></h4>
               <% if(posts[i].writer == loginUser.nickname){ %>
                 <div style="display: flex; flex-direction: row; margin-left: auto;">
-                  <a id="editBtn" class="btn btn-danger" href="/edit/<%= posts[i]._id %>">수정</a>
+                  <a id="editBtn" class="btn btn-danger" href="/edit/<%= posts [i]._id %>">수정</a>
                   <button class="btn btn-danger delete" data-id="<%= posts[i]._id %>" style="margin-left: 10px;">삭제</button>
                 </div>
               <% } %>
@@ -146,7 +145,7 @@
             <p></p>
             <hr id="line" class="my-1" style="width: 100%">
             <!-- 댓글 작성 -->
-            <form class="formbody" action="/group/<%= groupid.id %>/addComment" method="POST">
+            <form class="formbody" action="/group/<%= group._id %>/addComment" method="POST">
               <input class="noneDisplay" name="post_id" value="<%= posts[i]._id %>">
               <input id="inputComment" class="form-control" name="comment"/>
               <button id="addComment" class="btn btn-success addBtn" type="submit" class="btn btn-primary">댓글 등록</button>
@@ -196,11 +195,12 @@
         document.getElementById('createToggle').style.display='flex'
         document.getElementById('writeDiv').style.display='none'
         document.getElementById('searchDiv').style.display='flex'
-      }) 
+      })
 
       // 게시물, 댓글 작성
       $('#addBtn').click( () => {
-        location.replace(`/group/<%= groupid.id %>/post`);
+        console.log(`/group/<%= group._id %>/post : /group/<%= group._id %>/post`)
+        location.replace(`/group/<%= group._id %>/post`);
       })
 
       // 게시물 삭제

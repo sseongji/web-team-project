@@ -56,7 +56,7 @@
         
     </style>
   </head>
-  <body>
+  <body style="margin: auto;">
     <%- include('nav.ejs') %>
 
     <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
@@ -73,7 +73,7 @@
                     <div class="card-body">
 
                       <div class="personalhead">
-                        <h1 class="headinfo"> <%= userSession %> </h1>
+                        <h1 class="headinfo"> <%= loginUser %> </h1>
                         <div class="space"></div>
                         <a href="/changeprivacy">
                           <button type="button" class="btn btn-primary headinfo" style="font-size: small; background-color: #F16A6E; border-color:#F16A6E;">개인정보수정</button>
@@ -81,10 +81,10 @@
                       </div>
 
                       <ul>
-                        <li class="card-text personalinfo">아이디: <%= userSession.email %></li>
-                        <li class="card-text personalinfo">생년월일: <%= userSession.birth %></li>
-                        <li class="card-text personalinfo">지역: <%= userSession.region %></li>
-                        <li class="card-text personalinfo">태그: #<%= userSession.tag %></li>
+                        <li class="card-text personalinfo">아이디: <%= loginUser.email %></li>
+                        <li class="card-text personalinfo">생년월일: <%= loginUser.birth %></li>
+                        <li class="card-text personalinfo">지역: <%= loginUser.region %></li>
+                        <li class="card-text personalinfo">태그: #<%= loginUser.tag %></li>
                       </ul>
                     </div>
                 </div>
@@ -98,7 +98,7 @@
                       <a id="plink" href="#">모임</a>
                     </li>
                     <li>
-                      <a id="plink" href="/mypage_post/<%= userSession.email %>">게시글</a>
+                      <a id="plink" href="/mypage_postpage/<%= loginUser.email %>">게시글</a>
                     </li>
                     <li>
                       <a id="plink" href="#">댓글</a>
@@ -108,7 +108,7 @@
 
             <hr id="line" class="my-1"/>
         
-        
+            <%- include('mypage_post.ejs') %>
         
     </div>
 

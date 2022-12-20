@@ -54,6 +54,23 @@
       #preview {
         width: 485px;
       }
+
+      .card-text button {
+        border: none;
+      }
+
+      #members {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+      }
+
+      .members {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+      }
     </style>
   </head>
   <body>
@@ -62,15 +79,7 @@
     <div class="container">
       <%- include('nav.ejs') %>
       <main>
-        <div class="py-5 text-center" id="header">
-          <img
-            class="d-block mx-auto mb-4"
-            src="/docs/5.2/assets/brand/bootstrap-logo.svg"
-            alt=""
-            width="72"
-            height="57"
-          />
-        </div>
+        <div class="py-5 text-center" id="header"></div>
 
         <div class="row g-5" id="form">
           <div class="col-md-7 col-lg-8 border rounded" id="border">
@@ -95,17 +104,52 @@
                 </div>
 
                 <div class="col-12">
-                  <label for="member" class="form-label">멤버</label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="member"
-                    placeholder="<%= members%>"
-                    name="member"
-                    required
-                  />
-                  <div class="invalid-feedback">Valid name is required.</div>
+                  <label for="member" class="form-label"
+                    >멤버 수정(직접 삭제)</label
+                  >
+
+                  <div class="members">
+                    <% for(let i = 0; i < posts.member.length; i++){ %>
+                    <div
+                      class="card card h-100"
+                      style="width: 11rem; margin-bottom: 10px"
+                    >
+                      <div class="card-body">
+                        <p class="card-text" id="members">
+                          <h7><%=posts.member[i].name%> </h7>
+                          <i
+                            class="bi bi-x-square-fill delete"
+                            id="<%=posts.member[i].email%>"
+                          ></i>
+                        </p>
+                      </div>
+                    </div>
+                    <% } %>
+                  </div>
                 </div>
+
+                <script>
+                  $(".delete").click(function (e) {
+                    let email = e.target.id;
+                    let name = e.target.parentNode.innerText;
+
+                    $.ajax({
+                      method: "DELETE",
+                      url: "/group/<%=param%>/group_update",
+                      data: { email, name },
+                    })
+                      .done(function (result) {
+                        console.log("성공했어요.");
+                        //삭제 대상을 안보이게 처리하는 루틴
+
+                        location.reload();
+                      })
+                      .fail(function (xhr, textStatus, errorThrown) {
+                        //요청 실패하면 여기
+                        console.log(xhr, textStatus, errorThrown);
+                      });
+                  });
+                </script>
 
                 <div class="col-12">
                   <label for="Notice" class="form-label">공지</label>
@@ -264,7 +308,7 @@
           formData.append("image", imageInput.files[0]);
 
           $.ajax({
-            method: "PUT",
+            method: "POST",
             url: "/group/<%=param%>/group_upload",
             data: formData,
           }).done((result) => {
