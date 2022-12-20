@@ -883,7 +883,7 @@ app.get("/group/:id", (req, res) => {
     { _id: ObjectId(myId) },
     function (err, result) {
       if (err) return console.log(err);
-      console.log(result);
+
       res.render("group_info.ejs", { posts: result, myId });
     }
   );
@@ -933,7 +933,7 @@ app.post("/group/:id/register", (req, res) => {
             { _id: ObjectId(myId) },
             function (err, result) {
               if (err) return console.log(err);
-              console.log(result);
+
               res.render("group_info.ejs", { posts: result, myId });
             }
           );
@@ -960,7 +960,7 @@ app.get("/group/:id/group_update", (req, res) => {
         for (let index in result.member) {
           names.push(result.member[index].name);
         }
-        console.log(result);
+
         res.render("group_update.ejs", {
           posts: result,
           members: names,
@@ -974,8 +974,7 @@ app.get("/group/:id/group_update", (req, res) => {
 });
 
 app.post("/group/:id/group_update", upload.single("Img"), (req, res) => {
-  let myId = req.params.id;
-
+  let names = [];
   db.collection("group").updateOne(
     {
       _id: ObjectId(req.params.id),
@@ -984,7 +983,6 @@ app.post("/group/:id/group_update", upload.single("Img"), (req, res) => {
       //$set은 값을 대체시켜주는 것
       $set: {
         name: req.body.name,
-        member: members,
         notice: req.body.Notice,
         intro: req.body.Description,
         img: req.file.filename,
@@ -994,11 +992,41 @@ app.post("/group/:id/group_update", upload.single("Img"), (req, res) => {
     function (err, result) {
       if (err) return console.log(err);
 
-      res.render("group_update.ejs", {
-        posts: result,
-        members: members,
-        param: myId,
+      for (let index in result.member) {
+        names.push(result.member[index].name);
+      }
+      res.redirect("/");
+    }
+  );
+});
+
+app.delete("/group/:id/group_update", (req, res) => {
+  console.log(req.body);
+  db.collection("group").findOne(
+    { _id: ObjectId(req.params.id) },
+    function (err, result) {
+      if (err) return console.log(err);
+      result.member.forEach((item, index) => {
+        if (item.email === req.body.email) {
+          result.member.splice(index, 1);
+        }
       });
+      console.log(result.member);
+      db.collection("group").updateOne(
+        {
+          _id: ObjectId(req.params.id),
+        },
+        {
+          //$set은 값을 대체시켜주는 것
+          $set: {
+            member: result.member,
+          },
+        },
+        function (err, result) {
+          if (err) return console.log(err);
+          console.log(result);
+        }
+      );
     }
   );
 });
