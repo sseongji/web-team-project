@@ -415,7 +415,8 @@ passport.deserializeUser((userid, done) => {
 });
 
 // 마이페이지 내가 쓴 글
-app.get("/mypage_post/:id", (req, res) => {
+app.get("/mypage_postpage/:id", (req, res) => {
+  console.log("마이페이지 게시물 조회 시작")
   console.log(req.user.nickname);
   if (req.isAuthenticated()) {
     db.collection("post")
@@ -431,7 +432,33 @@ app.get("/mypage_post/:id", (req, res) => {
             res.render("mypage_postpage.ejs", {
               posts: postResult,
               comments: commentResult,
-              loginUser: req.user,
+              userSession: req.user,
+            });
+          });
+      });
+  } else {
+    res.redirect("/login");
+  }
+});
+
+// 마이페이지 내가 쓴 댓글
+app.get("/mypage_commentpage/:id", (req, res) => {
+  console.log("마이페이지 게시물 조회 시작")
+  if (req.isAuthenticated()) {
+    db.collection("post")
+      .find()
+      .sort({ _id: -1 })
+      .toArray((err, postResult) => {
+        console.log({ postResult });
+        // post 게시물 id를 기준으로 그 게시물의 댓글들만 가져옴
+        db.collection("comment")
+          .find({ writer: new RegExp(req.user.nickname) })
+          .toArray((err, commentResult) => {
+            // 게시물, 댓글을 post.ejs로 전달
+            res.render("mypage_commentpage.ejs", {
+              posts: postResult,
+              comments: commentResult,
+              userSession: req.user,
             });
           });
       });
@@ -699,27 +726,8 @@ app.put("/edit", (req, res) => {
       if (err) return console.log(err);
       console.log(result);
       console.log("수정 완료");
+      // res.send("<script>history.go(-2);</script>"); => 새로고침이 안되서 못쓸듯
       res.redirect(`/group/${req.body.groupid}/group_postpage`);
-    }
-  );
-});
-
-// mypage에서 게시물 수정 url 진입
-app.get("/mypage_edit/:id", (req, res) => {
-  console.log("마이페이지 수정 화면으로 진입");
-  console.log(req.params);
-  let groupinfo = req.params;
-  console.log(req.params.id);
-
-  db.collection("post").findOne(
-    { _id: parseInt(req.params.id) },
-    function (err, result) {
-      if (err) return console.log(err);
-      console.log(result);
-      res.render("mypage_edit.ejs", {
-        post: result,
-        group: groupinfo,
-      });
     }
   );
 });
@@ -730,6 +738,7 @@ app.delete("/delete", (req, res) => {
   req.body._id = parseInt(req.body._id);
   // post에 저장된 _id, 로그인한 유저의 _id
   var deleteData = { _id: req.body._id, _id: req.body._id };
+  console.log(`deleteData : `)
   console.log(deleteData);
 
   // post에 저장된 _id, 로그인한 유저의 _id의 값이 동일하면 db에서 삭제 요청
@@ -757,6 +766,7 @@ app.delete("/deleteComment", (req, res) => {
   req.body._id = parseInt(req.body._id);
   // post에 저장된 _id, 로그인한 유저의 _id
   var deleteData = { _id: req.body._id, _id: req.body._id };
+  console.log(`deleteData : `)
   console.log(deleteData);
 
   // post에 저장된 _id, 로그인한 유저의 _id의 값이 동일하면 db에서 삭제 요청
