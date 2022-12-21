@@ -117,10 +117,12 @@
                       <div class="card-body">
                         <p class="card-text" id="members">
                           <h7><%=posts.member[i].name%> </h7>
-                          <i
-                            class="bi bi-x-square-fill delete"
+                          <button
+                            type="button"
+                            class="btn-close delete"
+                            aria-label="Close"
                             id="<%=posts.member[i].email%>"
-                          ></i>
+                          ></button>
                         </p>
                       </div>
                     </div>
@@ -132,17 +134,17 @@
                   $(".delete").click(function (e) {
                     let email = e.target.id;
                     let name = e.target.parentNode.innerText;
+                    var btnClick = $(this);
 
+                    btnClick.parents(".h-100").fadeOut();
                     $.ajax({
                       method: "DELETE",
                       url: "/group/<%=param%>/group_update",
                       data: { email, name },
                     })
                       .done(function (result) {
-                        console.log("성공했어요.");
                         //삭제 대상을 안보이게 처리하는 루틴
-
-                        location.reload();
+                        console.log(result);
                       })
                       .fail(function (xhr, textStatus, errorThrown) {
                         //요청 실패하면 여기

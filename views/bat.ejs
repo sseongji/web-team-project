@@ -71,12 +71,21 @@
               <div class="show-date-<%=hw.date.d%>"><%=hw.date.d%></div>
               <!-- <div id="<%=mem%>-<%=hw.date.d%>"></div> -->
               <div class="<%=hw.date.d%>" id="<%=mem%>-<%=hw.date.d%>">
+                <%if(idx + 1 === hw.date.d){%>
+
+                <i class="bi bi-square"></i>
+                <%} else {%>
+
+                <i class="bi bi-check-square-fill"></i>
+                <%}%>
+                <!-- <i class="bi bi-check-lg"></i>
+
                 <%if(mem in hw.success === true){%> <% if(hw.success[mem] ===
                 true) { %>
                 <i class="bi bi-check-square-fill"></i>
                 <%} else {%>
                 <i class="bi bi-square"></i>
-                <%}%> <%}%>
+                <%}%> <%}%> -->
                 <!-- <i class="bi bi-check-lg"></i> -->
               </div>
             </div>
@@ -105,7 +114,7 @@
 
       //오늘 날짜
       const today = nowdate.getDate();
-      // console.log(today)
+      // console.log(today);
 
       //오늘 날짜 강조
       $(".show-date-" + today).css("background-color", "#F16A6E");

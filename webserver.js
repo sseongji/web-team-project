@@ -419,7 +419,7 @@ app.get("/mypage_post/:id", (req, res) => {
   console.log(req.user.nickname);
   if (req.isAuthenticated()) {
     db.collection("post")
-      .find({writer: new RegExp(req.user.nickname)})
+      .find({ writer: new RegExp(req.user.nickname) })
       .sort({ _id: -1 })
       .toArray((err, postResult) => {
         console.log({ postResult });
@@ -469,7 +469,7 @@ app.get("/mypage_post/:id", (req, res) => {
 // });
 
 // post 게시판
-app.get("/group/:id/group_postpage", (req, res) => {  
+app.get("/group/:id/group_postpage", (req, res) => {
   console.log(`group.id : ${req.params.id}`);
   if (req.isAuthenticated()) {
     db.collection("post")
@@ -481,8 +481,8 @@ app.get("/group/:id/group_postpage", (req, res) => {
         db.collection("comment")
           .find()
           .toArray((err, commentResult) => {
-            db.collection("group")
-              .findOne( { _id: ObjectId(req.params.id) },
+            db.collection("group").findOne(
+              { _id: ObjectId(req.params.id) },
               (err, groupResult) => {
                 if (err) return console.log(err);
                 console.log({ groupResult });
@@ -492,8 +492,9 @@ app.get("/group/:id/group_postpage", (req, res) => {
                   comments: commentResult,
                   loginUser: req.user,
                   group: groupResult,
-                })
-            });
+                });
+              }
+            );
           });
       });
   } else {
@@ -669,8 +670,8 @@ app.post("/group/:id/addComment", (req, res) => {
 
 // 게시물 수정 url 진입
 app.get("/edit/:id", (req, res) => {
-  console.log("게시물 수정 화면으로 진입")
-  console.log(req.params)
+  console.log("게시물 수정 화면으로 진입");
+  console.log(req.params);
   let groupinfo = req.params;
   console.log(req.params.id);
 
@@ -680,7 +681,7 @@ app.get("/edit/:id", (req, res) => {
       if (err) return console.log(err);
       console.log(result);
       res.render("edit.ejs", {
-        post: result, 
+        post: result,
         group: groupinfo,
       });
     }
@@ -705,8 +706,8 @@ app.put("/edit", (req, res) => {
 
 // mypage에서 게시물 수정 url 진입
 app.get("/mypage_edit/:id", (req, res) => {
-  console.log("마이페이지 수정 화면으로 진입")
-  console.log(req.params)
+  console.log("마이페이지 수정 화면으로 진입");
+  console.log(req.params);
   let groupinfo = req.params;
   console.log(req.params.id);
 
@@ -716,7 +717,7 @@ app.get("/mypage_edit/:id", (req, res) => {
       if (err) return console.log(err);
       console.log(result);
       res.render("mypage_edit.ejs", {
-        post: result, 
+        post: result,
         group: groupinfo,
       });
     }
@@ -843,7 +844,11 @@ app.get("/search", (req, res) => {
 
 //그룹 생성 페이지
 app.get("/group_add", (req, res) => {
-  return res.render("group_sign.ejs");
+  if (req.isAuthenticated()) {
+    return res.render("group_sign.ejs");
+  } else {
+    res.redirect("/login");
+  }
 });
 
 //그룹 생성 과정
@@ -1185,6 +1190,7 @@ app.get("/group/:id/bat", (req, res) => {
           todayHomework: todayHomework,
           score: score,
           params: req.params.id,
+          idx: idx,
         });
       };
 
