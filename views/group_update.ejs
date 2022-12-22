@@ -104,29 +104,54 @@
                 </div>
 
                 <div class="col-12">
-                  <label for="member" class="form-label">멤버</label>
+                  <label for="member" class="form-label"
+                    >멤버 수정(직접 삭제)</label
+                  >
+
                   <div class="members">
                     <% for(let i = 0; i < posts.member.length; i++){ %>
                     <div
                       class="card card h-100"
                       style="width: 11rem; margin-bottom: 10px"
                     >
-                      <img class="card-img-top" />
                       <div class="card-body">
                         <p class="card-text" id="members">
                           <h7><%=posts.member[i].name%> </h7>
-                          <input
-                            class="form-check-input mt-0 delete"
-                            type="checkbox"
-                            value=""
-                            aria-label="Checkbox for following text input"
-                          />
+                          <button
+                            type="button"
+                            class="btn-close delete"
+                            aria-label="Close"
+                            id="<%=posts.member[i].email%>"
+                          ></button>
                         </p>
                       </div>
                     </div>
                     <% } %>
                   </div>
                 </div>
+
+                <script>
+                  $(".delete").click(function (e) {
+                    let email = e.target.id;
+                    let name = e.target.parentNode.innerText;
+                    var btnClick = $(this);
+
+                    btnClick.parents(".h-100").fadeOut();
+                    $.ajax({
+                      method: "DELETE",
+                      url: "/group/<%=param%>/group_update",
+                      data: { email, name },
+                    })
+                      .done(function (result) {
+                        //삭제 대상을 안보이게 처리하는 루틴
+                        console.log(result);
+                      })
+                      .fail(function (xhr, textStatus, errorThrown) {
+                        //요청 실패하면 여기
+                        console.log(xhr, textStatus, errorThrown);
+                      });
+                  });
+                </script>
 
                 <div class="col-12">
                   <label for="Notice" class="form-label">공지</label>
@@ -285,7 +310,7 @@
           formData.append("image", imageInput.files[0]);
 
           $.ajax({
-            method: "PUT",
+            method: "POST",
             url: "/group/<%=param%>/group_upload",
             data: formData,
           }).done((result) => {

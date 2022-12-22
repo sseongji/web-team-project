@@ -57,7 +57,7 @@
       <div class="row g-0">
         <div class="col-md-4">
           <img
-            src="/public/image/<%= posts.img %>"
+            src="/public/image/<%= group.img %>"
             class="img-fluid rounded"
             alt="..."
             style="height: 232px; width: 323px"
@@ -65,21 +65,21 @@
         </div>
         <div class="col-md-8">
           <div class="card-body" style="margin-left: 25px">
-            <h5 class="card-title"><%=posts.name %></h5>
+            <h5 class="card-title"><%=group.name %></h5>
 
             <p class="card-text" style="margin-top: 25px">
-              각오 : <%=posts.intro %>
+              각오 : <%=group.intro %>
             </p>
             <p class="card-text">
-              <small class="text-muted">#<%=posts.tag %></small>
-              <small class="text-muted">#<%=posts.member.length %>명</small>
+              <small class="text-muted">#<%=group.tag %></small>
+              <small class="text-muted">#<%=group.member.length %>명</small>
             </p>
-            <a class="btn btn-primary" href=" /group/<%=posts._id %>/register"
+            <a class="btn btn-primary" href=" /group/<%=group._id %>/register"
               >그룹 가입</a
             >
             <a
               class="btn btn-primary"
-              href=" /group/<%=posts._id %>/group_update"
+              href=" /group/<%=group._id %>/group_update"
               >그룹 수정</a
             >
           </div>
@@ -97,16 +97,16 @@
           >
             <ul class="navbar-nav">
               <li class="item nav-item">
-                <a class="nav-link" href="/group/<%=posts._id %>">정보</a>
+                <a class="nav-link" href="/group/<%=group._id %>">정보</a>
               </li>
               <li class="item nav-item">
                 <a class="nav-link" href="#">스터디</a>
               </li>
               <li class="item nav-item">
-                <a class="nav-link" href="/group/<%=posts._id%>/group_postpage">게시판</a>
+                <a class="nav-link" href="/group/<%=group._id%>/group_postpage">게시판</a>
               </li>
               <li class="item nav-item">
-                <a class="nav-link" href="/group/<%=posts._id%>/bat "
+                <a class="nav-link" href="/group/<%=group._id%>/bat "
                   >밭가꾸기</a
                 >
               </li>
@@ -117,37 +117,8 @@
       <hr id="line" class="my-1" style="width: 1130px" />
     </center>
 
-    <div class="group-info card-group">
-      <h3>참여인원</h3>
-      <div class="members">
-        <% for(let i = 0; i < posts.member.length; i++){ %>
-        <div class="card card h-100" style="width: 16rem">
-          <img class="card-img-top" />
-          <div class="card-body">
-            <p class="card-text"><%=posts.member[i].name%> %></p>
-          </div>
-        </div>
-        <% } %>
-      </div>
-    </div>
-
-    <div class="group-info">
-      <h3>소개 / 공지사항</h3>
-      <textarea
-        name=""
-        id=""
-        rows="10"
-        style="
-          max-width: 1000px;
-          margin-left: 23%;
-          margin-top: 25px;
-          height: 200px;
-          border-radius: 5px;
-        "
-      >
-      <%=posts.notice%>
-        </textarea
-      >
+    <%- include('group_post.ejs') %>
+    
     </div>
   </body>
 </html>
