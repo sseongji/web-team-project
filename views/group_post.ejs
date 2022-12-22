@@ -70,6 +70,9 @@
       .noneDisplay{
         display: none;
       }
+      .container{
+        width: 1130px;
+      }
     </style>
   </head>
   <body>
@@ -81,8 +84,8 @@
         <h2 class="ml-2 my-3" style="margin: auto;">게시판</h2>
       </div>
       <div class="container" style="display: flex;">
-        <a id="createToggle" class="btn btn-primary" href="#">글쓰기</a>
-        <a id="searchToggle" class="btn btn-primary" style="display: none;" href="#">검색</a>
+        <a id="createToggle" class="btn btn-primary" href="#" style="background-color: #F16A6E; border-color:#F16A6E;">글쓰기</a>
+        <a id="searchToggle" class="btn btn-primary" style="display: none; background-color: #F16A6E; border-color:#F16A6E;" href="#">검색</a>
       </div>
 
       <!-- 검색창 -->
@@ -93,7 +96,7 @@
           <option value="createdate">작성일</option>
         </select>
         <input id="searchInput" type="text" class="form-control" style="flex: 1;">
-        <button id="searchBtn" class="btn btn-success addBtn" >검색</button>
+        <button id="searchBtn" class="btn btn-success addBtn"  >검색</button>
       </div>
 
       <script>
@@ -136,8 +139,8 @@
               <h4 id="postContent"><%= posts[i].writer %> : <%= posts[i].content %></h4>
               <% if(posts[i].writer == loginUser.nickname){ %>
                 <div style="display: flex; flex-direction: row; margin-left: auto;">
-                  <a id="editBtn" class="btn btn-danger" href="/edit/<%= posts [i]._id %>">수정</a>
-                  <button class="btn btn-danger delete" data-id="<%= posts[i]._id %>" style="margin-left: 10px;">삭제</button>
+                  <a id="editBtn" class="btn btn-danger" href="/edit/<%= posts [i]._id %>" style="background-color: #F16A6E; border-color: #F16A6E;">수정</a>
+                  <button class="btn btn-danger delete" data-id="<%= posts[i]._id %>" style="margin-left: 10px; background-color: #F16A6E; border-color: #F16A6E;">삭제</button>
                 </div>
               <% } %>
             </div>
@@ -163,7 +166,7 @@
                     <div id="deleteOption">
                       날짜 : <%= comments[j].createdate %> <%= comments[j].createtime %>
                       <% if(comments[j].writer == loginUser.nickname){ %>
-                        <button class="btn btn-danger deleteComment" data-id="<%= comments[j]._id %>">삭제</button>
+                        <button class="btn btn-danger deleteComment" data-id="<%= comments[j]._id %>"  style="background-color: #F16A6E; border-color: #F16A6E;">삭제</button>
                       <% } %>
                     </div>
                     <p></p>
