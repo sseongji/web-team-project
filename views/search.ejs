@@ -4,18 +4,14 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css?family=Karma"
-    />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.1/font/bootstrap-icons.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
     <style>
       #album{
         width: 1130px;
-        margin-left: 20%;
+        margin: auto;
       }
+      
 
     </style>
 
@@ -34,15 +30,14 @@
           
             <h1 style="color: #4AB186;">모임에 참여해보세요!</h1>
       
-          <p style="display: flex; justify-content:flex-end;"><a href="./group_add">원하는 모임이 없으신가요?</a> </p>
+          <p style="display: flex; justify-content:flex-end;"><a href="./group_add" style="color: #F16A6E;">원하는 모임이 없으신가요?</a> </p>
         <div class="input-group mb-3"  style="padding: 2rem; background-color: rgba(255, 255, 255, 0.5); border: 1px solid #adb5bd;; border-radius: 5px;">
   
           <div class="input-group mb-3">
             <input type="text" id="search-input" class="form-control" placeholder="그룹 검색" aria-label="Recipient's username" aria-describedby="button-addon2">
-            <button class="btn btn-primary btn-lg " type="button" id="search">검색</button>
+            <button class="btn btn-primary btn-lg " type="button" id="search" style="background-color: #4AB186; border-color: #4AB186;">검색</button>
           </div>
             
-          </div>
         </div>
 
         <script>
@@ -55,7 +50,7 @@
           
         </section>
         
-        <div class="album py-5 bg-light" id="album">
+        <div class="album py-5 bg-white" id="album">
           <div class="container">
             <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
               <% for(var i = 0; i < posts.length; i++){ 
@@ -94,7 +89,7 @@
                         
                         <a href="/group/<%= posts[i]._id %>"><button
                           type="button"
-                          class="btn btn-sm btn-outline-secondary"
+                          class="btn btn-sm btn-outline-light" style="background-color: #F16A6E; border-color: #F16A6E;"
                         >참여하기 
                         </button>
                         </a> 
@@ -107,26 +102,11 @@
               <% } } %>
               </div>
             </div>
-          </div>
-         
         </div>
+         
       </main>
 
       
-
-        <footer class="my-5 pt-5 text-muted text-center text-small">
-    <p class="mb-1">&copy; 2017–2022 Company Name</p>
-    <ul class="list-inline">
-      <li class="list-inline-item"><a href="#">Privacy</a></li>
-      <li class="list-inline-item"><a href="#">Terms</a></li>
-      <li class="list-inline-item"><a href="#">Support</a></li>
-    </ul>
-  </footer>
-      <script>
-
-
-       
-      </script>
       <script
         src="/docs/5.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3"

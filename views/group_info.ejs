@@ -22,21 +22,20 @@
       }
 
       .group-info {
-        margin-top: 50px;
+        width: 1130px;
+        margin: auto;
+        padding-top: 50px;
         text-align: left;
         display: flex;
         flex-direction: column;
       }
 
       .group-info h3 {
-        margin-top: 20px;
-        margin-left: 23%;
+        padding-left: 40px;
       }
 
       .members {
         margin-top: 20px;
-        margin-left: 20%;
-        margin-right: 20%;
         display: flex;
         flex-wrap: wrap;
       }
@@ -50,104 +49,105 @@
   <body>
     <%- include('nav.ejs') %>
 
-    <div
-      class="card mb-3 container"
-      style="max-width: 1000px; margin-top: 30px; height: 250px; border: none"
-    >
-      <div class="row g-0">
-        <div class="col-md-4">
-          <img
-            src="/public/image/<%= posts.img %>"
-            class="img-fluid rounded"
-            alt="..."
-            style="height: 232px; width: 323px"
-          />
-        </div>
-        <div class="col-md-8">
-          <div class="card-body" style="margin-left: 25px">
-            <h5 class="card-title"><%=posts.name %></h5>
+    <div class="full">
+      <div
+        class="card mb-3 container"
+        style="max-width: 1000px; margin-top: 30px; height: 250px; border: none"
+      >
+        <div class="row g-0">
+          <div class="col-md-4">
+            <img
+              src="/public/image/<%= posts.img %>"
+              class="img-fluid rounded"
+              alt="..."
+              style="height: 232px; width: 323px"
+            />
+          </div>
+          <div class="col-md-8">
+            <div class="card-body" style="margin-left: 25px">
+              <h5 class="card-title"><%=posts.name %></h5>
 
-            <p class="card-text" style="margin-top: 25px">
-              각오 : <%=posts.intro %>
-            </p>
-            <p class="card-text">
-              <small class="text-muted">#<%=posts.tag %></small>
-              <small class="text-muted">#<%=posts.member.length %>명</small>
-            </p>
-            <a class="btn btn-primary" href=" /group/<%=posts._id %>/register"
-              >그룹 가입</a
-            >
-            <a
-              class="btn btn-primary"
-              href=" /group/<%=posts._id %>/group_update"
-              >그룹 수정</a
-            >
+              <p class="card-text" style="margin-top: 25px">
+                각오 : <%=posts.intro %>
+              </p>
+              <p class="card-text">
+                <small class="text-muted">#<%=posts.tag %></small>
+                <small class="text-muted">#<%=posts.member.length %>명</small>
+              </p>
+              <a class="btn btn-primary" href=" /group/<%=posts._id %>/register" style="background-color: #4AB186; border-color: #4AB186;"
+                >그룹 가입</a
+              >
+              <a
+                class="btn btn-primary"
+                href=" /group/<%=posts._id %>/group_update" style="background-color: #4AB186; border-color: #4AB186;"
+                >그룹 수정</a
+              >
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <center style="margin-top: 70px">
-      <hr id="line" class="my-1" style="width: 1130px" />
-      <nav class="navbar navbar-expand" id="navibar" style="width: 1130px">
-        <div class="container-fluid" style="margin-left: 60px">
-          <div
-            class="collapse navbar-collapse justify-content-start"
-            id="navbarNav"
-          >
-            <ul class="navbar-nav">
-              <li class="item nav-item">
-                <a class="nav-link" href="/group/<%=posts._id %>">정보</a>
-              </li>
-              <li class="item nav-item">
-                <a class="nav-link" href="#">스터디</a>
-              </li>
-              <li class="item nav-item">
-                <a class="nav-link" href="/group/<%=posts._id%>/group_postpage">게시판</a>
-              </li>
-              <li class="item nav-item">
-                <a class="nav-link" href="/group/<%=posts._id%>/bat "
-                  >밭가꾸기</a
-                >
-              </li>
-            </ul>
+      <center style="margin-top: 70px">
+        <hr id="line" class="my-1" style="width: 1130px" />
+        <nav class="navbar navbar-expand" id="navibar" style="width: 1130px">
+          <div class="container-fluid" style="margin-left: 60px">
+            <div
+              class="collapse navbar-collapse justify-content-start"
+              id="navbarNav"
+            >
+              <ul class="navbar-nav">
+                <li class="item nav-item">
+                  <a class="nav-link" href="/group/<%=posts._id %>">정보</a>
+                </li>
+                <li class="item nav-item">
+                  <a class="nav-link" href="#">스터디</a>
+                </li>
+                <li class="item nav-item">
+                  <a class="nav-link" href="/group/<%=posts._id%>/group_postpage">게시판</a>
+                </li>
+                <li class="item nav-item">
+                  <a class="nav-link" href="/group/<%=posts._id%>/bat "
+                    >밭가꾸기</a
+                  >
+                </li>
+              </ul>
+            </div>
           </div>
-        </div>
-      </nav>
-      <hr id="line" class="my-1" style="width: 1130px" />
-    </center>
+        </nav>
+        <hr id="line" class="my-1" style="width: 1130px" />
+      </center>
 
-    <div class="group-info card-group">
-      <h3>참여인원</h3>
-      <div class="members">
-        <% for(let i = 0; i < posts.member.length; i++){ %>
-        <div class="card card h-100" style="width: 16rem">
-          <img class="card-img-top" />
-          <div class="card-body">
-            <p class="card-text"><%=posts.member[i].name%> %></p>
+      <div class="group-info card-group">
+        <h3>참여인원</h3>
+        <div class="members">
+          <% for(let i = 0; i < posts.member.length; i++){ %>
+          <div class="card card h-100" style="width: 16rem">
+            <img class="card-img-top" />
+            <div class="card-body">
+              <p class="card-text"><%=posts.member[i].name%> %></p>
+            </div>
           </div>
+          <% } %>
         </div>
-        <% } %>
       </div>
-    </div>
 
-    <div class="group-info">
-      <h3>소개 / 공지사항</h3>
-      <textarea
-        name=""
-        id=""
-        rows="10"
-        style="
-          max-width: 1000px;
-          margin-left: 23%;
-          margin-top: 25px;
-          height: 200px;
-          border-radius: 5px;
-        "
-      >
-      <%=posts.notice%>
-        </textarea
-      >
+      <div class="group-info">
+        <h3>소개 / 공지사항</h3>
+        <textarea
+          name=""
+          id=""
+          rows="10"
+          style="
+            max-width: 1000px;
+            margin: 30px 0 0 50px;
+            height: 200px;
+            border-radius: 5px;
+          "
+        >
+        <%=posts.notice%>
+          </textarea
+        >
+      </div>
     </div>
   </body>
 </html>
